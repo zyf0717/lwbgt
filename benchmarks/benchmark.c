@@ -10,6 +10,7 @@
 #include <time.h>
 
 #define FIELD_COUNT 19
+#define LINE_CAPACITY 1024
 #define MAX_COHORTS 8
 
 typedef struct {
@@ -64,11 +65,11 @@ static Case *load_cases(const char *path, size_t *count_out)
 {
     FILE *stream = fopen(path, "r");
     if (!stream) fail("cannot open cases");
-    char *line = NULL; size_t line_size = 0, count = 0, capacity = 512;
-    if (getline(&line, &line_size, stream) < 0) fail("cases are empty");
+    char line[LINE_CAPACITY]; size_t count = 0, capacity = 512;
+    if (!fgets(line, sizeof(line), stream)) fail("cases are empty");
     Case *cases = calloc(capacity, sizeof(*cases));
     if (!cases) fail("allocation failed");
-    while (getline(&line, &line_size, stream) >= 0) {
+    while (fgets(line, sizeof(line), stream)) {
         line[strcspn(line, "\r\n")] = '\0';
         char *field[FIELD_COUNT];
         if (split(line, field) != FIELD_COUNT) fail("case width differs");
@@ -91,7 +92,7 @@ static Case *load_cases(const char *path, size_t *count_out)
         item->height = number(field[16]); item->delta = number(field[17]);
         item->urban = (int)integer(field[18]);
     }
-    free(line); fclose(stream);
+    if (ferror(stream) || fclose(stream)) fail("cannot read cases");
     if (!count) fail("no benchmark cases");
     *count_out = count;
     return cases;
@@ -113,7 +114,12 @@ static void pin_cpu(void)
 static double now(void)
 {
     struct timespec value;
-    if (clock_gettime(CLOCK_MONOTONIC_RAW, &value)) fail("clock failed");
+#ifdef CLOCK_MONOTONIC_RAW
+    const clockid_t clock_id = CLOCK_MONOTONIC_RAW;
+#else
+    const clockid_t clock_id = CLOCK_MONOTONIC;
+#endif
+    if (clock_gettime(clock_id, &value)) fail("clock failed");
     return value.tv_sec + value.tv_nsec * 1e-9;
 }
 
