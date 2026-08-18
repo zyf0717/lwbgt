@@ -21,9 +21,9 @@
     "floating_point_flags": "-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing"
   },
   "results": {
-    "overall_speedup": 1.2480815296334145,
+    "overall_speedup": 1.2486714033422681,
     "slowest_cohort": "nasa-power",
-    "slowest_cohort_speedup": 1.211243299348596
+    "slowest_cohort_speedup": 1.210023327256411
   },
   "source": {
     "benchmark_sha256": "9d264acde0bd22e5c23cba9215ce932c3ad4511841bb8465648dc475ffbba3b4",
@@ -32,7 +32,7 @@
     "compare_harness_sha256": "67756b76beadf9e40854cdcdafc0cface98bc8368312b527015ec17ca4164f52",
     "ffi_header_sha256": "188e0d7e0d92a73bcc2f53f79b01195f362b078408bc1eb8fc0c2e16d8021742",
     "ffi_source_sha256": "9b29013b15d17b964d940ac0fc6aca9d7faae8c99df941fc63102710bbeae00a",
-    "measured_tree_commit": "34cff95a534d603660195d7b2b42d4198634789f",
+    "measured_tree_commit": "cd7f986f16c8bcddea34e03a4d7580fa2acad7e5",
     "case_generator_sha256": "94aeafbbadf04e192d38434ba80215ff26ce8dc338f04410ec7978c8185ab876"
   }
 }

@@ -35,7 +35,7 @@ measurement parity and per-cohort noise.
 | Optimizations 1+2 | GCC 16.2.0 container | 1.159× | 1.141× | failed |
 | Optimizations 1+2+3 | GCC 13.3.0 host | 1.316× | 1.279× | passed |
 | Optimizations 1+2+3 | GCC 16.2.0 container | 1.289× | 1.253× | passed |
-| v0.2.0 PIC static build | GCC 13.3.0 host | 1.248× | 1.211× | passed |
+| v0.2.0 PIC static build | GCC 13.3.0 host | 1.249× | 1.210× | passed |
 
 All measured cohorts exceed the no-regression floor. The v0.1.0 candidate
 passes the unchanged 1.20× overall gate on both required compilers. The v0.2.0

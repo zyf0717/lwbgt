@@ -12,7 +12,7 @@
 - Verified the final static and shared artifacts on Linux/GCC,
   macOS/AppleClang, and Windows/MinGW, including installed consumers and all
   three language examples.
-- Revalidated the position-independent static build at 1.248× overall median
+- Revalidated the position-independent static build at 1.249× overall median
   throughput with exact compatibility and all release gates passing.
 
 ## v0.1.0 — 2026-08-18

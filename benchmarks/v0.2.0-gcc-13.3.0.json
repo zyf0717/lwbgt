@@ -1,58 +1,58 @@
 {
   "cohorts": {
     "domain-edge": {
-      "candidate_median_rows_s": 126434.79787744403,
-      "candidate_relative_mad": 0.0025542386777901113,
+      "candidate_median_rows_s": 126235.74941486646,
+      "candidate_relative_mad": 0.002405617353641619,
       "gate": 0.98,
       "passed": true,
-      "reference_median_rows_s": 100649.42789227463,
-      "reference_relative_mad": 0.007033056655195023,
-      "speedup": 1.2561899309826932
+      "reference_median_rows_s": 101101.21978402926,
+      "reference_relative_mad": 0.00344242694518144,
+      "speedup": 1.2486075804478833
     },
     "era5": {
-      "candidate_median_rows_s": 183579.96476303742,
-      "candidate_relative_mad": 0.0038622408088600465,
+      "candidate_median_rows_s": 183166.53717526383,
+      "candidate_relative_mad": 0.005707678928716041,
       "gate": 0.98,
       "passed": true,
-      "reference_median_rows_s": 144218.618824224,
-      "reference_relative_mad": 0.008551599447423664,
-      "speedup": 1.2729283240937683
+      "reference_median_rows_s": 145182.65741712434,
+      "reference_relative_mad": 0.005630496025970801,
+      "speedup": 1.2616282167160502
     },
     "hsb-generated": {
-      "candidate_median_rows_s": 182743.19552577854,
-      "candidate_relative_mad": 0.0013252694534817285,
+      "candidate_median_rows_s": 182754.29922424105,
+      "candidate_relative_mad": 0.004301276159852415,
       "gate": 0.98,
       "passed": true,
-      "reference_median_rows_s": 146306.421057576,
-      "reference_relative_mad": 0.005427637357319581,
-      "speedup": 1.2490442607017471
+      "reference_median_rows_s": 145694.43814932753,
+      "reference_relative_mad": 0.002062177532641658,
+      "speedup": 1.2543670269480673
     },
     "matrix": {
-      "candidate_median_rows_s": 197997.78770278368,
-      "candidate_relative_mad": 0.0002949983984593772,
+      "candidate_median_rows_s": 197911.49859228512,
+      "candidate_relative_mad": 0.0002068937979182935,
       "gate": 0.98,
       "passed": true,
-      "reference_median_rows_s": 159093.92386442496,
-      "reference_relative_mad": 0.0002601300562978065,
-      "speedup": 1.244533938778903
+      "reference_median_rows_s": 158801.8196844982,
+      "reference_relative_mad": 0.0007171181316209883,
+      "speedup": 1.2462797906566099
     },
     "nasa-power": {
-      "candidate_median_rows_s": 242948.71682274822,
-      "candidate_relative_mad": 0.003914590813641794,
+      "candidate_median_rows_s": 242792.40503395305,
+      "candidate_relative_mad": 0.008389071488401725,
       "gate": 0.98,
       "passed": true,
-      "reference_median_rows_s": 200577.96559403508,
-      "reference_relative_mad": 0.005103033368379052,
-      "speedup": 1.211243299348596
+      "reference_median_rows_s": 200651.01189780943,
+      "reference_relative_mad": 0.005281799038131307,
+      "speedup": 1.210023327256411
     },
     "overall": {
-      "candidate_median_rows_s": 198074.969419647,
-      "candidate_relative_mad": 0.00030809254460525476,
+      "candidate_median_rows_s": 197741.62334126906,
+      "candidate_relative_mad": 6.472710503524594e-05,
       "gate": 1.2,
       "passed": true,
-      "reference_median_rows_s": 158703.54998188734,
-      "reference_relative_mad": 0.0002723752806130911,
-      "speedup": 1.2480815296334145
+      "reference_median_rows_s": 158361.61764574898,
+      "reference_relative_mad": 0.0006757113828901074,
+      "speedup": 1.2486714033422681
     }
   },
   "iterations_per_case": 200,
