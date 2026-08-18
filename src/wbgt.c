@@ -373,6 +373,7 @@ int	rad;		/* switch to enable/disable radiative heating;
 		Fatm, /* radiative heating term */
 		esat(), dew_point(), h_cylinder_in_air(), 
 		viscosity(), diffusivity(), evap(), emis_atm();
+	double	Fatm_base, solar_base;
 		
 	int	converged, iter;
 	
@@ -385,6 +386,12 @@ int	rad;		/* switch to enable/disable radiative heating;
 	eair = rh * esat(Tair,0);
 	Tdew = dew_point(eair,0);
 	Twb_prev = Tdew; /* first guess is the dew point temperature */
+	/* Modified by Yifei/HeatStressDev: hoist loop-invariant radiation work. */
+	if ( rad ) {
+		Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
+		solar_base = (1.-ALB_WICK) * solar *
+		       ( (1.-fdir)*(1.+0.25*D_WICK/L_WICK) + fdir*((tan(sza)/PI)+0.25*D_WICK/L_WICK) + ALB_SFC );
+	}
 	converged = FALSE;
 	iter = 0;
 	do {
@@ -393,9 +400,8 @@ int	rad;		/* switch to enable/disable radiative heating;
 		h = h_cylinder_in_air(D_WICK, L_WICK, Tref, Pair, speed);
 		if ( rad )
 			Fatm = STEFANB * EMIS_WICK *
-			       ( 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) ) - pow(Twb_prev,4.) )
-			     + (1.-ALB_WICK) * solar *
-			       ( (1.-fdir)*(1.+0.25*D_WICK/L_WICK) + fdir*((tan(sza)/PI)+0.25*D_WICK/L_WICK) + ALB_SFC );
+			       ( Fatm_base - pow(Twb_prev,4.) )
+			     + solar_base;
 		else
 			Fatm = 0.0f;
 		ewick = esat(Twb_prev,0);
@@ -469,11 +475,16 @@ float Tair,		/* air (dry bulb) temperature, degC						*/
 {
 	float	Tsfc, Tref, Tglobe_prev, Tglobe_new, h,
 		h_sphere_in_air(), emis_atm();
+	double	Fatm_base, solar_base;
 		
 	int	converged, iter;
 	
 	Tsfc = Tair;
 	Tglobe_prev = Tair; /* first guess is the air temperature */
+	/* Modified by Yifei/HeatStressDev: hoist loop-invariant radiation work. */
+	Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
+	solar_base = solar/(2.*STEFANB*EMIS_GLOBE)*(1.-ALB_GLOBE)*
+		     (fdir*(1./(2.*cza)-1.)+1.+ ALB_SFC);
 	converged = FALSE;
 	iter = 0;
 	do {
@@ -481,9 +492,9 @@ float Tair,		/* air (dry bulb) temperature, degC						*/
 		Tref = 0.5*( Tglobe_prev + Tair );	/* evaluate properties at the average temperature */
 		h = h_sphere_in_air(D_GLOBE, Tref, Pair, speed);
 		Tglobe_new = pow( 
-				0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) )
+				Fatm_base
 				- h/(STEFANB*EMIS_GLOBE)*(Tglobe_prev - Tair)
-				+ solar/(2.*STEFANB*EMIS_GLOBE)*(1.-ALB_GLOBE)*(fdir*(1./(2.*cza)-1.)+1.+ ALB_SFC)
+				+ solar_base
 				, 0.25);
 		if ( fabs(Tglobe_new-Tglobe_prev) < CONVERGENCE ) converged = TRUE;
 		Tglobe_prev = 0.9*Tglobe_prev + 0.1*Tglobe_new;
