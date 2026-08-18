@@ -4,9 +4,8 @@
 WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
 behaviour while eliminating demonstrably repeated or dead work.
 
-**Release status: v0.2.1 development.** v0.2.0 is the current public release;
-v0.1.0 is the frozen scalar-compatibility release. Its complete permitted
-optimization set measures
+**Release status: v0.2.1.** v0.1.0 is the frozen scalar-compatibility release.
+Its complete permitted optimization set measures
 1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
 The v0.2.0 position-independent static build measures 1.249× on the GCC 13
 host. All three results exceed the mandatory 1.20× gate with exact

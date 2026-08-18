@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — v0.2.1
+## v0.2.1 — 2026-08-18
 
 - Licensed project-authored files under Apache-2.0 while preserving the
   Liljegren-derived numerical files under their UChicago Argonne terms.
