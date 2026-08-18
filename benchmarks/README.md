@@ -19,6 +19,9 @@ The checked-in baseline used:
 - Iterations: 200 per case per execution
 - Repetitions: 7
 
+Exact host, compiler, container image, affinity, source, and harness metadata
+for the final runs is recorded in `optimization-3-environment.json`.
+
 `baseline-gcc-13.3.0.json` compares two byte-identical source builds. Its 1.20×
 overall gate is expected to fail before optimization; the baseline establishes
 measurement parity and per-cohort noise.

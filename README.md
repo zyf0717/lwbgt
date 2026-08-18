@@ -1,13 +1,15 @@
 # lwbgt
 
-`lwbgt` is a source-derived, performance-focused C library based on the
-Liljegren WBGT v1.1 reference source. The intended v0.1.0 preserves the original
-scalar ABI and numerical behaviour while eliminating demonstrably dead work.
+`lwbgt` is a drop-in-compatible, source-derived optimization of the Liljegren
+WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
+behaviour while eliminating demonstrably repeated or dead work.
 
 **Release status: v0.1.0 release candidate.** The complete permitted
 optimization set measures 1.316× on the primary GCC 13 benchmark and 1.289× in
 the GCC 16.2 container, above the mandatory 1.20× gate with exact compatibility.
-No `v0.1.0` tag has been created yet.
+This is a narrowly supported 29–32% measured throughput improvement on those
+tested environments, not a broader portability or workload claim. No `v0.1.0`
+tag has been created yet.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
@@ -25,13 +27,17 @@ The build produces the static library `liblwbgt.a` and installs `lwbgt.h`.
 Core compilation is GNU89 with `-fno-fast-math -ffp-contract=off
 -fno-strict-aliasing`; LTO and architecture-specific flags are not enabled.
 
-## Compatibility contract
+## Supported API and compatibility contract
 
-The callable `calc_wbgt` and `esat` symbols and their declarations in
-`include/lwbgt.h` are permanent compatibility ABI. Scalar floating-point
-arguments use `double` at the ABI boundary because the original K&R `float`
-parameters undergo default argument promotion; output pointers remain
-`float *`.
+Only the callable `calc_wbgt` and `esat` symbols declared in `include/lwbgt.h`
+are the supported public API, and their declarations are the permanent
+compatibility ABI. Scalar floating-point arguments use `double` at the ABI
+boundary because the original K&R `float` parameters undergo default argument
+promotion; output pointers remain `float *`.
+
+The static archive retains global helper symbols inherited from the source
+implementation. They are link-visible implementation details, not supported
+API. The exported-symbol review is recorded in `tests/API.md`.
 
 The exact upstream source is retained unmodified at
 `upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained

@@ -1,11 +1,15 @@
-# HeatStressBench compatibility proof
+# Final HeatStressBench compatibility proof
 
 - Checkout: `/home/yifei/repos/HeatStressBench`
 - Commit: `59224f7b2e8f49d8ffd6cf97ae8cf7cdb927630b`
+- lwbgt clean-checkout commit: `0b5406ca34d1a5ec65ea697ceeee9ba767b86e4b`
+- Compiler: GCC 16.2.0
+- Core flags: GNU89, `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`
+- Adapter flags: C11, `-O2 -fno-fast-math -ffp-contract=off -Wall -Wextra -Werror`
 - Adapter sources were not modified.
-- Compile flags matched the frozen target recipe.
+- Compile flags matched the frozen `liljegren-c` target recipe.
 - Each adapter object was linked once with the unmodified reference archive and
-  once with `liblwbgt.a`; the archive was the only changed link input.
+  once with final `liblwbgt.a`; the archive was the only changed link input.
 
 Unchanged adapter source SHA-256 values:
 
@@ -15,17 +19,17 @@ Unchanged adapter source SHA-256 values:
 | `adapter-realistic.c` | `7e9b49976125941366ff20e4aae1cc9e9f359a712c4afec2066e112ddbdecaa3` |
 | `decomposition-adapter.c` | `85d24742f002d664b7214c2838e09d38e9345451840d3271c9b6fc8e66c3006b` |
 
-Result CSVs were byte-identical between reference and derivative:
+All three adapter sources compiled unchanged. Result CSVs were byte-identical
+between reference and final derivative:
 
-| Path | Result SHA-256 |
-|---|---|
-| Generated sample | `727907d0e105422251b65bd9e7ef5caf29589d28b5a9925753ad84993e5d2eee` |
-| Decomposition sample | `0b75461093e03437110054ae55509f9550afc096a39a8e010ee632927abf11c6` |
-| NASA POWER representative sample | `a0e6f80ad4216a10e5f6b79a7d146b4003f8f8f39e8d2efb746125bb47c3a397` |
-| ERA5 representative sample | `fa1e09f4160d00e2bc9863632fa3e4074e193882637b9f7e83bba173b3ce2967` |
+| Adapter/path | Rows | Result SHA-256 |
+|---|---:|---|
+| `adapter.c`, generated | 47 | `0a438e15e5a2520fe2318651ab5d7ead7cb23710c325a5a8e809f34dc9d55c85` |
+| `adapter.c`, decomposition | 8,217 | `c9e1417538941098c3cdb05f9ad979d1cb2f21d602ed8d9a717f14863214d790` |
+| `decomposition-adapter.c`, components | 8,217 | `259e452d446995072cd26184e5489558a2a30d90285b3d78f8672dd2b2910d31` |
+| `adapter-realistic.c`, NASA POWER | 256 | `cbeecd280e954bacd49ad727b26834c773aba1c8a342af8a629d149d08a6c5e0` |
+| `adapter-realistic.c`, ERA5 | 256 | `b5a67503f1a3cf71ab39ff76c9adff5007fe9895691429cd3b6edb85a5cfc49c` |
 
-The three existing C adapter sources compile and link unchanged. The existing
-shell scripts and CSV schemas were not changed. A separate HeatStressBench
-`lwbgt` target and container manifest were intentionally not added because the
-mandatory performance gate failed; the frozen canonical `liljegren-c` target
-remains untouched.
+The existing shell scripts, adapter sources, and CSV schemas were not changed.
+The frozen canonical `liljegren-c` target remains the behavioural oracle and
+was not replaced or relabelled.

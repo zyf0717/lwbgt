@@ -21,3 +21,6 @@ bit-identical and every benchmark cohort exceeds 1.25×.
 - Proved that all three existing HeatStressBench C adapters compile unchanged
   and produce byte-identical generated, decomposition, NASA POWER sample, and
   ERA5 sample results when only the link input changes.
+- Audited the static archive export surface and fixed the permanent supported
+  API at `calc_wbgt` and `esat`; inherited helper exports remain implementation
+  details.
