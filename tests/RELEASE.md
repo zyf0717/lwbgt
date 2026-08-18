@@ -8,6 +8,12 @@ was cloned locally with `git clone --no-hardlinks` into a separate clean
 checkout. The checkout reported no tracked or untracked changes before the
 release build.
 
+After the release documentation was assembled, finalized commit
+`1db2c56943ae793dfdac4520b84d05bfef6c64ae` was cloned into a second clean
+checkout. The complete build, CTest, explicit differential test, and frozen
+HeatStressBench adapter checks below were repeated successfully with identical
+results. The subsequent evidence-only commit changes no library or test code.
+
 The clean-checkout verification was:
 
 ```sh
