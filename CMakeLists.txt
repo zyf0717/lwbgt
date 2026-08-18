@@ -163,12 +163,25 @@ if(BUILD_TESTING)
                     LWBGT_R_REAL_EXECUTABLE "${LWBGT_R_EXECUTABLE}" REALPATH
                 )
                 get_filename_component(LWBGT_R_BIN_DIR "${LWBGT_R_REAL_EXECUTABLE}" DIRECTORY)
-                get_filename_component(LWBGT_R_HOME "${LWBGT_R_BIN_DIR}" DIRECTORY)
-                set(LWBGT_R_CPPFLAGS_LIST "-I${LWBGT_R_HOME}/include")
-                set(LWBGT_R_LIBRARIES "${LWBGT_R_HOME}/lib/libR.dylib")
-                if(NOT EXISTS "${LWBGT_R_LIBRARIES}")
-                    message(FATAL_ERROR "Cannot locate libR.dylib below ${LWBGT_R_HOME}")
+                find_path(LWBGT_R_INCLUDE_DIR R.h
+                    HINTS
+                        /Library/Frameworks/R.framework/Resources/include
+                        "${LWBGT_R_BIN_DIR}/../include"
+                        /Applications/R.app/Contents/Resources/include
+                    NO_DEFAULT_PATH
+                )
+                find_library(LWBGT_R_LIBRARY R
+                    HINTS
+                        /Library/Frameworks/R.framework/Resources/lib
+                        "${LWBGT_R_BIN_DIR}/../lib"
+                        /Applications/R.app/Contents/Resources/lib
+                    NO_DEFAULT_PATH
+                )
+                if(NOT LWBGT_R_INCLUDE_DIR OR NOT LWBGT_R_LIBRARY)
+                    message(FATAL_ERROR "Cannot locate the macOS R headers and runtime library")
                 endif()
+                set(LWBGT_R_CPPFLAGS_LIST "-I${LWBGT_R_INCLUDE_DIR}")
+                set(LWBGT_R_LIBRARIES "${LWBGT_R_LIBRARY}")
             else()
                 execute_process(
                     COMMAND "${LWBGT_R_EXECUTABLE}" CMD config --cppflags
