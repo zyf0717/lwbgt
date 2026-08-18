@@ -55,7 +55,10 @@ set_target_properties(lwbgt_shared PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 if(WIN32)
-    set_target_properties(lwbgt_shared PROPERTIES ARCHIVE_OUTPUT_NAME lwbgt_dll)
+    set_target_properties(lwbgt_shared PROPERTIES
+        ARCHIVE_OUTPUT_NAME lwbgt_dll
+        PREFIX ""
+    )
     target_sources(lwbgt_shared PRIVATE cmake/lwbgt.def)
 elseif(APPLE)
     target_link_options(lwbgt_shared PRIVATE
