@@ -1,0 +1,62 @@
+{
+  "cohorts": {
+    "domain-edge": {
+      "candidate_median_rows_s": 113726.66633285131,
+      "candidate_relative_mad": 0.0015406089924086053,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 100027.26988154788,
+      "reference_relative_mad": 0.004702197093630697,
+      "speedup": 1.136956616605914
+    },
+    "era5": {
+      "candidate_median_rows_s": 165835.0729431014,
+      "candidate_relative_mad": 0.007628120942888577,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 143609.76077544427,
+      "reference_relative_mad": 0.009690075980431489,
+      "speedup": 1.154761849387172
+    },
+    "hsb-generated": {
+      "candidate_median_rows_s": 166826.19418176715,
+      "candidate_relative_mad": 0.005941040875066996,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 145185.24009032547,
+      "reference_relative_mad": 0.003787652978803985,
+      "speedup": 1.1490575355867991
+    },
+    "matrix": {
+      "candidate_median_rows_s": 180580.2487350076,
+      "candidate_relative_mad": 0.0005190675472530081,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 159183.32234535238,
+      "reference_relative_mad": 0.0018579418387986895,
+      "speedup": 1.1344168853520598
+    },
+    "nasa-power": {
+      "candidate_median_rows_s": 223713.89670799742,
+      "candidate_relative_mad": 0.01235550352102715,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 197953.94727374945,
+      "reference_relative_mad": 0.012526962707539507,
+      "speedup": 1.130131021831177
+    },
+    "overall": {
+      "candidate_median_rows_s": 180138.14354129185,
+      "candidate_relative_mad": 0.0002391475169403538,
+      "gate": 1.2,
+      "passed": false,
+      "reference_median_rows_s": 158862.78028686217,
+      "reference_relative_mad": 0.0008022099690360989,
+      "speedup": 1.13392289380818
+    }
+  },
+  "iterations_per_case": 200,
+  "method": "single-thread, pinned CPU, one warm-up, interleaved executions",
+  "passed": false,
+  "repetitions": 7
+}

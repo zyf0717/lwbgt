@@ -433,15 +433,19 @@ float	diameter,	/* cylinder diameter, m								*/
 			 c = 0.4;
 			 
 	float	density,
+		mu,
+		conductivity,
 		Re,	/* Reynolds number								*/
 		Nu,	/* Nusselt number									*/
-		viscosity(),
-		thermal_cond();
+		viscosity();
 		
+	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
+	mu = viscosity(Tair);
 	density = Pair * 100. / ( R_AIR * Tair );
-	Re = max(speed,MIN_SPEED) * density * diameter / viscosity(Tair);
+	Re = max(speed,MIN_SPEED) * density * diameter / mu;
 	Nu = b * pow(Re,(1.-c)) * pow(Pr,(1.-a));
-	return( Nu * thermal_cond(Tair) / diameter );
+	conductivity = ( Cp + 1.25 * R_AIR ) * mu;
+	return( Nu * conductivity / diameter );
 }
  
 /* ============================================================================
@@ -507,15 +511,19 @@ float	diameter,	/* sphere diameter, m							*/
 	
 {
 	float	density,
+		mu,
+		conductivity,
 		Re,	/* Reynolds number							*/
 		Nu,	/* Nusselt number								*/
-		viscosity(),
-		thermal_cond();
+		viscosity();
 		
+	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
+	mu = viscosity(Tair);
 	density = Pair * 100. / ( R_AIR * Tair );
-	Re = max(speed,MIN_SPEED) * density * diameter / viscosity(Tair);
+	Re = max(speed,MIN_SPEED) * density * diameter / mu;
 	Nu = 2.0 + 0.6 * sqrt(Re) * pow(Pr,0.3333);
-	return( Nu * thermal_cond(Tair) / diameter );
+	conductivity = ( Cp + 1.25 * R_AIR ) * mu;
+	return( Nu * conductivity / diameter );
 }
  
 
