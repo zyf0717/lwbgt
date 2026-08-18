@@ -1,0 +1,1 @@
+The complete upstream source licence will be copied with the vendored source.
