@@ -1,8 +1,11 @@
 # lwbgt
 
-`lwbgt` is a drop-in-compatible, source-derived optimization of the Liljegren
-WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
-behaviour while eliminating demonstrably repeated or dead work.
+`lwbgt` is a stable, low-level C/FFI computational kernel for Liljegren outdoor
+WBGT. Derived from the Liljegren WBGT v1.1 C implementation, it preserves the
+original scalar ABI and documented numerical behaviour while removing
+demonstrably repeated or dead work. It is intended to be embedded as a
+numerical backend by higher-level scientific packages, services, and
+high-throughput data pipelines.
 
 **Release status: v0.2.1.** v0.1.0 is the frozen scalar-compatibility release.
 Its complete permitted optimization set measures
@@ -14,6 +17,41 @@ documented environments and workloads, not broader portability claims.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
+
+## Purpose
+
+`lwbgt` owns the numerical Liljegren calculation, stable C/FFI contracts,
+reproducible compatibility evidence, and low-level static/shared-library
+distribution. Higher-level callers own table and dataframe APIs,
+meteorological data ingestion, unit conversion beyond the documented ABI,
+missing-data policy, additional domain validation, classification and advisory
+systems, orchestration and parallelism, and application-specific defaults.
+This narrow boundary is intentional.
+
+```text
+Applications / research pipelines
+              |
+      Python / R / Julia / services
+              |
+            lwbgt
+              |
+   Liljegren WBGT numerical model
+```
+
+## When to use lwbgt
+
+Use `lwbgt` when you need a stable C or FFI Liljegren backend; behaviour
+anchored to the original Liljegren C implementation; an embedded WBGT kernel
+for another package or service; high-volume calculation with preprocessing
+kept outside the kernel; or an auditable, reference-compatible numerical
+backend within the documented compatibility scope.
+
+## When not to use lwbgt directly
+
+A higher-level package is more appropriate when the primary requirement is
+dataframe-oriented ergonomics, automatic weather-data preprocessing, policy or
+heat-risk classifications, a batteries-included Python/R/Julia API, or GPU/JAX
+execution.
 
 ## Build and install
 
@@ -47,17 +85,22 @@ The v1 FFI ABI adds fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1`
 structures and `lwbgt_calc_batch_v1`. The batch call executes scalar calls in
 input order. It returns the supplied wind as the effective 2-m wind when no
 height conversion is needed, avoiding the legacy scalar routine's untouched
-output-pointer behavior. Independent calls using separate buffers are
-thread-safe; the batch function itself is serial.
+output-pointer behavior. It performs no allocation, retains no caller pointers,
+and introduces no domain validation, clamping, unit conversion, or
+missing-value policy beyond inherited scalar behaviour. Input and output arrays
+must not overlap. Independent calls using separate buffers are thread-safe; a
+single batch call is serial.
 
 The shared library exports only `calc_wbgt`, `esat`, and
 `lwbgt_calc_batch_v1`. The static archive retains global helper symbols inherited
 from the source implementation; they remain unsupported implementation details.
 The exported-symbol review is recorded in `tests/API.md`.
 
-Minimal Python, R, and Julia examples are under `examples/`. They are tested
-interoperability examples, not maintained PyPI, CRAN, or Julia registry
-packages, and they make no compatibility claim for third-party wrappers.
+Minimal Python, R, and Julia examples under `examples/` demonstrate the intended
+integration pattern: higher-level language packages can bind the stable ABI
+while owning their user-facing policies. They are tested interoperability
+examples, not maintained PyPI, CRAN, or Julia registry packages, and they make
+no compatibility claim for third-party wrappers.
 
 The exact upstream source is retained unmodified at
 `upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained

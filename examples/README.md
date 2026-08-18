@@ -1,7 +1,11 @@
 # Language binding examples
 
 These dependency-light examples call the versioned `lwbgt_calc_batch_v1` C ABI.
-They are interoperability checks and starting points, not registry packages.
+They demonstrate the intended integration pattern: higher-level language
+packages can bind the stable ABI while owning their user-facing policies. They
+are tested interoperability checks and starting points, not maintained PyPI,
+CRAN, or Julia registry packages, and they make no compatibility commitment for
+third-party wrappers.
 
 Build the shared library and run every installed-language example through CTest:
 
