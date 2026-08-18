@@ -1,6 +1,16 @@
 # Changelog
 
-## Unreleased — v0.1.0 release candidate
+## Unreleased — v0.2.0
+
+- Added the fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1` structures and
+  serial `lwbgt_calc_batch_v1` FFI entry point without changing the scalar ABI.
+- Added versioned shared-library builds with a three-symbol dynamic export
+  surface while retaining the existing static archive.
+- Added dependency-light Python, R, and Julia examples and made them release
+  gates on Linux/GCC, macOS/Clang, and Windows/MinGW CI.
+- Added relocatable CMake and `pkg-config` installation metadata.
+
+## v0.1.0 — 2026-08-18
 
 The release gate passes with 1.316× median single-thread throughput on GCC
 13.3.0 and 1.289× on GCC 16.2.0. All 454 compatibility cases remain

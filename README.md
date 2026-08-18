@@ -4,12 +4,12 @@
 WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
 behaviour while eliminating demonstrably repeated or dead work.
 
-**Release status: v0.1.0 release candidate.** The complete permitted
-optimization set measures 1.316× on the primary GCC 13 benchmark and 1.289× in
-the GCC 16.2 container, above the mandatory 1.20× gate with exact compatibility.
-This is a narrowly supported 29–32% measured throughput improvement on those
-tested environments, not a broader portability or workload claim. No `v0.1.0`
-tag has been created yet.
+**Release status: v0.2.0 development.** v0.1.0 is the frozen scalar-compatibility
+release. Its complete permitted optimization set measures 1.316× on the primary
+GCC 13 benchmark and 1.289× in the GCC 16.2 container, above the mandatory
+1.20× gate with exact compatibility. This is a narrowly supported 29–32%
+measured throughput improvement on those tested environments, not a broader
+portability or workload claim.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
@@ -23,21 +23,37 @@ ctest --test-dir build --output-on-failure
 cmake --install build --prefix /desired/prefix
 ```
 
-The build produces the static library `liblwbgt.a` and installs `lwbgt.h`.
-Core compilation is GNU89 with `-fno-fast-math -ffp-contract=off
--fno-strict-aliasing`; LTO and architecture-specific flags are not enabled.
+The build produces `liblwbgt.a` and a versioned shared library and installs
+`lwbgt.h`, CMake package metadata, and `pkg-config` metadata. Core compilation is
+GNU89 with `-fno-fast-math -ffp-contract=off -fno-strict-aliasing`; LTO and
+architecture-specific flags are not enabled. GCC, Clang/AppleClang, and MinGW
+GCC are supported; MSVC cannot compile the preserved K&R source.
+
+Installed CMake consumers can select `lwbgt::static` or `lwbgt::shared` after
+`find_package(lwbgt CONFIG REQUIRED)`.
 
 ## Supported API and compatibility contract
 
-Only the callable `calc_wbgt` and `esat` symbols declared in `include/lwbgt.h`
-are the supported public API, and their declarations are the permanent
-compatibility ABI. Scalar floating-point arguments use `double` at the ABI
-boundary because the original K&R `float` parameters undergo default argument
-promotion; output pointers remain `float *`.
+The legacy `calc_wbgt` and `esat` declarations in `include/lwbgt.h` remain the
+permanent scalar compatibility ABI. Scalar floating-point arguments use
+`double` at the ABI boundary because the original K&R `float` parameters undergo
+default argument promotion; output pointers remain `float *`.
 
-The static archive retains global helper symbols inherited from the source
-implementation. They are link-visible implementation details, not supported
-API. The exported-symbol review is recorded in `tests/API.md`.
+The v1 FFI ABI adds fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1`
+structures and `lwbgt_calc_batch_v1`. The batch call executes scalar calls in
+input order. It returns the supplied wind as the effective 2-m wind when no
+height conversion is needed, avoiding the legacy scalar routine's untouched
+output-pointer behavior. Independent calls using separate buffers are
+thread-safe; the batch function itself is serial.
+
+The shared library exports only `calc_wbgt`, `esat`, and
+`lwbgt_calc_batch_v1`. The static archive retains global helper symbols inherited
+from the source implementation; they remain unsupported implementation details.
+The exported-symbol review is recorded in `tests/API.md`.
+
+Minimal Python, R, and Julia examples are under `examples/`. They are tested
+interoperability examples, not maintained PyPI, CRAN, or Julia registry
+packages, and they make no compatibility claim for third-party wrappers.
 
 The exact upstream source is retained unmodified at
 `upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained
@@ -70,7 +86,7 @@ Argonne/Department of Energy acknowledgement is in `NOTICE`.
 
 ## Explicit non-goals
 
-This release adds no namespaced high-level API, batch API, shared
-library or SONAME, alternate solver, precision change, new physics, cache,
-parallelism, OpenMP, SIMD, GPU path, fast-math mode, language binding, or
-package-manager distribution.
+This release adds no namespaced high-level language API, official language
+package, alternate solver, precision change, new physics, cache, parallelism,
+OpenMP, SIMD, GPU path, fast-math mode, or language package-manager
+distribution.
