@@ -1,15 +1,33 @@
 #include "lwbgt.h"
 
+#define LWBGT_ASSERT_OFFSET(type, field, expected) \
+    _Static_assert(offsetof(type, field) == expected, "unexpected " #type " field offset")
+
 _Static_assert(sizeof(lwbgt_input_v1) == 104, "unexpected lwbgt_input_v1 layout");
-_Static_assert(offsetof(lwbgt_input_v1, latitude_deg_north) == 32,
-               "unexpected lwbgt_input_v1 field offset");
-_Static_assert(offsetof(lwbgt_input_v1, vertical_temperature_difference_c) == 96,
-               "unexpected lwbgt_input_v1 field offset");
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, year, 0);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, month, 4);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, day, 8);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, hour, 12);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, minute, 16);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, gmt_offset_hours, 20);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, averaging_minutes, 24);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, urban, 28);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, latitude_deg_north, 32);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, longitude_deg_east, 40);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, solar_w_m2, 48);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, pressure_hpa, 56);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, air_temperature_c, 64);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, relative_humidity_percent, 72);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, wind_speed_m_s, 80);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, wind_height_m, 88);
+LWBGT_ASSERT_OFFSET(lwbgt_input_v1, vertical_temperature_difference_c, 96);
 _Static_assert(sizeof(lwbgt_output_v1) == 24, "unexpected lwbgt_output_v1 layout");
-_Static_assert(offsetof(lwbgt_output_v1, estimated_wind_speed_m_s) == 4,
-               "unexpected lwbgt_output_v1 field offset");
-_Static_assert(offsetof(lwbgt_output_v1, wbgt_c) == 20,
-               "unexpected lwbgt_output_v1 field offset");
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, status, 0);
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, estimated_wind_speed_m_s, 4);
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, globe_temperature_c, 8);
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, natural_wet_bulb_c, 12);
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, psychrometric_wet_bulb_c, 16);
+LWBGT_ASSERT_OFFSET(lwbgt_output_v1, wbgt_c, 20);
 
 int lwbgt_calc_batch_v1(
     const lwbgt_input_v1 *inputs,

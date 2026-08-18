@@ -4,8 +4,9 @@
 WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
 behaviour while eliminating demonstrably repeated or dead work.
 
-**Release status: v0.2.0.** v0.1.0 is the frozen scalar-compatibility release.
-Its complete permitted optimization set measures
+**Release status: v0.2.1 development.** v0.2.0 is the current public release;
+v0.1.0 is the frozen scalar-compatibility release. Its complete permitted
+optimization set measures
 1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
 The v0.2.0 position-independent static build measures 1.249× on the GCC 13
 host. All three results exceed the mandatory 1.20× gate with exact
@@ -34,6 +35,9 @@ Installed CMake consumers can select `lwbgt::static` or `lwbgt::shared` after
 `find_package(lwbgt CONFIG REQUIRED)`.
 
 ## Supported API and compatibility contract
+
+[ABI.md](ABI.md) defines the authoritative layouts, units, error behavior,
+concurrency rules, symbol surface, and compatibility policy.
 
 The legacy `calc_wbgt` and `esat` declarations in `include/lwbgt.h` remain the
 permanent scalar compatibility ABI. Scalar floating-point arguments use
@@ -82,6 +86,11 @@ repetitions, medians, and dispersion are under `benchmarks/`. HeatStressBench
 adapter evidence is under `tests/`.
 
 ## Licence and provenance
+
+Project-authored files are licensed under [Apache-2.0](LICENSE). The retained
+upstream source and modified derivative remain under the UChicago Argonne
+Liljegren WBGT v1.1 terms. [LICENSING.md](LICENSING.md) defines the file-level
+boundary and redistribution requirements.
 
 `UPSTREAM.md` records the repository, pinned commit, blob, import date, and
 relationship to HeatStressBench. The complete upstream source licence is in

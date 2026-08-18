@@ -13,3 +13,7 @@ is not replaced by this project.
 
 `src/wbgt.c` is a modified derivative maintained by Yifei/HeatStressDev. Each
 source modification is identified adjacent to the changed code.
+
+`LICENSING.md` defines the boundary between the UChicago Argonne terms that
+continue to govern the retained and modified numerical source and Apache-2.0,
+which governs project-authored files.

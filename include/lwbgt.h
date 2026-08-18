@@ -10,7 +10,7 @@ extern "C" {
 
 #define LWBGT_VERSION_MAJOR 0
 #define LWBGT_VERSION_MINOR 2
-#define LWBGT_VERSION_PATCH 0
+#define LWBGT_VERSION_PATCH 1
 #define LWBGT_FFI_ABI_VERSION 1
 
 typedef struct lwbgt_input_v1 {

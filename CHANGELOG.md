@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — v0.2.1
+
+- Licensed project-authored files under Apache-2.0 while preserving the
+  Liljegren-derived numerical files under their UChicago Argonne terms.
+- Added the authoritative v1 ABI contract covering layouts, units, status and
+  ownership semantics, concurrency, symbols, and compatibility policy.
+- Added an installed C++ consumer that validates public-header compatibility,
+  structure sizes and offsets, and shared-library linkage.
+
 ## v0.2.0 — 2026-08-18
 
 - Added the fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1` structures and

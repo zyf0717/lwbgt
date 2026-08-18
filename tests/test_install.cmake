@@ -9,6 +9,12 @@ endfunction()
 
 run_checked("${CMAKE_COMMAND}" --install "${BUILD_DIR}" --config "${CONFIG}"
             --prefix "${INSTALL_DIR}")
+foreach(DOCUMENT LICENSE ABI.md LICENSING.md NOTICE
+        LicenseRef-UChicago-Argonne-WBGT-1.1.txt)
+    if(NOT EXISTS "${INSTALL_DIR}/${INSTALL_DATADIR}/doc/lwbgt/${DOCUMENT}")
+        message(FATAL_ERROR "installed documentation is missing ${DOCUMENT}")
+    endif()
+endforeach()
 run_checked("${CMAKE_COMMAND}" -G "${GENERATOR}"
             -S "${SOURCE_DIR}" -B "${BUILD_DIR}/consumer-build"
             "-DCMAKE_PREFIX_PATH=${INSTALL_DIR}")
@@ -20,7 +26,7 @@ elseif(SYSTEM_NAME STREQUAL "Darwin")
 else()
     set(ENV{LD_LIBRARY_PATH} "${INSTALL_DIR}/${INSTALL_LIBDIR}")
 endif()
-foreach(NAME lwbgt_static_consumer lwbgt_shared_consumer)
+foreach(NAME lwbgt_static_consumer lwbgt_shared_consumer lwbgt_cpp_consumer)
     set(CONSUMER "${BUILD_DIR}/consumer-build/${NAME}${EXECUTABLE_SUFFIX}")
     if(NOT EXISTS "${CONSUMER}" AND CONFIG)
         set(CONSUMER "${BUILD_DIR}/consumer-build/${CONFIG}/${NAME}${EXECUTABLE_SUFFIX}")

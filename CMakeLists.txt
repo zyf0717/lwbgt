@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.2.0 LANGUAGES C)
+project(lwbgt VERSION 0.2.1 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -237,6 +237,7 @@ if(BUILD_TESTING)
                 -DCONFIG=$<CONFIG>
                 -DEXECUTABLE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}
                 -DINSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
+                -DINSTALL_DATADIR=${CMAKE_INSTALL_DATAROOTDIR}
                 -DINSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
                 -DSYSTEM_NAME=${CMAKE_SYSTEM_NAME}
                 "-DGENERATOR=${CMAKE_GENERATOR}"
@@ -276,6 +277,11 @@ install(FILES
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lwbgt.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
 )
-install(FILES NOTICE LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
+install(FILES
+    LICENSE
+    ABI.md
+    LICENSING.md
+    NOTICE
+    LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/lwbgt"
 )
