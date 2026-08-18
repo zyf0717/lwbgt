@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — v0.2.0
+## v0.2.0 — 2026-08-18
 
 - Added the fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1` structures and
   serial `lwbgt_calc_batch_v1` FFI entry point without changing the scalar ABI.
@@ -9,6 +9,11 @@
 - Added dependency-light Python, R, and Julia examples and made them release
   gates on Linux/GCC, macOS/Clang, and Windows/MinGW CI.
 - Added relocatable CMake and `pkg-config` installation metadata.
+- Verified the final static and shared artifacts on Linux/GCC,
+  macOS/AppleClang, and Windows/MinGW, including installed consumers and all
+  three language examples.
+- Revalidated the position-independent static build at 1.248× overall median
+  throughput with exact compatibility and all release gates passing.
 
 ## v0.1.0 — 2026-08-18
 

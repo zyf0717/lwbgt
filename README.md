@@ -4,12 +4,13 @@
 WBGT v1.1 C implementation. It preserves the original scalar ABI and numerical
 behaviour while eliminating demonstrably repeated or dead work.
 
-**Release status: v0.2.0 development.** v0.1.0 is the frozen scalar-compatibility
-release. Its complete permitted optimization set measures 1.316× on the primary
-GCC 13 benchmark and 1.289× in the GCC 16.2 container, above the mandatory
-1.20× gate with exact compatibility. This is a narrowly supported 29–32%
-measured throughput improvement on those tested environments, not a broader
-portability or workload claim.
+**Release status: v0.2.0 release candidate.** v0.1.0 is the frozen
+scalar-compatibility release. Its complete permitted optimization set measures
+1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
+The v0.2.0 position-independent static build measures 1.248× on the GCC 13
+host. All three results exceed the mandatory 1.20× gate with exact
+compatibility. These are narrowly supported throughput measurements on the
+documented environments and workloads, not broader portability claims.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
@@ -72,10 +73,13 @@ probe hash with GCC 13.3.0 and GCC 16.2.0.
 |---|---:|---:|---:|
 | Linux x86-64, GCC 13.3.0 | bit-identical | 1.316× | passed |
 | Linux x86-64 container, GCC 16.2.0 | bit-identical | 1.289× | passed |
+| Linux x86-64, GCC 13.3.0, v0.2.0 PIC build | bit-identical | 1.248× | passed |
 
-Every benchmark cohort exceeds 1.25×. Detailed host results, hardware, flags,
-datasets, warm-up, CPU-affinity policy, repetitions, medians, and dispersion are
-under `benchmarks/`. HeatStressBench adapter evidence is under `tests/`.
+Every v0.1.0 benchmark cohort exceeds 1.25×. The v0.2.0 PIC build passes the
+unchanged overall and per-cohort gates, with a 1.211× slowest measured cohort.
+Detailed host results, hardware, flags, datasets, warm-up, CPU-affinity policy,
+repetitions, medians, and dispersion are under `benchmarks/`. HeatStressBench
+adapter evidence is under `tests/`.
 
 ## Licence and provenance
 

@@ -1,0 +1,38 @@
+{
+  "affinity_cpu": 0,
+  "benchmark": {
+    "iterations_per_case": 200,
+    "method": "single-thread, pinned CPU, one warm-up, interleaved executions",
+    "repetitions": 7,
+    "workload_cases": 454
+  },
+  "host": {
+    "architecture": "x86_64",
+    "cmake": "3.28.3",
+    "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "cpu": "13th Gen Intel(R) Core(TM) i9-13900HK",
+    "logical_cpus": 20,
+    "os_kernel": "Linux 7.0.0-28-generic x86_64",
+    "python": "3.12.3",
+    "result_file": "v0.2.0-gcc-13.3.0.json"
+  },
+  "library_build": {
+    "core": "single position-independent object set shared by static and shared libraries",
+    "floating_point_flags": "-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing"
+  },
+  "results": {
+    "overall_speedup": 1.2480815296334145,
+    "slowest_cohort": "nasa-power",
+    "slowest_cohort_speedup": 1.211243299348596
+  },
+  "source": {
+    "benchmark_sha256": "9d264acde0bd22e5c23cba9215ce932c3ad4511841bb8465648dc475ffbba3b4",
+    "candidate_numerical_commit": "67a8c592750d08d2b1e5270e1e72b6db6903b385",
+    "candidate_source_sha256": "e6e69fb76858cda4d3ca9c6f3acee36fd4b506d216694b8283b86b95cb11b06a",
+    "compare_harness_sha256": "67756b76beadf9e40854cdcdafc0cface98bc8368312b527015ec17ca4164f52",
+    "ffi_header_sha256": "188e0d7e0d92a73bcc2f53f79b01195f362b078408bc1eb8fc0c2e16d8021742",
+    "ffi_source_sha256": "9b29013b15d17b964d940ac0fc6aca9d7faae8c99df941fc63102710bbeae00a",
+    "measured_tree_commit": "34cff95a534d603660195d7b2b42d4198634789f",
+    "case_generator_sha256": "94aeafbbadf04e192d38434ba80215ff26ce8dc338f04410ec7978c8185ab876"
+  }
+}
