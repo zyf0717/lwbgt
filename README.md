@@ -4,10 +4,10 @@
 Liljegren WBGT v1.1 reference source. The intended v0.1.0 preserves the original
 scalar ABI and numerical behaviour while eliminating demonstrably dead work.
 
-**Release status: experimental.** The complete permitted optimization set
-measures 1.162× on the primary GCC 13 benchmark and 1.159× in the GCC 16.2
-HeatStressBench toolchain, below the mandatory 1.20× gate. No `v0.1.0` tag has
-been created.
+**Release status: v0.1.0 release candidate.** The complete permitted
+optimization set measures 1.316× on the primary GCC 13 benchmark and 1.289× in
+the GCC 16.2 container, above the mandatory 1.20× gate with exact compatibility.
+No `v0.1.0` tag has been created yet.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
@@ -48,10 +48,10 @@ probe hash with GCC 13.3.0 and GCC 16.2.0.
 
 | Environment | Exact result | Median overall speedup | Release gate |
 |---|---:|---:|---:|
-| Linux x86-64, GCC 13.3.0 | bit-identical | 1.162× | failed |
-| Linux x86-64 container, GCC 16.2.0 | bit-identical | 1.159× | failed |
+| Linux x86-64, GCC 13.3.0 | bit-identical | 1.316× | passed |
+| Linux x86-64 container, GCC 16.2.0 | bit-identical | 1.289× | passed |
 
-No benchmark cohort regressed. Detailed host results, hardware, flags,
+Every benchmark cohort exceeds 1.25×. Detailed host results, hardware, flags,
 datasets, warm-up, CPU-affinity policy, repetitions, medians, and dispersion are
 under `benchmarks/`. HeatStressBench adapter evidence is under `tests/`.
 
@@ -64,7 +64,7 @@ Argonne/Department of Energy acknowledgement is in `NOTICE`.
 
 ## Explicit non-goals
 
-This experimental work adds no namespaced high-level API, batch API, shared
+This release adds no namespaced high-level API, batch API, shared
 library or SONAME, alternate solver, precision change, new physics, cache,
 parallelism, OpenMP, SIMD, GPU path, fast-math mode, language binding, or
 package-manager distribution.

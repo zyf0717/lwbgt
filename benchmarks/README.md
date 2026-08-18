@@ -30,7 +30,10 @@ measurement parity and per-cohort noise.
 | Optimization 1 | GCC 13.3.0 host | 1.134× | 1.130× | failed |
 | Optimizations 1+2 | GCC 13.3.0 host | 1.162× | 1.123× | failed |
 | Optimizations 1+2 | GCC 16.2.0 container | 1.159× | 1.141× | failed |
+| Optimizations 1+2+3 | GCC 13.3.0 host | 1.316× | 1.279× | passed |
+| Optimizations 1+2+3 | GCC 16.2.0 container | 1.289× | 1.253× | passed |
 
-No measured cohort regressed by more than 2%. Because neither compiler reaches
-1.20× overall, the repository remains experimental and must not be tagged
-`v0.1.0`.
+All measured cohorts exceed the no-regression floor. The final candidate passes
+the unchanged 1.20× overall gate on both required compilers and is ready for
+v0.1.0 release preparation. No further optimization is permitted before that
+release.
