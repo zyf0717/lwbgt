@@ -38,7 +38,7 @@ def inspect_wheel(path: Path) -> None:
     licenses = {
         name.split(".dist-info/licenses/", 1)[1]
         for name in names
-        if ".dist-info/licenses/" in name
+        if ".dist-info/licenses/" in name and not name.endswith("/")
     }
     if licenses != LICENSE_FILES:
         raise RuntimeError(f"{path}: wheel licences differ: {sorted(licenses)}")
