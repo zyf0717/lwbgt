@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(lwbgt_consumer LANGUAGES C CXX)
 
-find_package(lwbgt 0.2.1 CONFIG REQUIRED)
+find_package(lwbgt 0.3.0 CONFIG REQUIRED)
 add_executable(lwbgt_static_consumer main.c)
 add_executable(lwbgt_shared_consumer main.c)
 add_executable(lwbgt_cpp_consumer main.cpp)

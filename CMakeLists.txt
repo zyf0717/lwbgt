@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.2.1 LANGUAGES C)
+project(lwbgt VERSION 0.3.0 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -47,6 +47,7 @@ set(LWBGT_OBJECTS
 
 add_library(lwbgt STATIC ${LWBGT_OBJECTS})
 add_library(lwbgt_shared SHARED ${LWBGT_OBJECTS})
+add_library(lwbgt_python SHARED ${LWBGT_OBJECTS})
 set_target_properties(lwbgt PROPERTIES EXPORT_NAME static)
 set_target_properties(lwbgt_shared PROPERTIES
     EXPORT_NAME shared
@@ -54,21 +55,33 @@ set_target_properties(lwbgt_shared PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
+set_target_properties(lwbgt_python PROPERTIES
+    OUTPUT_NAME lwbgt
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/python-runtime"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/python-runtime"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/python-runtime"
+)
+
+function(lwbgt_restrict_shared_exports target)
+    if(WIN32)
+        set_target_properties(${target} PROPERTIES PREFIX "")
+        target_sources(${target} PRIVATE cmake/lwbgt.def)
+    elseif(APPLE)
+        target_link_options(${target} PRIVATE
+            "LINKER:-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/cmake/lwbgt.exports"
+        )
+    elseif(UNIX)
+        target_link_options(${target} PRIVATE
+            "LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/cmake/lwbgt.map"
+        )
+    endif()
+endfunction()
+
 if(WIN32)
-    set_target_properties(lwbgt_shared PROPERTIES
-        ARCHIVE_OUTPUT_NAME lwbgt_dll
-        PREFIX ""
-    )
-    target_sources(lwbgt_shared PRIVATE cmake/lwbgt.def)
-elseif(APPLE)
-    target_link_options(lwbgt_shared PRIVATE
-        "LINKER:-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/cmake/lwbgt.exports"
-    )
-elseif(UNIX)
-    target_link_options(lwbgt_shared PRIVATE
-        "LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/cmake/lwbgt.map"
-    )
+    set_target_properties(lwbgt_shared PROPERTIES ARCHIVE_OUTPUT_NAME lwbgt_dll)
 endif()
+lwbgt_restrict_shared_exports(lwbgt_shared)
+lwbgt_restrict_shared_exports(lwbgt_python)
 
 foreach(target lwbgt lwbgt_shared)
     target_include_directories(${target} PUBLIC
@@ -78,6 +91,10 @@ foreach(target lwbgt lwbgt_shared)
 endforeach()
 target_link_libraries(lwbgt PUBLIC m)
 target_link_libraries(lwbgt_shared PRIVATE m)
+target_link_libraries(lwbgt_python PRIVATE m)
+if(MINGW)
+    target_link_options(lwbgt_python PRIVATE -static-libgcc)
+endif()
 
 if(BUILD_TESTING)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -102,6 +119,12 @@ if(BUILD_TESTING)
     endfunction()
 
     lwbgt_add_harness(lwbgt_probe tests/probe.c lwbgt)
+    lwbgt_add_harness(lwbgt_python_probe tests/probe.c lwbgt_python)
+    if(WIN32)
+        set_target_properties(lwbgt_python_probe PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/python-runtime"
+        )
+    endif()
     lwbgt_add_harness(lwbgt_reference_probe tests/probe.c lwbgt_reference)
     lwbgt_add_harness(lwbgt_benchmark benchmarks/benchmark.c lwbgt)
     lwbgt_add_harness(lwbgt_reference_benchmark benchmarks/benchmark.c lwbgt_reference)
@@ -120,6 +143,13 @@ if(BUILD_TESTING)
                 "${LWBGT_CASES}"
     )
     set_tests_properties(exact_equivalence PROPERTIES DEPENDS generate_cases)
+    add_test(
+        NAME python_runtime_exact_equivalence
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
+                exact "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_python_probe>"
+                "${LWBGT_CASES}"
+    )
+    set_tests_properties(python_runtime_exact_equivalence PROPERTIES DEPENDS generate_cases)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)
@@ -128,6 +158,12 @@ if(BUILD_TESTING)
         NAME shared_exports
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_exports.py"
                 "${CMAKE_SYSTEM_NAME}" "$<TARGET_FILE:lwbgt_shared>"
+                "${CMAKE_NM}" "${CMAKE_OBJDUMP}"
+    )
+    add_test(
+        NAME python_runtime_exports
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_exports.py"
+                "${CMAKE_SYSTEM_NAME}" "$<TARGET_FILE:lwbgt_python>"
                 "${CMAKE_NM}" "${CMAKE_OBJDUMP}"
     )
 
@@ -262,6 +298,10 @@ install(TARGETS lwbgt lwbgt_shared
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
+install(TARGETS lwbgt_python EXCLUDE_FROM_ALL
+    LIBRARY DESTINATION lwbgt COMPONENT python
+    RUNTIME DESTINATION lwbgt COMPONENT python
 )
 install(FILES include/lwbgt.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 install(EXPORT lwbgtTargets

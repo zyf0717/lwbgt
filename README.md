@@ -7,7 +7,16 @@ demonstrably repeated or dead work. It is intended to be embedded as a
 numerical backend by higher-level scientific packages, services, and
 high-throughput data pipelines.
 
-**Release status: v0.2.1.** v0.1.0 is the frozen scalar-compatibility release.
+Python is an official, dependency-free `ctypes` binding to that same native
+kernel. Install a self-contained binary wheel with `pip install lwbgt`. Input
+units are explicit in field names and are never converted implicitly. The
+package intentionally does not add dataframe/xarray models, meteorological
+preprocessing, classifications, advisory policy, or alternate WBGT methods.
+For those higher-level workflows, consider
+[`pywbgt`](https://pypi.org/project/pywbgt/) or
+[`thermofeel`](https://pypi.org/project/thermofeel/).
+
+**Release status: v0.3.0.** v0.1.0 is the frozen scalar-compatibility release.
 Its complete permitted optimization set measures
 1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
 The v0.2.0 position-independent static build measures 1.249× on the GCC 13
@@ -17,6 +26,50 @@ documented environments and workloads, not broader portability claims.
 
 It is not affiliated with or endorsed by the original authors, UChicago
 Argonne, or the U.S. Department of Energy.
+
+This distribution contains a modified Liljegren WBGT v1.1 derivative. Binary
+and source redistributions must retain the UChicago Argonne/Department of
+Energy acknowledgement in
+[NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) and comply with
+[LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md).
+
+## Python installation and quick start
+
+```sh
+python -m pip install lwbgt
+```
+
+```python
+from lwbgt import Input, calculate, esat
+
+weather = Input(
+    year=2024, month=4, day=15, hour=14, minute=30,
+    gmt_offset_hours=8, averaging_minutes=60, urban=1,
+    latitude_deg_north=1.3521, longitude_deg_east=103.8198,
+    solar_w_m2=742.0, pressure_hpa=1008.4,
+    air_temperature_c=32.1, relative_humidity_percent=68.0,
+    wind_speed_m_s=2.8, wind_height_m=10.0,
+    vertical_temperature_difference_c=-0.4,
+)
+result = calculate(weather)
+assert result.status == 0
+print(result.wbgt_c)
+print(esat(273.15, phase=0))
+```
+
+Batch calculation uses the native serial batch entry point rather than a
+Python loop:
+
+```python
+from lwbgt import calculate_batch
+
+results = calculate_batch([weather, weather])
+```
+
+`Input` and `Result` are immutable typed records. Their complete field names,
+units, solver status, and `-9999` failure convention map directly to ABI v1;
+see [ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md). No third-party
+Python runtime dependency is required.
 
 ## Purpose
 
@@ -53,7 +106,7 @@ dataframe-oriented ergonomics, automatic weather-data preprocessing, policy or
 heat-risk classifications, a batteries-included Python/R/Julia API, or GPU/JAX
 execution.
 
-## Build and install
+## Native build and install
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -73,7 +126,8 @@ Installed CMake consumers can select `lwbgt::static` or `lwbgt::shared` after
 
 ## Supported API and compatibility contract
 
-[ABI.md](ABI.md) defines the authoritative layouts, units, error behavior,
+[ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md) defines the
+authoritative layouts, units, error behavior,
 concurrency rules, symbol surface, and compatibility policy.
 
 The legacy `calc_wbgt` and `esat` declarations in `include/lwbgt.h` remain the
@@ -96,16 +150,21 @@ The shared library exports only `calc_wbgt`, `esat`, and
 from the source implementation; they remain unsupported implementation details.
 The exported-symbol review is recorded in `tests/API.md`.
 
-Minimal Python, R, and Julia examples under `examples/` demonstrate the intended
-integration pattern: higher-level language packages can bind the stable ABI
-while owning their user-facing policies. They are tested interoperability
-examples, not maintained PyPI, CRAN, or Julia registry packages, and they make
-no compatibility claim for third-party wrappers.
+The maintained Python package and minimal R and Julia examples demonstrate the
+intended integration pattern: higher-level packages can bind the stable ABI
+while owning their user-facing policies. The R and Julia examples are tested
+interoperability examples, not registry packages, and no compatibility claim is
+made for third-party wrappers.
 
 The exact upstream source is retained unmodified at
 `upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained
 by Yifei/HeatStressDev. HeatStressBench's frozen `liljegren-c` target remains
 the oracle and is not replaced or relabelled.
+
+Numerical provenance and the exact-compatibility scope are documented in
+[ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md),
+[UPSTREAM.md](https://github.com/zyf0717/lwbgt/blob/main/UPSTREAM.md), and the
+[retained test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
 
 For matched compilers and floating-point flags, the acceptance policy is exact
 32-bit equality for return status, estimated wind speed, `Tg`, `Tnwb`, `Tpsy`,
@@ -129,10 +188,12 @@ adapter evidence is under `tests/`.
 
 ## Licence and provenance
 
-Project-authored files are licensed under [Apache-2.0](LICENSE). The retained
+Project-authored files are licensed under
+[Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE). The retained
 upstream source and modified derivative remain under the UChicago Argonne
-Liljegren WBGT v1.1 terms. [LICENSING.md](LICENSING.md) defines the file-level
-boundary and redistribution requirements.
+Liljegren WBGT v1.1 terms.
+[LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md) defines
+the file-level boundary and redistribution requirements.
 
 `UPSTREAM.md` records the repository, pinned commit, blob, import date, and
 relationship to HeatStressBench. The complete upstream source licence is in
@@ -141,7 +202,7 @@ Argonne/Department of Energy acknowledgement is in `NOTICE`.
 
 ## Explicit non-goals
 
-This release adds no namespaced high-level language API, official language
-package, alternate solver, precision change, new physics, cache, parallelism,
-OpenMP, SIMD, GPU path, fast-math mode, or language package-manager
-distribution.
+This release adds no high-level dataframe/xarray API, unit conversion,
+meteorological ingestion, dew-point policy, classification thresholds,
+alternate solver, precision change, new physics, cache, parallelism, OpenMP,
+SIMD, GPU path, or fast-math mode.

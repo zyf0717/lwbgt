@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.0 — 2026-08-19
+
+- Added the official dependency-free Python API: immutable `Input` and `Result`
+  records plus `calculate`, `calculate_batch`, and `esat`.
+- Added an unversioned, wheel-only shared target built from the existing native
+  objects with the same restricted three-symbol export surface.
+- Added platform-specific, Python-ABI-independent wheel and rebuildable sdist
+  packaging through scikit-build-core.
+- Added installed-wheel ABI layout, resource loading, scalar, batch, failure,
+  `esat`, deterministic fixture, archive licensing, and version-coherence tests.
+- Added cibuildwheel coverage for manylinux x86_64/aarch64, macOS x86_64/arm64,
+  and Windows amd64, plus OIDC Trusted Publishing release automation.
+
 ## v0.2.1 — 2026-08-18
 
 - Licensed project-authored files under Apache-2.0 while preserving the

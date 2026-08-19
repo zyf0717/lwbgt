@@ -32,6 +32,11 @@ and 24-byte layouts. The shared library's platform-specific export lists expose
 only `calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1`; `shared_exports` audits that
 surface in CTest.
 
+v0.3.0 adds a wheel-only, unversioned shared runtime built from the same object
+libraries. `python_runtime_exports` audits the same three-symbol surface, and
+`python_runtime_exact_equivalence` reruns the frozen 454-case comparison through
+an executable linked to that target.
+
 The archive also exposes these inherited implementation symbols:
 
 ```text
