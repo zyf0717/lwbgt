@@ -1,9 +1,6 @@
 name: wheels
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
   workflow_call:
 
