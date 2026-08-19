@@ -1,56 +1,44 @@
-# v0.2.1 release verification
+# v0.3.0 release verification
 
-v0.2.1 is a distribution and ABI-documentation patch. It does not change the
-frozen numerical implementation, scalar ABI, v1 batch runtime behavior, shared
-symbol surface, or floating-point flags. It adds an explicit Apache-2.0 default
-licence with upstream exceptions, installs the complete licence and ABI
-document set, enforces every v1 field offset at compile time, and adds an
-installed C++ consumer.
+v0.3.0 adds a dependency-free Python `ctypes` distribution around the unchanged
+Liljegren numerical source and FFI ABI v1. The wheel-only runtime uses the same
+object files, compiler flags, linker export controls, and three-symbol surface
+as the native shared library. The normal native CMake installation remains
+unchanged.
 
-On 2026-08-18, release-preparation commit
-`c91259b9906e8c7150e3bf6849c293b0a4f5eb31` was cloned locally with
-`git clone --no-hardlinks` into a separate directory. The checkout reported no
-tracked or untracked changes before configuration. The subsequent
-evidence-only commit changes no library, build, test, licence, or ABI contract
-content.
+Release acceptance requires:
 
-The clean-checkout verification command set is:
+- the full native CTest matrix on Linux/GCC, macOS/AppleClang, and
+  Windows/MinGW;
+- exact 454-case equivalence through both the native and wheel-only targets;
+- installed-wheel API, layout, scalar, batch, solver-failure, `esat`, and
+  packaged-resource tests;
+- `py3-none` wheels for manylinux x86_64/aarch64, macOS x86_64/arm64, and
+  Windows amd64, repaired and dependency-inspected by platform tools;
+- one loadable runtime library per wheel and no native development tree;
+- clean installation of the same Linux wheel on Python 3.10 and the latest
+  stable CPython;
+- an isolated sdist rebuild and clean source-built-wheel test;
+- PEP 639 metadata plus `LICENSE`, `LICENSING.md`, `NOTICE`, and the complete
+  UChicago Argonne licence in every archive;
+- version coherence and successful metadata validation.
 
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON
-cmake --build build --clean-first --parallel
-ctest --test-dir build --output-on-failure
-python3 tests/compare.py exact \
-  build/lwbgt_reference_probe build/lwbgt_probe build/cases.csv
-sha256sum LICENSE
-```
+Local Linux/GCC 13 verification on 2026-08-19 passed all 10 CTest tests: native
+and wheel-target 454-case exact equivalence, batch equivalence, both export
+audits, installed C/C++ consumers, and the Python/R/Julia examples. All 16
+installed-wheel tests passed from both the wheel and an isolated sdist build.
+The local `py3-none-linux_x86_64` wheel contains exactly one 22,728-byte runtime
+library and all four required legal files; `twine check` and `auditwheel show`
+passed. The same wheel produced Singapore WBGT `32.50229263305664` with status 0
+on clean Python 3.10.20, 3.12.13, and 3.14.7 environments.
 
-Acceptance requires all eight CTest tests, including installed C, C++, Python,
-R, and Julia consumers; the installed licence, notice, and ABI documents; the
-three-symbol shared export audit; and the frozen 454-case exact probe hash. The
-Apache-2.0 text must have SHA-256
-`c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`.
+Cross-platform wheel results, TestPyPI rehearsal status, PyPI publication,
+attestation verification, and the final release commit/tag are pending until
+the changes are merged and the release workflows execute.
 
-No performance rerun is required because the numerical source and runtime code
-paths are unchanged. The v0.2.0 performance and compatibility evidence remains
-applicable and is retained in `RELEASE-0.2.0.md` and `../benchmarks/`.
+Production PyPI publication is structurally blocked on a successful TestPyPI
+OIDC upload, byte-for-byte artifact identity check, and clean installed-wheel
+test suite.
 
-Cross-platform CI must independently pass on Linux/GCC, macOS/AppleClang, and
-Windows/MinGW before tagging. Historical v0.1.0 and v0.2.0 clean-checkout
-records are retained in `RELEASE-0.1.0.md` and `RELEASE-0.2.0.md`.
-
-All eight CTest tests passed in the clean checkout. This covered installed C,
-C++, Python, R, and Julia consumers; the installed documentation set; and the
-shared export audit. The explicit differential run reported 454 bit-identical
-cases with the frozen probe SHA-256:
-
-```text
-087532603ebd6d3addad5bec4d99290eb3f1a9ed82bdfb141d5e9708194235ff
-```
-
-The Apache-2.0 text produced the required
-`c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`
-SHA-256. The same library, licence, ABI, and test tree passed GitHub Actions on
-Linux/GCC, macOS/AppleClang, and Windows/MinGW in
-[run 32127738223](https://github.com/zyf0717/lwbgt/actions/runs/32127738223).
+Historical verification is retained in `RELEASE-0.1.0.md`,
+`RELEASE-0.2.0.md`, and `RELEASE-0.2.1.md`.

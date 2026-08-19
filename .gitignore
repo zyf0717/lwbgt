@@ -1,3 +1,9 @@
 /build/
 /build-gcc16/
 /build-profile/
+__pycache__/
+*.py[cod]
+/dist/
+/wheelhouse/
+/sdist-wheel/
+/sdist-test/

@@ -18,3 +18,5 @@ Redistributions must comply with both applicable licence sets and retain the
 acknowledgements and restrictions in `NOTICE`. In particular, binary
 redistributions containing the Liljegren-derived implementation must reproduce
 its licence and acknowledgement in their documentation or other materials.
+The Python wheel and source distribution therefore include `LICENSE`, this
+file, `NOTICE`, and the complete UChicago Argonne licence under `LICENSES/`.

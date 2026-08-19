@@ -2,9 +2,10 @@
 
 These dependency-light examples call the versioned `lwbgt_calc_batch_v1` C ABI.
 They demonstrate the intended integration pattern: higher-level language
-packages can bind the stable ABI while owning their user-facing policies. They
-are tested interoperability checks and starting points, not maintained PyPI,
-CRAN, or Julia registry packages, and they make no compatibility commitment for
+packages can bind the stable ABI while owning their user-facing policies. The
+official PyPI package under `python/lwbgt` supersedes the Python example for
+normal use. The R and Julia examples are interoperability checks and starting
+points, not registry packages, and make no compatibility commitment for
 third-party wrappers.
 
 Build the shared library and run every installed-language example through CTest:

@@ -124,3 +124,13 @@ The release CI validates Linux with GCC, macOS with AppleClang, and Windows with
 MinGW GCC. MSVC is unsupported because it cannot compile the preserved GNU89
 numerical source. The public header is valid C and C++ and is tested through
 installed C and C++ consumers.
+
+## Official Python binding
+
+The `lwbgt` Python distribution loads its bundled unversioned runtime through
+`importlib.resources` and `ctypes`. Its public `Input` and `Result` records map
+field-for-field to the v1 structures above. `calculate` and `calculate_batch`
+both use `lwbgt_calc_batch_v1`; the latter submits the entire iterable in one
+native call. `esat` directly exposes the scalar symbol. The binding performs no
+unit conversion, domain validation, clamping, missing-data handling, or solver
+failure substitution.
