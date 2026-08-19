@@ -1,4 +1,4 @@
-# lwbgt
+# lwbgt: Liljegren wet bulb globe temperature kernel
 
 [![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
 [![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
@@ -7,11 +7,11 @@
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
 `lwbgt` is a stable, low-level C/FFI computational kernel for Liljegren outdoor
-WBGT. Derived from the Liljegren WBGT v1.1 C implementation, it preserves the
-original scalar ABI and documented numerical behaviour while removing
-demonstrably repeated or dead work. It is intended to be embedded as a
-numerical backend by higher-level scientific packages, services, and
-high-throughput data pipelines.
+wet bulb globe temperature (WBGT). Derived from the Liljegren WBGT v1.1 C
+implementation, it preserves the original scalar ABI and documented numerical
+behaviour while removing demonstrably repeated or dead work. It is intended to
+be embedded as a numerical backend by higher-level scientific packages,
+services, and high-throughput data pipelines.
 
 Python is an official, dependency-free `ctypes` binding to that same native
 kernel. Install a self-contained binary wheel with `pip install lwbgt`. Input
@@ -38,6 +38,17 @@ and source redistributions must retain the UChicago Argonne/Department of
 Energy acknowledgement in
 [NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) and comply with
 [LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md).
+
+## Find the right documentation
+
+- **How do I calculate outdoor wet bulb globe temperature in Python?** Start
+  with the [installation and quick-start example](#python-installation-and-quick-start).
+- **Which Python WBGT package should I use?** See the factual
+  [lwbgt vs pywbgt vs thermofeel comparison](https://github.com/zyf0717/lwbgt/blob/main/COMPARISON.md).
+- **What inputs, units, status codes, and native interfaces does lwbgt use?**
+  Read the [ABI and API contract](https://github.com/zyf0717/lwbgt/blob/main/ABI.md).
+- **Does lwbgt convert units, accept xarray objects, or classify heat risk?**
+  Read the [wet bulb globe temperature FAQ](https://github.com/zyf0717/lwbgt/blob/main/FAQ.md).
 
 ## Python installation and quick start
 
