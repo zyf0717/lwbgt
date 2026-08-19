@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "lwbgt"
 version = "0.3.0"
-description = "Reference-compatible Liljegren outdoor WBGT kernel with a lightweight Python binding"
+description = "Reference-compatible Liljegren outdoor wet bulb globe temperature (WBGT) kernel with C/FFI and dependency-free Python APIs"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0 AND LicenseRef-UChicago-Argonne-WBGT-1.1"
@@ -16,7 +16,17 @@ license-files = [
   "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 ]
 authors = [{ name = "Yifei Zheng" }]
-keywords = ["WBGT", "Liljegren", "heat stress", "meteorology"]
+keywords = [
+  "wet bulb globe temperature",
+  "WBGT",
+  "Liljegren",
+  "heat stress",
+  "occupational heat stress",
+  "meteorology",
+  "biometeorology",
+  "scientific computing",
+  "FFI",
+]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -33,6 +43,8 @@ classifiers = [
 dependencies = []
 
 [project.urls]
+Homepage = "https://github.com/zyf0717/lwbgt"
+Documentation = "https://github.com/zyf0717/lwbgt#readme"
 Source = "https://github.com/zyf0717/lwbgt"
 Issues = "https://github.com/zyf0717/lwbgt/issues"
 Changelog = "https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md"
@@ -60,6 +72,8 @@ sdist.include = [
   "/ABI.md",
   "/CHANGELOG.md",
   "/CITATION.cff",
+  "/COMPARISON.md",
+  "/FAQ.md",
   "/LICENSE",
   "/LICENSES/**",
   "/LICENSING.md",
