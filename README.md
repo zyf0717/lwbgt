@@ -1,5 +1,11 @@
 # lwbgt
 
+[![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
+[![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
+[![PyPI version](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/lwbgt.svg)](https://pypi.org/project/lwbgt/)
+[![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
+
 `lwbgt` is a stable, low-level C/FFI computational kernel for Liljegren outdoor
 WBGT. Derived from the Liljegren WBGT v1.1 C implementation, it preserves the
 original scalar ABI and documented numerical behaviour while removing
