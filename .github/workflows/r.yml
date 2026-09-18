@@ -85,7 +85,7 @@ jobs:
             Windows)
               exports="$(objdump -p "$dll" |
                 sed -n '/\[Ordinal\/Name Pointer\] Table/,/^$/p' |
-                sed -En 's/.*\][[:space:]]+([^[:space:]]+).*/\1/p' |
+                sed -En 's/^[[:space:]]*\[[[:space:]]*[0-9]+\][[:space:]]+([^[:space:]]+).*/\1/p' |
                 sort)"
               test "$exports" = R_init_lwbgt
               ! nm -u "$dll" |
