@@ -83,15 +83,19 @@ jobs:
               ! nm -gu "$dll" | grep -Eq '[[:space:]_](exit|printf)$'
               ;;
             Windows)
-              exports="$(objdump -p "$dll" |
-                sed -n '/\[Ordinal\/Name Pointer\] Table/,/^$/p' |
-                sed -En 's/^[[:space:]]*\[[[:space:]]*[0-9]+\][[:space:]]+([^[:space:]]+).*/\1/p' |
-                sort)"
-              test "$exports" = R_init_lwbgt
-              ! nm -u "$dll" |
+              export_rows="$(objdump -p "$dll" |
+                grep -E '^[[:space:]]*\[[[:space:]]*[0-9]+\]' || true)"
+              printf 'Windows export rows:\n%s\n' "$export_rows"
+              export_count="$(printf '%s\n' "$export_rows" |
+                awk 'NF { count++ } END { print count + 0 }')"
+              test "$export_count" -eq 1
+              printf '%s\n' "$export_rows" |
+                grep -Eq '\][[:space:]]+R_init_lwbgt[[:space:]]*$'
+              undefined="$(nm -u "$dll" 2>/dev/null |
                 awk '{print $NF}' |
                 sed -e 's/^__imp_//' -e 's/^_//' |
-                grep -Eq '^(exit|printf)$'
+                sort -u || true)"
+              ! printf '%s\n' "$undefined" | grep -Eq '^(exit|printf)$'
               ;;
             *)
               exports="$(nm -D --defined-only "$dll" | awk '{print $NF}' | sort)"
