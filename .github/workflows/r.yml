@@ -76,16 +76,22 @@ jobs:
         run: |
           dll="$(find lwbgt.Rcheck/lwbgt/libs -type f \( -name '*.so' -o -name '*.dll' -o -name '*.dylib' \) -print -quit)"
           test -n "$dll"
-          case "$(uname -s)" in
-            Darwin*)
+          case "$RUNNER_OS" in
+            macOS)
               exports="$(nm -gU "$dll" | awk '{print $NF}' | sed 's/^_//' | sort)"
               test "$exports" = R_init_lwbgt
               ! nm -gu "$dll" | grep -Eq '[[:space:]_](exit|printf)$'
               ;;
-            MINGW*|MSYS*)
-              symbols="$(objdump -p "$dll")"
-              printf '%s\n' "$symbols" | grep -q R_init_lwbgt
-              ! printf '%s\n' "$symbols" | grep -Eq 'calc_wbgt|solarposition|[[:space:]_](exit|printf)$'
+            Windows)
+              exports="$(objdump -p "$dll" |
+                sed -n '/\[Ordinal\/Name Pointer\] Table/,/^$/p' |
+                sed -En 's/.*\][[:space:]]+([^[:space:]]+).*/\1/p' |
+                sort)"
+              test "$exports" = R_init_lwbgt
+              ! nm -u "$dll" |
+                awk '{print $NF}' |
+                sed -e 's/^__imp_//' -e 's/^_//' |
+                grep -Eq '^(exit|printf)$'
               ;;
             *)
               exports="$(nm -D --defined-only "$dll" | awk '{print $NF}' | sort)"
