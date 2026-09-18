@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.3.0 LANGUAGES C)
+project(lwbgt VERSION 0.4.0 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -26,10 +26,6 @@ set(LWBGT_LEGACY_OPTIONS
     -Wno-implicit-function-declaration
 )
 
-set_source_files_properties(src/wbgt.c PROPERTIES
-    LANGUAGE C
-    COMPILE_DEFINITIONS "main=lwbgt_original_demo_main"
-)
 add_library(lwbgt_core OBJECT src/wbgt.c)
 target_compile_options(lwbgt_core PRIVATE ${LWBGT_FP_OPTIONS} ${LWBGT_LEGACY_OPTIONS})
 set_target_properties(lwbgt_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -135,6 +131,10 @@ if(BUILD_TESTING)
         NAME generate_cases
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/generate_cases.py"
                 "${LWBGT_CASES}"
+    )
+    add_test(
+        NAME r_source_sync
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_r_sources.py"
     )
     add_test(
         NAME exact_equivalence

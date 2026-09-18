@@ -1,0 +1,12 @@
+Package-authored files
+  Copyright 2026 Yifei Zheng.
+  Apache License, Version 2.0.
+
+Bundled Liljegren WBGT derivative: src/wbgt.c
+  Copyright 2008 UChicago Argonne, LLC. All Rights Reserved.
+  UChicago Argonne Liljegren WBGT v1.1 terms.
+  Original author: James C. Liljegren.
+  Solar-position code author: Nels Larson.
+  Derivative modifications: Yifei/HeatStressDev.
+
+See LICENSE, LICENSES/, and NOTICE in the installed package.

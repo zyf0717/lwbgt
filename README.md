@@ -2,6 +2,7 @@
 
 [![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
 [![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
+[![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
 [![PyPI version](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
@@ -13,16 +14,17 @@ behaviour while removing demonstrably repeated or dead work. It is intended to
 be embedded as a numerical backend by higher-level scientific packages,
 services, and high-throughput data pipelines.
 
-Python is an official, dependency-free `ctypes` binding to that same native
-kernel. Install a self-contained binary wheel with `pip install lwbgt`. Input
-units are explicit in field names and are never converted implicitly. The
-package intentionally does not add dataframe/xarray models, meteorological
-preprocessing, classifications, advisory policy, or alternate WBGT methods.
+Python and R provide official dependency-free bindings to that same native
+kernel. Install a self-contained Python wheel with `pip install lwbgt`; the R
+package is under `r/` and is prepared for CRAN. Input units are explicit in
+field names and are never converted implicitly. The package intentionally does
+not add meteorological preprocessing, classifications, advisory policy, or
+alternate WBGT methods.
 For those higher-level workflows, consider
 [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.3.0.** v0.1.0 is the frozen scalar-compatibility release.
+**Release status: v0.4.0.** v0.1.0 is the frozen scalar-compatibility release.
 Its complete permitted optimization set measures
 1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
 The v0.2.0 position-independent static build measures 1.249× on the GCC 13
@@ -43,6 +45,8 @@ Energy acknowledgement in
 
 - **How do I calculate outdoor wet bulb globe temperature in Python?** Start
   with the [installation and quick-start example](#python-installation-and-quick-start).
+- **How do I calculate it in R?** Start with the
+  [R quick-start example](#r-installation-and-quick-start).
 - **Which Python WBGT package should I use?** See the factual
   [lwbgt vs pywbgt vs thermofeel comparison](https://github.com/zyf0717/lwbgt/blob/main/COMPARISON.md).
 - **What inputs, units, status codes, and native interfaces does lwbgt use?**
@@ -88,11 +92,39 @@ units, solver status, and `-9999` failure convention map directly to ABI v1;
 see [ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md). No third-party
 Python runtime dependency is required.
 
+## R installation and quick start
+
+Until the CRAN release is accepted, install the package from this repository:
+
+```sh
+R CMD INSTALL r
+```
+
+```r
+library(lwbgt)
+
+weather <- lwbgt_input(
+    year = 2024, month = 4, day = 15, hour = 14, minute = 30,
+    gmt_offset_hours = 8, averaging_minutes = 60, urban = 1,
+    latitude_deg_north = 1.3521, longitude_deg_east = 103.8198,
+    solar_w_m2 = 742, pressure_hpa = 1008.4,
+    air_temperature_c = 32.1, relative_humidity_percent = 68,
+    wind_speed_m_s = 2.8, wind_height_m = 10,
+    vertical_temperature_difference_c = -0.4
+)
+calculate(weather)
+esat(273.15)
+```
+
+The R API returns ordinary data frames, recycles scalar constructor arguments,
+and reports invalid or missing rows without aborting the remaining batch. It
+has no package dependencies beyond R itself.
+
 ## Purpose
 
 `lwbgt` owns the numerical Liljegren calculation, stable C/FFI contracts,
-reproducible compatibility evidence, and low-level static/shared-library
-distribution. Higher-level callers own table and dataframe APIs,
+reproducible compatibility evidence, low-level static/shared-library
+distribution, and the narrow R data-frame wrapper. Higher-level callers own
 meteorological data ingestion, unit conversion beyond the documented ABI,
 missing-data policy, additional domain validation, classification and advisory
 systems, orchestration and parallelism, and application-specific defaults.
@@ -119,9 +151,8 @@ backend within the documented compatibility scope.
 ## When not to use lwbgt directly
 
 A higher-level package is more appropriate when the primary requirement is
-dataframe-oriented ergonomics, automatic weather-data preprocessing, policy or
-heat-risk classifications, a batteries-included Python/R/Julia API, or GPU/JAX
-execution.
+automatic weather-data preprocessing, policy or heat-risk classifications, a
+batteries-included API, or GPU/JAX execution.
 
 ## Native build and install
 
@@ -167,11 +198,11 @@ The shared library exports only `calc_wbgt`, `esat`, and
 from the source implementation; they remain unsupported implementation details.
 The exported-symbol review is recorded in `tests/API.md`.
 
-The maintained Python package and minimal R and Julia examples demonstrate the
+The maintained Python and R packages and minimal Julia example demonstrate the
 intended integration pattern: higher-level packages can bind the stable ABI
-while owning their user-facing policies. The R and Julia examples are tested
-interoperability examples, not registry packages, and no compatibility claim is
-made for third-party wrappers.
+while owning their user-facing policies. The low-level R and Julia examples
+remain tested interoperability examples; the package under `r/` is the
+supported R interface.
 
 The exact upstream source is retained unmodified at
 `upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained
@@ -219,7 +250,8 @@ Argonne/Department of Energy acknowledgement is in `NOTICE`.
 
 ## Explicit non-goals
 
-This release adds no high-level dataframe/xarray API, unit conversion,
+This release adds no dataframe/xarray integration beyond the lean base-R API,
+unit conversion,
 meteorological ingestion, dew-point policy, classification thresholds,
 alternate solver, precision change, new physics, cache, parallelism, OpenMP,
 SIMD, GPU path, or fast-math mode.

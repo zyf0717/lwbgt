@@ -1,0 +1,3 @@
+CC = clang
+CC90 = clang -std=gnu90
+C90FLAGS =
