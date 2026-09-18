@@ -23,9 +23,13 @@ jobs:
     needs: release-tag
     uses: ./.github/workflows/wheels.yml
 
+  r-artifact:
+    needs: release-tag
+    uses: ./.github/workflows/r.yml
+
   testpypi-publish:
     name: Publish verified artifacts to TestPyPI
-    needs: artifacts
+    needs: [artifacts, r-artifact]
     runs-on: ubuntu-24.04
     environment:
       name: testpypi
@@ -161,7 +165,7 @@ jobs:
 
   github-release:
     name: Create GitHub release
-    needs: publish
+    needs: [publish, r-artifact]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -171,8 +175,12 @@ jobs:
           pattern: dist-*
           path: dist
           merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          name: cran-source
+          path: cran-dist
       - name: Create release for the existing annotated tag
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/* cran-dist/* --verify-tag --generate-notes

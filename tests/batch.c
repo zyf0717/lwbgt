@@ -149,6 +149,29 @@ static void check_argument_contract(const lwbgt_input_v1 *input)
         fail("null output was accepted");
 }
 
+static void check_invalid_date_failure(void)
+{
+    float estimated_wind = 1.0f;
+    float globe = 2.0f;
+    float natural_wet_bulb = 3.0f;
+    float psychrometric_wet_bulb = 4.0f;
+    float wbgt = 5.0f;
+    int status;
+
+    status = calc_wbgt(
+        1949, 1, 1, 12, 0, 0, 60, 0.0, 0.0, 500.0, 1013.0,
+        25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
+        &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
+    );
+    if (status != -1 ||
+        !same_float(estimated_wind, -9999.0f) ||
+        !same_float(globe, -9999.0f) ||
+        !same_float(natural_wet_bulb, -9999.0f) ||
+        !same_float(psychrometric_wet_bulb, -9999.0f) ||
+        !same_float(wbgt, -9999.0f))
+        fail("invalid date did not initialize failure outputs");
+}
+
 int main(int argc, char **argv)
 {
     lwbgt_input_v1 inputs[MAX_CASES];
@@ -181,6 +204,7 @@ int main(int argc, char **argv)
     if (count == 0) fail("no cases generated");
 
     check_argument_contract(&inputs[0]);
+    check_invalid_date_failure();
     memset(actual, 0xa5, count * sizeof(*actual));
     if (lwbgt_calc_batch_v1(inputs, actual, count) != LWBGT_BATCH_OK)
         fail("batch call failed");

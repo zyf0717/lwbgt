@@ -7,3 +7,8 @@ __pycache__/
 /wheelhouse/
 /sdist-wheel/
 /sdist-test/
+/lwbgt_*.tar.gz
+/lwbgt.Rcheck/
+/r/src/*.o
+/r/src/*.so
+/r/src/*.dll

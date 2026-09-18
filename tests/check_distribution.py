@@ -24,6 +24,12 @@ SDIST_BUILD_FILES = {
     "python/lwbgt/__init__.py",
     "python/lwbgt/_ffi.py",
     "python/lwbgt/_types.py",
+    "r/DESCRIPTION",
+    "r/NAMESPACE",
+    "r/R/lwbgt.R",
+    "r/src/wbgt.c",
+    "r/src/lwbgt.h",
+    "r/src/lwbgt_r.c",
 }
 
 
