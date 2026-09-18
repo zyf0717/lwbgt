@@ -59,23 +59,30 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
  
 #include	<math.h>
 
+/* Modified by Yifei/HeatStressDev: use prototypes accepted by current C compilers. */
+int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
+		int avg, double lat, double lon, double solar, double pres,
+		double Tair, double relhum, double speed, double zspeed, double dT,
+		int urban, float *est_speed, float *Tg, float *Tnwb, float *Tpsy,
+		float *Twbg);
+float esat(double tk, int phase);
+
 /* Modified by Yifei/HeatStressDev: omit the demonstration program from libraries. */
 #ifdef LWBGT_BUILD_DEMO
 #include	<stdio.h>
+#include	<stdlib.h>
 
 #define	MAXLINE	1000	/* Maximum input line length */
 
-int	main()
+int	main(void)
 
 {
 	char	string[MAXLINE];
-	int	urban, avg, calc_wbgt(), status, status2;
+	int	urban, avg, status, status2;
 	int	year, month = 0, day, time, hour, minute, gmt;
 	float	lat, lon;
 	float u30m, u10m, u2m, solar, Pair, RHair, Tair, dT30_2, dT10_2;
 	float speed, zspeed, est_speed, dT, Tg, Tg2, Tnwb, Tnwb2, Tpsy, Twbg, Twbg2;
-	
-	void	exit();
 	
 /* 
  *  input meteorological data from file
@@ -200,47 +207,54 @@ int	main()
 #define	CONVERGENCE	0.02
 #define	MAX_ITER	50
 
-int calc_wbgt(year, month, day, hour, minute, gmt, avg, lat, lon, 
-		solar, pres, Tair, relhum, speed, zspeed, dT, urban, est_speed,
-		Tg, Tnwb, Tpsy, Twbg)
+int calc_solar_parameters(int year, int month, double day, float lat,
+		float lon, float *solar, float *cza, float *fdir);
+float Twb(float Tair, float rh, float Pair, float speed, float solar,
+		float fdir, float cza, int rad);
+float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
+		float speed);
+float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
+		float fdir, float cza);
+float h_sphere_in_air(float diameter, float Tair, float Pair, float speed);
+float dew_point(float e, int phase);
+float viscosity(float Tair);
+float thermal_cond(float Tair);
+float diffusivity(float Tair, float Pair);
+float evap(float Tair);
+float emis_atm(float Tair, float rh);
+int solarposition(int year, int month, double day, double days_1900,
+		double latitude, double longitude, double *ap_ra, double *ap_dec,
+		double *altitude, double *refraction, double *azimuth,
+		double *distance);
+int daynum(int year, int month, int day);
+float est_wind_speed(float speed, float zspeed, int stability_class, int urban);
+int stab_srdt(int daytime, float speed, float solar, float dT);
 
-int	year,		/* 4-digit, e.g. 2007								*/
-	month,	/* month (1-12) or month = 0 implies iday is day of year		*/
-	day,		/* day of month or day of year (1-366)					*/
-	hour,		/* hour in local standard time (LST)					*/
-	minute,	/* minutes past the hour							*/
-	gmt,		/* LST-GMT difference, hours (negative in USA)				*/
-	avg,		/* averaging time of meteorological inputs, minutes			*/
-	urban;	/* select "urban" (1) or "rural" (0) wind speed power law exponent*/
-		
-float	lat,		/* north latitude, decimal							*/
-	lon,		/* east longitude, decimal (negative in USA)				*/
-	solar,	/* solar irradiance, W/m2							*/
-	pres,		/* barometric pressure, mb							*/
-	Tair,		/* air (dry bulb) temperature, degC						*/
-	relhum,	/* relative humidity, %								*/
-	speed,	/* wind speed, m/s								*/
-	zspeed,	/* height of wind speed measurement, m					*/
-	dT,		/* vertical temperature difference (upper minus lower), degC	*/
-		
-	*est_speed,	/* estimated speed at reference height, m/s				*/
-	*Tg,		/* globe temperature, degC							*/
-	*Tnwb,	/* natural wet bulb temperature, degC					*/
-	*Tpsy,	/* psychrometric wet bulb temperature, degC				*/
-	*Twbg;	/* wet bulb globe temperature, degC						*/
+int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
+		int avg, double lat_arg, double lon_arg, double solar_arg,
+		double pres_arg, double Tair_arg, double relhum_arg,
+		double speed_arg, double zspeed_arg, double dT_arg, int urban,
+		float *est_speed, float *Tg, float *Tnwb, float *Tpsy, float *Twbg)
 
 {
+	/* Preserve the scalar ABI's historical float conversion at function entry. */
 	float	cza,	/* cosine of solar zenith angle						*/
 		fdir,	/* fraction of solar irradiance due to direct beam			*/
 		tk,	/* temperature converted to kelvin						*/
 		rh,	/* relative humidity, fraction between 0 and 1				*/
-		est_wind_speed(),
-		Tglobe(),
-		Twb();
+		lat = (float)lat_arg,
+		lon = (float)lon_arg,
+		solar = (float)solar_arg,
+		pres = (float)pres_arg,
+		Tair = (float)Tair_arg,
+		relhum = (float)relhum_arg,
+		speed = (float)speed_arg,
+		zspeed = (float)zspeed_arg,
+		dT = (float)dT_arg;
 	
 	double hour_gmt, dday;
 	
-	int	daytime, stability_class, stab_srdt();
+	int	daytime, stability_class;
 /* 
  *  convert time to GMT and center in avg period;
  */
@@ -298,18 +312,8 @@ float	lat,		/* north latitude, decimal							*/
  *		 Argonne National Laboratory
  */
  
-int	calc_solar_parameters(year, month, day, lat, lon, solar, cza, fdir)
-
-int	year,		/* 4-digit year, e.g., 2007							*/
-	month;	/* 2-digit month; month = 0 implies day = day of year			*/
-	
-double day;		/* day.fraction of month if month > 0;
-			   else day.fraction of year if month = 0 (GMT)				*/
-float	lat,		/* north latitude									*/
-	lon,		/* east latitude (negative in USA)						*/
-	*solar,	/* solar irradiance (W/m2)							*/
-	*cza,		/* cosine of solar zenith angle						*/
-	*fdir;	/* fraction of solar irradiance due to direct beam			*/
+int calc_solar_parameters(int year, int month, double day, float lat,
+		float lon, float *solar, float *cza, float *fdir)
 	
 {
 	float	toasolar, normsolar; 
@@ -358,18 +362,8 @@ float	lat,		/* north latitude									*/
  *		 Argonne National Laboratory
  */
  
-float Twb(Tair, rh, Pair, speed, solar, fdir, cza, rad)
-
-float Tair,		/* air (dry bulb) temperature, degC						*/
-	rh,
-	Pair,		/* barometric pressure, mb							*/
-	speed,	/* wind speed, m/s								*/
-	solar,	/* solar irradiance, W/m2							*/
-	fdir,		/* fraction of solar irradiance due to direct beam			*/
-	cza;		/* cosine of solar zenith angle						*/
-	
-int	rad;		/* switch to enable/disable radiative heating; 
-			 * no radiative heating --> pyschrometric wet bulb temp		*/
+float Twb(float Tair, float rh, float Pair, float speed, float solar,
+		float fdir, float cza, int rad)
 		
 {
 	static float a = 0.56; /* from Bedingfield and Drew */
@@ -378,9 +372,7 @@ int	rad;		/* switch to enable/disable radiative heating;
 		eair, ewick, density, 
 		Sc,	/* Schmidt number */
 		h,	/* convective heat transfer coefficient */
-		Fatm, /* radiative heating term */
-		esat(), dew_point(), h_cylinder_in_air(), 
-		viscosity(), diffusivity(), evap(), emis_atm();
+		Fatm; /* radiative heating term */
 	double	Fatm_base, solar_base;
 		
 	int	converged, iter;
@@ -433,13 +425,8 @@ int	rad;		/* switch to enable/disable radiative heating;
  *
  */
  
-float h_cylinder_in_air(diameter, length, Tair, Pair, speed)
- 
-float	diameter,	/* cylinder diameter, m								*/
-	length,	/* cylinder length, m								*/
-	Tair,		/* air temperature, K								*/
-	Pair,		/* barometric pressure, mb							*/
-	speed;	/* fluid (wind) speed, m/s							*/
+float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
+		float speed)
 	
 {
 	static float a = 0.56,  /* parameters from Bedingfield and Drew */
@@ -450,8 +437,9 @@ float	diameter,	/* cylinder diameter, m								*/
 		mu,
 		conductivity,
 		Re,	/* Reynolds number								*/
-		Nu,	/* Nusselt number									*/
-		viscosity();
+		Nu;	/* Nusselt number									*/
+
+	(void)length;
 		
 	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
 	mu = viscosity(Tair);
@@ -470,19 +458,11 @@ float	diameter,	/* cylinder diameter, m								*/
  *		 Argonne National Laboratory
  */
  
-float Tglobe(Tair, rh, Pair, speed, solar, fdir, cza)
-
-float Tair,		/* air (dry bulb) temperature, degC						*/
-	rh,		/* relative humidity, fraction between 0 and 1				*/
-	Pair,		/* barometric pressure, mb							*/
-	speed,	/* wind speed, m/s								*/
-	solar,	/* solar irradiance, W/m2							*/
-	fdir,		/* fraction of solar irradiance due to direct beam			*/
-	cza;		/* cosine of solar zenith angle						*/
+float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
+		float fdir, float cza)
 	
 {
-	float	Tsfc, Tref, Tglobe_prev, Tglobe_new, h,
-		h_sphere_in_air(), emis_atm();
+	float	Tsfc, Tref, Tglobe_prev, Tglobe_new, h;
 	double	Fatm_base, solar_base;
 		
 	int	converged, iter;
@@ -521,20 +501,14 @@ float Tair,		/* air (dry bulb) temperature, degC						*/
  *
  */
  
-float h_sphere_in_air(diameter, Tair, Pair, speed)
- 
-float	diameter,	/* sphere diameter, m							*/
-	Tair,		/* air temperature, K							*/
-	Pair,		/* barometric pressure, mb						*/
-	speed;	/* fluid (air) speed, m/s						*/
+float h_sphere_in_air(float diameter, float Tair, float Pair, float speed)
 	
 {
 	float	density,
 		mu,
 		conductivity,
 		Re,	/* Reynolds number							*/
-		Nu,	/* Nusselt number								*/
-		viscosity();
+		Nu;	/* Nusselt number								*/
 		
 	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
 	mu = viscosity(Tair);
@@ -553,27 +527,25 @@ float	diameter,	/* sphere diameter, m							*/
  *  Reference: Buck's (1981) approximation (eqn 3) of Wexler's (1976) formulae.
  */
  
-float esat(tk,phase)
-
-float	tk;	/* air temperature, K */
-int	phase;
+float esat(double tk_arg, int phase)
 
 {
-	float y, es;
+	/* Preserve the scalar ABI's historical float conversion at function entry. */
+	float tk = (float)tk_arg, y, es;
 	
 	if ( phase == 0 ) {	/* over liquid water */
 		y = (tk - 273.15)/(tk - 32.18);
 		es = 6.1121 * exp( 17.502 * y );
-/*		es = (1.0007 + (3.46E-6 * pres)) * es /* correction for moist air, if pressure is available */
+/*		es = (1.0007 + (3.46E-6 * pres)) * es; correction for moist air, if pressure is available */
 	} 
 	else {			/* over ice */
 		y = (tk - 273.15)/(tk - 0.6);
 		es = 6.1115 * exp( 22.452 * y );
-/*		es = (1.0003 + (4.18E-6 * pres)) * es /* correction for moist air, if pressure is available */
+/*		es = (1.0003 + (4.18E-6 * pres)) * es; correction for moist air, if pressure is available */
 	}
 	
 	es = 1.004 * es;  /* correction for moist air, if pressure is not available; for pressure > 800 mb */
-/*	es = 1.0034 * es; /* correction for moist air, if pressure is not available; for pressure down to 200 mb */
+/*	es = 1.0034 * es; correction for moist air, if pressure is not available; for pressure down to 200 mb */
 
 	return ( es );
 }
@@ -583,10 +555,7 @@ int	phase;
  *           temperature, K.
  */
  
-float dew_point(e,phase)
-
-float	e;	/* vapor pressure, mb */
-int	phase;
+float dew_point(float e, int phase)
 
 {
 	float z, tdk;
@@ -609,9 +578,7 @@ int	phase;
  *  Reference: BSL, page 23.
  */
  
-float viscosity(Tair)
-
-float	Tair;	/* air temperature, K */
+float viscosity(float Tair)
 
 {
 	static float sigma = 3.617,
@@ -630,13 +597,9 @@ float	Tair;	/* air temperature, K */
  *  Reference: BSL, page 257.
  */
  
-float thermal_cond(Tair)
-
-float	Tair;	/* air temperature, K */
+float thermal_cond(float Tair)
 
 {			 
-	float	viscosity();
-
 	return( ( Cp + 1.25 * R_AIR ) * viscosity(Tair) );
 }
 
@@ -646,10 +609,7 @@ float	Tair;	/* air temperature, K */
  *  Reference: BSL, page 505.
  */
  
-float diffusivity(Tair,Pair)
-
-float	Tair,	/* Air temperature, K */
-	Pair; /* Barometric pressure, mb */
+float diffusivity(float Tair, float Pair)
 
 {
 	static float Pcrit_air = 36.4, 
@@ -677,9 +637,7 @@ float	Tair,	/* Air temperature, K */
  *  Reference: Van Wylen and Sonntag, Table A.1.1
  */
  
-float evap(Tair)
-
-float	Tair;	/* air temperature, K */
+float evap(float Tair)
 
 {			 
 	return( (313.15 - Tair)/30. * (-71100.) + 2.4073E6 );
@@ -691,13 +649,10 @@ float	Tair;	/* air temperature, K */
  *  Reference: Oke (2nd edition), page 373.
  */
  
-float emis_atm(Tair, rh)
-
-float	Tair,	/* air temperature, K */
-	rh;	/* relative humidity, fraction between 0 and 1 */
+float emis_atm(float Tair, float rh)
 
 {
-	float e, esat();
+	float e;
 	
 	e = rh * esat(Tair,0);
 	return( 0.575 * pow(e, 0.143) );
@@ -767,54 +722,12 @@ float	Tair,	/* air temperature, K */
 #define	DEG_RAD	0.017453292519943295
 #define	RAD_DEG	57.295779513082323
 
-double acos(),
-       asin(),
-       atan2(),
-       cos(),
-       fabs(),
-       modf(),
-       sin(),
-       tan();
-
-
-int solarposition(year, month, day, days_1900, latitude, longitude,
-                  ap_ra, ap_dec, altitude, refraction, azimuth, distance)
-
-int    year,          /* Four digit year (Gregorian calendar).
-                       *   [1950 through 2049; 0 o.k. if using days_1900] */
-       month;         /* Month number.
-                       *   [1 through 12; 0 o.k. if using daynumber for day] */
-double day,           /* Calendar day.fraction, or daynumber.fraction.
-                       *   [If month is NOT 0:
-                       *      0 through 32; 31st @ 18:10:00 UT = 31.75694
-                       *    If month IS 0:
-                       *      0 through 367; 366 @ 18:10:00 UT = 366.75694] */
-       days_1900,     /* Days since 1900 January 0 @ 00:00:00 UT.
-                       *   [18262.0 (1950/01/00) through 54788.0 (2049/12/32);
-                       *    1990/01/01 @ 18:10:00 UT = 32873.75694;
-                       *    0.0 o.k. if using {year, month, day} or
-                       *    {year, daynumber}] */
-       latitude,      /* Observation site geographic latitude.
-                       *   [degrees.fraction, North positive] */
-       longitude,     /* Observation site geographic longitude.
-                       *   [degrees.fraction, East positive] */
-       *ap_ra,        /* Apparent solar right ascension.
-                       *   [hours; 0.0 <= *ap_ra < 24.0] */
-       *ap_dec,       /* Apparent solar declination.
-                       *   [degrees; -90.0 <= *ap_dec <= 90.0] */
-       *altitude,     /* Solar altitude, uncorrected for refraction.
-                       *   [degrees; -90.0 <= *altitude <= 90.0] */
-       *refraction,   /* Refraction correction for solar altitude.
-                       * Add this to altitude to compensate for refraction.
-                       *   [degrees; 0.0 <= *refraction] */
-       *azimuth,      /* Solar azimuth.
-                       *   [degrees; 0.0 <= *azimuth < 360.0, East is 90.0] */
-       *distance;     /* Distance of Sun from Earth (heliocentric-geocentric).
-                       *   [astronomical units; 1 a.u. is mean distance] */
+int solarposition(int year, int month, double day, double days_1900,
+		double latitude, double longitude, double *ap_ra, double *ap_dec,
+		double *altitude, double *refraction, double *azimuth,
+		double *distance)
 
 {
-  int    daynum();        /* Computes a sequential daynumber during a year. */
-
   int    daynumber,       /* Sequential daynumber during a year. */
          delta_days,      /* Whole days since 2000 January 0. */
          delta_years;     /* Whole years since 2000. */
@@ -1059,8 +972,7 @@ double day,           /* Calendar day.fraction, or daynumber.fraction.
  *         U.S.A.
  */
 
-int daynum(year, month, day)
-int year, month, day;
+int daynum(int year, int month, int day)
 {
   static int begmonth[13] = {0,0,31,59,90,120,151,181,212,243,273,304,334};
   int dnum,
@@ -1091,13 +1003,7 @@ int year, month, day;
  *  Reference: EPA-454/5-99-005, 2000, section 6.2.5
  */
 
-float est_wind_speed(speed, zspeed, stability_class, urban)
-
-int	stability_class,
-	urban;
-	
-float	speed,
-	zspeed;
+float est_wind_speed(float speed, float zspeed, int stability_class, int urban)
 	
 {
 	float urban_exp[6] = { 0.15, 0.15, 0.20, 0.25, 0.30, 0.30 },
@@ -1120,13 +1026,7 @@ float	speed,
  *
  *  Reference: EPA-454/5-99-005, 2000, section 6.2.5
  */
-int stab_srdt(daytime, speed, solar, dT)
-
-int	daytime;
-
-float	speed,
-	solar,
-	dT;
+int stab_srdt(int daytime, float speed, float solar, float dT)
 	
 {
 	static int	lsrdt[6][8] = {
