@@ -84,7 +84,7 @@ jobs:
               ;;
             Windows)
               export_rows="$(objdump -p "$dll" |
-                grep -E '^[[:space:]]*\[[[:space:]]*[0-9]+\]' || true)"
+                grep -E '^[[:space:]]*\[[[:space:]]*[0-9]+\][[:space:]]+[A-Za-z_]' || true)"
               printf 'Windows export rows:\n%s\n' "$export_rows"
               export_count="$(printf '%s\n' "$export_rows" |
                 awk 'NF { count++ } END { print count + 0 }')"
