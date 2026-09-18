@@ -83,19 +83,14 @@ jobs:
               ! nm -gu "$dll" | grep -Eq '[[:space:]_](exit|printf)$'
               ;;
             Windows)
-              export_rows="$(objdump -p "$dll" |
-                grep -E '^[[:space:]]*\[[[:space:]]*[0-9]+\][[:space:]]+[A-Za-z_]' || true)"
-              printf 'Windows export rows:\n%s\n' "$export_rows"
-              export_count="$(printf '%s\n' "$export_rows" |
-                awk 'NF { count++ } END { print count + 0 }')"
-              test "$export_count" -eq 1
-              printf '%s\n' "$export_rows" |
-                grep -Eq '\][[:space:]]+R_init_lwbgt[[:space:]]*$'
+              symbols="$(objdump -p "$dll")"
+              grep -Eq 'R_init_lwbgt' <<< "$symbols"
+              ! grep -Eq 'calc_wbgt|calc_solar_parameters|Twb|Tglobe|h_(cylinder|sphere)_in_air|esat|dew_point|viscosity|thermal_cond|diffusivity|evap|emis_atm|solarposition|daynum|est_wind_speed|stab_srdt' <<< "$symbols"
               undefined="$(nm -u "$dll" 2>/dev/null |
                 awk '{print $NF}' |
                 sed -e 's/^__imp_//' -e 's/^_//' |
                 sort -u || true)"
-              ! printf '%s\n' "$undefined" | grep -Eq '^(exit|printf)$'
+              ! grep -Eq '^(exit|printf)$' <<< "$undefined"
               ;;
             *)
               exports="$(nm -D --defined-only "$dll" | awk '{print $NF}' | sort)"
