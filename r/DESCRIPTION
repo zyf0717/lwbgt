@@ -17,7 +17,8 @@ Description: Computes outdoor wet bulb globe temperature using the
     per-row validation, and deterministic failure reporting.
 License: file LICENSE
 Copyright: See file inst/COPYRIGHTS.
-URL: https://github.com/zyf0717/lwbgt
+URL: https://github.com/zyf0717/lwbgt,
+    https://zyf0717.r-universe.dev/lwbgt
 BugReports: https://github.com/zyf0717/lwbgt/issues
 Depends: R (>= 4.3.0)
 SystemRequirements: USE_C90

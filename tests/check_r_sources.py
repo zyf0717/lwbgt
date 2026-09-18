@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Require the CRAN package to carry exact copies of the public native sources."""
+"""Require the R package to carry exact copies of the public native sources."""
 
 from __future__ import annotations
 
