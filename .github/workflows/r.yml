@@ -1,6 +1,9 @@
 name: R package
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
   workflow_call:
   workflow_dispatch:
@@ -67,7 +70,7 @@ jobs:
       - name: Build and check without the PDF manual
         run: |
           R CMD build r
-          R CMD check --as-cran --no-manual lwbgt_*.tar.gz
+          R CMD check --no-manual lwbgt_*.tar.gz
           ! grep -Eq '^Status:.*(ERROR|WARNING)' lwbgt.Rcheck/00check.log
       - name: Require Clang compilation
         if: matrix.compiler == 'clang'
@@ -99,8 +102,8 @@ jobs:
               ;;
           esac
 
-  cran-source:
-    name: Checked CRAN source package
+  r-source:
+    name: Checked R source package
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -120,14 +123,14 @@ jobs:
         run: |
           python tests/check_versions.py
           python tests/check_r_sources.py
-      - name: Build and run the complete CRAN check
+      - name: Build and run the complete R package check
         run: |
           R CMD build r
-          R CMD check --as-cran lwbgt_*.tar.gz
+          R CMD check lwbgt_*.tar.gz
           ! grep -Eq '^Status:.*(ERROR|WARNING)' lwbgt.Rcheck/00check.log
-      - name: Upload the checked CRAN source package
+      - name: Upload the checked R source package
         uses: actions/upload-artifact@v7
         with:
-          name: cran-source
+          name: r-source
           path: lwbgt_*.tar.gz
           if-no-files-found: error

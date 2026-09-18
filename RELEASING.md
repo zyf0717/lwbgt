@@ -1,16 +1,18 @@
 # Release process
 
-The v0.4 release consists of the CRAN source package, five
+The v0.4 release consists of one checked R source package, five
 Python-ABI-independent platform wheels, and one Python source distribution.
-The R package must be accepted from the release commit before that commit is
-tagged or any Python/GitHub artifacts are published.
+The R package is distributed from GitHub and R-universe; it is not submitted
+to CRAN because the bundled numerical source remains under the UChicago
+Argonne licence.
 
 ## One-time service configuration
 
 1. Configure the PyPI and TestPyPI Trusted Publishers for repository
    `zyf0717/lwbgt`, workflow `release.yml`, and their matching protected GitHub
    environments. Do not add API tokens.
-2. Ensure the CRAN maintainer email in `r/DESCRIPTION` is current and verified.
+2. Install the R-universe GitHub app for the `zyf0717` account and allow it to
+   report commit statuses for this repository.
 
 ## Release sequence
 
@@ -18,8 +20,8 @@ tagged or any Python/GitHub artifacts are published.
    `DESCRIPTION`, `CITATION.cff`, and the README. Add the changelog entry.
 2. Require green native, wheel, and R-package CI on the exact release commit.
    The R workflow checks Linux/GCC, Linux/Clang with R-devel, Windows/Rtools,
-   and macOS/AppleClang. Its `cran-source` artifact has passed
-   `R CMD check --as-cran`, including the PDF manual.
+   and macOS/AppleClang. Its `r-source` artifact has passed a complete
+   `R CMD check`, including the PDF manual.
 3. Download the CI artifacts and independently verify them:
 
    ```sh
@@ -27,26 +29,47 @@ tagged or any Python/GitHub artifacts are published.
    python tests/check_r_sources.py
    python tests/check_distribution.py dist/*
    python -m twine check dist/*
-   R CMD check --as-cran lwbgt_0.4.0.tar.gz
+   R CMD check lwbgt_0.4.0.tar.gz
    ```
 
-4. Rehearse the unchanged CRAN tarball on win-builder and macbuilder. Inspect
-   package size, manual, DLL dependencies, examples, and installed legal files.
-5. Submit that checked tarball to CRAN from the untagged release commit. Address
-   reviewer feedback. If any source changes are required, bump the unified
-   project version, rebuild all artifacts, and restart this sequence. If CRAN
-   rejects the unlisted UChicago Argonne licence, stop and obtain a
-   standard-licence grant; do not remove or rewrite the upstream terms.
-6. After CRAN accepts the unchanged commit, create and push its annotated or
-   signed tag:
+4. Create and push an annotated or signed tag only after every release gate
+   passes:
 
    ```sh
    git tag -s v0.4.0 -m "lwbgt v0.4.0"
    git push origin v0.4.0
    ```
 
-7. The tag workflow reruns the complete R and Python artifact gates, publishes
+5. The tag workflow reruns the complete R and Python artifact gates, publishes
    to TestPyPI, verifies byte identity and installation, publishes to PyPI, and
-   creates a GitHub release containing the Python and CRAN source artifacts.
-8. Verify CRAN, PyPI, and GitHub metadata and clean installations. Never delete
-   and re-upload a defective immutable artifact; issue a patch release.
+   creates a GitHub release containing the Python and R source artifacts.
+6. For the first R release, add this entry to `packages.json` in
+   `zyf0717/zyf0717.r-universe.dev`, preserving the existing entries:
+
+   ```json
+   {
+       "package": "lwbgt",
+       "url": "https://github.com/zyf0717/lwbgt",
+       "subdir": "r",
+       "branch": "*release"
+   }
+   ```
+
+   Do this after the v0.4 GitHub release exists: the preceding v0.3 release
+   does not contain the R package. The `subdir` is required because
+   `DESCRIPTION` is under `r/`; `*release` keeps later R-universe builds on the
+   latest published GitHub release.
+7. R-universe detects the new GitHub release through the `*release` registry
+   entry and builds the package from `r/`. Require a successful build for the
+   tagged commit at `https://zyf0717.r-universe.dev/lwbgt` before announcing
+   the R release.
+8. Verify PyPI and GitHub metadata, then test both supported R installation
+   paths in clean R libraries:
+
+   ```r
+   install.packages("lwbgt", repos = "https://zyf0717.r-universe.dev")
+   remotes::install_github("zyf0717/lwbgt/r@*release", upgrade = "never")
+   ```
+
+Never delete and re-upload a defective immutable artifact; issue a patch
+release.

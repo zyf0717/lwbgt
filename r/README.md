@@ -4,6 +4,20 @@
 reference-compatible Liljegren outdoor wet bulb globe temperature kernel.
 Input names and units match the native and Python APIs.
 
+Install the latest release from R-universe:
+
+```r
+install.packages("lwbgt", repos = "https://zyf0717.r-universe.dev")
+```
+
+Or install the latest GitHub release directly from this repository's `r/`
+subdirectory:
+
+```r
+install.packages("remotes", repos = "https://cloud.r-project.org")
+remotes::install_github("zyf0717/lwbgt/r@*release")
+```
+
 ```r
 input <- lwbgt_input(
     year = 2024, month = 4, day = 15, hour = 14, minute = 30,

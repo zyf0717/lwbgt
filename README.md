@@ -3,6 +3,8 @@
 [![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
 [![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
 [![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
+[![R-universe version](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
+[![R-universe checks](https://zyf0717.r-universe.dev/lwbgt/badges/checks)](https://zyf0717.r-universe.dev/lwbgt)
 [![PyPI version](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
@@ -16,10 +18,11 @@ services, and high-throughput data pipelines.
 
 Python and R provide official dependency-free bindings to that same native
 kernel. Install a self-contained Python wheel with `pip install lwbgt`; the R
-package is under `r/` and is prepared for CRAN. Input units are explicit in
-field names and are never converted implicitly. The package intentionally does
-not add meteorological preprocessing, classifications, advisory policy, or
-alternate WBGT methods.
+package is published through R-universe and can also be installed directly
+from the `r/` subdirectory on GitHub. Input units are explicit in field names
+and are never converted implicitly. The package intentionally does not add
+meteorological preprocessing, classifications, advisory policy, or alternate
+WBGT methods.
 For those higher-level workflows, consider
 [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
@@ -94,10 +97,18 @@ Python runtime dependency is required.
 
 ## R installation and quick start
 
-Until the CRAN release is accepted, install the package from this repository:
+Install the latest release from R-universe:
 
-```sh
-R CMD INSTALL r
+```r
+install.packages("lwbgt", repos = "https://zyf0717.r-universe.dev")
+```
+
+Alternatively, install the latest GitHub release directly from its `r/`
+subdirectory:
+
+```r
+install.packages("remotes", repos = "https://cloud.r-project.org")
+remotes::install_github("zyf0717/lwbgt/r@*release")
 ```
 
 ```r

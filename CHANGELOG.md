@@ -2,7 +2,7 @@
 
 ## v0.4.0 — 2026-09-18
 
-- Added a dependency-free CRAN package under `r/` with the plain-data-frame
+- Added a dependency-free R package under `r/` with the plain-data-frame
   `lwbgt_input()`, `calculate()`, and vectorized `esat()` API.
 - Matched the Python wrapper's input names, units, ordering, and public `esat`
   default while adding per-row R validation and stable failure statuses.
@@ -10,8 +10,8 @@
   forced native symbols and the native floating-point safety flags.
 - Guarded the legacy demonstration program out of library builds and made
   invalid solar-position inputs return initialized failure outputs.
-- Added base-R API tests, source/version coherence gates, multi-platform CRAN
-  checks, and a CRAN-first release sequence.
+- Added base-R API tests, source/version coherence gates, multi-platform R
+  package checks, direct GitHub installation, and R-universe distribution.
 
 ## v0.3.0 — 2026-08-19
 
