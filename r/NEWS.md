@@ -1,3 +1,9 @@
+# lwbgt 0.4.1
+
+- Declared the CRAN-facing package license as Apache License 2.0 while
+  preserving the original UChicago Argonne terms and attribution for the
+  bundled Liljegren-derived `src/wbgt.c`.
+
 # lwbgt 0.4.0
 
 - Added the first R interface with dependency-free vectorized

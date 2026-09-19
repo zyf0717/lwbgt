@@ -27,7 +27,7 @@ For those higher-level workflows, consider
 [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.0.** v0.1.0 is the frozen scalar-compatibility release.
+**Release status: v0.4.1.** v0.1.0 is the frozen scalar-compatibility release.
 Its complete permitted optimization set measures
 1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
 The v0.2.0 position-independent static build measures 1.249× on the GCC 13

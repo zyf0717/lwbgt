@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 library(lwbgt)
 
 assert_error <- function(expr) {

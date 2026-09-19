@@ -45,6 +45,12 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
 ******************************************************************************************/
 
 /*
+ * DERIVATIVE WORK NOTICE
+ * Modified by Yifei Zheng / HeatStressDev, 2026. This file contains changes
+ * from Liljegren WBGT v1.1 and remains governed by the terms above.
+ */
+
+/*
  *  Purpose: to demonstrate the use of the subroutine calc_wbgt to calculate
  *           the wet bulb-globe temperature (WBGT).  The program reads input 
  *           data from a file containing meteorological measurements then 
@@ -59,7 +65,7 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
  
 #include	<math.h>
 
-/* Modified by Yifei/HeatStressDev: use prototypes accepted by current C compilers. */
+/* Use prototypes accepted by current C compilers. */
 int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		int avg, double lat, double lon, double solar, double pres,
 		double Tair, double relhum, double speed, double zspeed, double dT,
@@ -67,7 +73,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		float *Twbg);
 float esat(double tk, int phase);
 
-/* Modified by Yifei/HeatStressDev: omit the demonstration program from libraries. */
+/* Omit the demonstration program from libraries. */
 #ifdef LWBGT_BUILD_DEMO
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -264,7 +270,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
  *  calculate the cosine of the solar zenith angle and fraction of solar irradiance
  *  due to the direct beam; adjust the solar irradiance if it is out of bounds
  */
-	/* Modified by Yifei/HeatStressDev: propagate invalid solar-position inputs. */
+	/* Propagate invalid solar-position inputs. */
 	if ( calc_solar_parameters(year, month, dday, lat, lon, &solar, &cza, &fdir) != 0 ) {
 		*est_speed = *Tg = *Tnwb = *Tpsy = *Twbg = -9999.;
 		return -1;
@@ -320,7 +326,7 @@ int calc_solar_parameters(int year, int month, double day, float lat,
 	
 	double days_1900 = 0.0, ap_ra, ap_dec, elev, refr, azim, soldist;
 	
-	/* Modified by Yifei/HeatStressDev: do not consume unset outputs on failure. */
+	/* Do not consume unset outputs on failure. */
 	if ( solarposition(year, month, day, days_1900, (double)lat, (double)lon,
 		&ap_ra, &ap_dec, &elev, &refr, &azim, &soldist) != 0 )
 		return(-1);
@@ -378,7 +384,7 @@ float Twb(float Tair, float rh, float Pair, float speed, float solar,
 	int	converged, iter;
 	
 	Tsfc = Tair;
-	/* Modified by Yifei/HeatStressDev: skip dead radiative work when rad == 0. */
+	/* Skip dead radiative work when rad == 0. */
 	if ( rad )
 		sza = acos(cza); /* solar zenith angle, radians */
 	else
@@ -386,7 +392,7 @@ float Twb(float Tair, float rh, float Pair, float speed, float solar,
 	eair = rh * esat(Tair,0);
 	Tdew = dew_point(eair,0);
 	Twb_prev = Tdew; /* first guess is the dew point temperature */
-	/* Modified by Yifei/HeatStressDev: hoist loop-invariant radiation work. */
+	/* Hoist loop-invariant radiation work. */
 	if ( rad ) {
 		Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
 		solar_base = (1.-ALB_WICK) * solar *
@@ -441,7 +447,7 @@ float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
 
 	(void)length;
 		
-	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
+	/* Reuse rounded viscosity in conductivity. */
 	mu = viscosity(Tair);
 	density = Pair * 100. / ( R_AIR * Tair );
 	Re = max(speed,MIN_SPEED) * density * diameter / mu;
@@ -469,7 +475,7 @@ float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
 	
 	Tsfc = Tair;
 	Tglobe_prev = Tair; /* first guess is the air temperature */
-	/* Modified by Yifei/HeatStressDev: hoist loop-invariant radiation work. */
+	/* Hoist loop-invariant radiation work. */
 	Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
 	solar_base = solar/(2.*STEFANB*EMIS_GLOBE)*(1.-ALB_GLOBE)*
 		     (fdir*(1./(2.*cza)-1.)+1.+ ALB_SFC);
@@ -510,7 +516,7 @@ float h_sphere_in_air(float diameter, float Tair, float Pair, float speed)
 		Re,	/* Reynolds number							*/
 		Nu;	/* Nusselt number								*/
 		
-	/* Modified by Yifei/HeatStressDev: reuse rounded viscosity in conductivity. */
+	/* Reuse rounded viscosity in conductivity. */
 	mu = viscosity(Tair);
 	density = Pair * 100. / ( R_AIR * Tair );
 	Re = max(speed,MIN_SPEED) * density * diameter / mu;

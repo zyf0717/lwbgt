@@ -1,7 +1,7 @@
 Package: lwbgt
 Type: Package
 Title: Reference-Compatible Outdoor Wet Bulb Globe Temperature
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Yifei", "Zheng", email = "zyf0717@gmail.com",
            role = c("aut", "cre", "cph"),
@@ -15,7 +15,7 @@ Description: Computes outdoor wet bulb globe temperature using the
     al. (2008) <doi:10.1080/15459620802310770>. Provides dependency-free,
     vectorized access to the native calculation with explicit input units,
     per-row validation, and deterministic failure reporting.
-License: file LICENSE
+License: Apache License (== 2.0)
 Copyright: See file inst/COPYRIGHTS.
 URL: https://github.com/zyf0717/lwbgt,
     https://zyf0717.r-universe.dev/lwbgt
