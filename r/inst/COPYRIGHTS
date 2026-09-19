@@ -1,12 +1,17 @@
-Package-authored files
+Project-authored R code, bridge code, documentation, tests, and metadata
   Copyright 2026 Yifei Zheng.
-  Apache License, Version 2.0.
+  Licensed under the Apache License, Version 2.0.
+  Full license text: LICENSES/Apache-2.0.txt.
 
 Bundled Liljegren WBGT derivative: src/wbgt.c
   Copyright 2008 UChicago Argonne, LLC. All Rights Reserved.
-  UChicago Argonne Liljegren WBGT v1.1 terms.
+  This derivative is governed by the original UChicago Argonne Liljegren
+  WBGT v1.1 terms.
   Original author: James C. Liljegren.
   Solar-position code author: Nels Larson.
-  Derivative modifications: Yifei/HeatStressDev.
+  Derivative modifications are attributed to Yifei/HeatStressDev in the
+  blanket derivative-work notice in src/wbgt.c.
+  Full license text:
+  LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt.
 
-See LICENSE, LICENSES/, and NOTICE in the installed package.
+See LICENSES/ and NOTICE in the installed package.

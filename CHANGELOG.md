@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.1 — 2026-09-19
+
+- Declared the CRAN-facing R package license as standard Apache License 2.0.
+- Preserved the original UChicago Argonne license, attribution, and required
+  acknowledgement for the bundled Liljegren-derived source.
+
 ## v0.4.0 — 2026-09-18
 
 - Added a dependency-free R package under `r/` with the plain-data-frame

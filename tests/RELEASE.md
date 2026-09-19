@@ -1,8 +1,8 @@
-# v0.4.0 release verification
+# v0.4.1 release verification
 
-v0.4.0 adds the dependency-free base-R package under `r/`. It compiles a
-synchronized copy of the existing kernel directly into the package DLL; the C
-ABI remains version 1 and Python behavior is unchanged.
+v0.4.1 declares the CRAN-facing R package license as standard Apache License
+2.0 while preserving the separate UChicago Argonne terms for the synchronized
+Liljegren-derived kernel. The C ABI remains version 1.
 
 Release acceptance requires:
 
@@ -25,13 +25,14 @@ release; the `*release` entry in `zyf0717/zyf0717.r-universe.dev` then makes
 that release available through R-universe. A required source change after
 publication requires a unified version bump and a new release.
 
-Local Linux/GCC 13 verification on 2026-09-18 passed all 11 CTest tests,
-including the 454-case exact-equivalence suite, all 17 installed-wheel tests,
-and the full R test file. The complete R package check completed with 0 errors
-and 0 warnings. The installed R DLL exports only `R_init_lwbgt`, has no `exit`
-or `printf` import, and includes all legal files. Cross-platform, direct
-GitHub-install, and R-universe results remain pending until their respective
-CI and release steps run.
+Local release verification on 2026-09-19 passed version and R-source coherence,
+the Python runtime-version and distribution-license fixtures, `R CMD build`,
+and the full R test file under `R CMD check --as-cran`. The CRAN check completed
+with 0 errors and no license-related warnings or notes. Its environment emitted
+one warning for the unavailable optional `checkbashisms` script and two notes
+for a new submission and a compiler-injected flag. Full native, wheel,
+cross-platform, direct GitHub-install, and R-universe results remain pending
+until their respective local or CI release gates run.
 
 Historical verification is retained in `RELEASE-0.1.0.md`,
 `RELEASE-0.2.0.md`, and `RELEASE-0.2.1.md`.

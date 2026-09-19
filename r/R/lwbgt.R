@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 .lwbgt_input_names <- c(
     "year",
     "month",
