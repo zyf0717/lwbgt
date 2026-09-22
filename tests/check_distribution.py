@@ -19,6 +19,7 @@ SDIST_BUILD_FILES = {
     "pyproject.toml",
     "README.md",
     "docs/ABI.md",
+    "docs/COMPATIBILITY.md",
     "docs/COMPARISON.md",
     "docs/FAQ.md",
     "docs/README.md",

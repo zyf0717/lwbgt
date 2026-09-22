@@ -87,28 +87,12 @@ metadata, and `pkg-config` metadata. CMake consumers can select
 GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC cannot compile the
 preserved K&R source.
 
-## Compatibility and performance
-
-The shared library exports only `calc_wbgt`, `esat`, and
-`lwbgt_calc_batch_v1`. Independent calls with separate buffers are thread-safe;
-a batch call is serial. The acceptance policy requires exact 32-bit output
-equality for matched compilers and floating-point flags.
-
-| Environment | Exact result | Median overall speedup |
-|---|---:|---:|
-| Linux x86-64, GCC 13.3.0 | bit-identical | 1.316× |
-| Linux x86-64 container, GCC 16.2.0 | bit-identical | 1.289× |
-| Linux x86-64, GCC 13.3.0, PIC build | bit-identical | 1.249× |
-
-These measurements apply only to the documented environments and workloads.
-Full methods and retained results are in the
-[benchmark documentation](https://github.com/zyf0717/lwbgt/tree/main/benchmarks).
-
 ## Documentation
 
 | Topic | Document |
 |---|---|
 | Inputs, units, layouts, status codes, and concurrency | [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md) |
+| Numerical compatibility and measured performance | [Compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md) |
 | Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
 | Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
 | Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |

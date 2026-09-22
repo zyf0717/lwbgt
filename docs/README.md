@@ -6,6 +6,7 @@ installation and first use. Detailed project documentation is organized here:
 | Document | Contents |
 |---|---|
 | [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md) | Native layouts, units, status codes, ownership, concurrency, and supported symbols |
+| [Compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md) | Exact-result policy and measured speedups |
 | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) | Scope, integration, input handling, and common package questions |
 | [Package comparison](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) | Documented differences between `lwbgt`, `pywbgt`, and `thermofeel` |
 | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) | Source lineage and retained oracle |
