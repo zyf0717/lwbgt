@@ -46,7 +46,7 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
 
 /*
  * DERIVATIVE WORK NOTICE
- * Modified by Yifei Zheng / HeatStressDev, 2026. This file contains changes
+ * Modified by Yifei Zheng, 2026. This file contains changes
  * from Liljegren WBGT v1.1 and remains governed by the terms above.
  */
 

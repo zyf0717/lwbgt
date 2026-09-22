@@ -34,7 +34,7 @@ point input is an ABI-boundary `double`.
 
 | Offset | Field | Type | Units and meaning |
 |---:|---|---|---|
-| 0 | `year` | `int32_t` | Four-digit Gregorian year |
+| 0 | `year` | `int32_t` | Four-digit Gregorian year; solar-position support is 1950–2049 |
 | 4 | `month` | `int32_t` | Month 1–12; 0 means `day` is day-of-year |
 | 8 | `day` | `int32_t` | Day of month, or day-of-year when `month == 0` |
 | 12 | `hour` | `int32_t` | Local standard-time hour, 0–23 |
@@ -42,8 +42,8 @@ point input is an ABI-boundary `double`.
 | 20 | `gmt_offset_hours` | `int32_t` | Local standard time minus GMT, in hours |
 | 24 | `averaging_minutes` | `int32_t` | Input averaging interval in minutes |
 | 28 | `urban` | `int32_t` | 0 selects rural; 1 selects urban wind scaling |
-| 32 | `latitude_deg_north` | `double` | Degrees north; south is negative |
-| 40 | `longitude_deg_east` | `double` | Degrees east; west is negative |
+| 32 | `latitude_deg_north` | `double` | Degrees north in [-90, 90] |
+| 40 | `longitude_deg_east` | `double` | Degrees east in [-180, 180] |
 | 48 | `solar_w_m2` | `double` | Solar irradiance, W/m² |
 | 56 | `pressure_hpa` | `double` | Barometric pressure, hPa (equivalent to mb) |
 | 64 | `air_temperature_c` | `double` | Dry-bulb air temperature, °C |
@@ -83,8 +83,12 @@ int lwbgt_calc_batch_v1(
 - Records execute serially, in ascending array order, by calling the scalar
   implementation once per record.
 - The function return value reports call validity. Each output `status` reports
-  that record's scalar solver result: 0 for success and -1 for failure to
-  converge. A failed record uses the upstream `-9999` result convention.
+  that record's scalar result: 0 for success and -1 for either invalid
+  solar-position inputs or failure of the globe or natural wet-bulb solver to
+  converge.
+- Invalid solar-position inputs set all five numerical outputs to `-9999`. On
+  solver non-convergence, the failed temperature and `wbgt_c` are `-9999`;
+  other numerical outputs may remain valid.
 - Inputs are forwarded without domain validation, clamping, unit conversion, or
   missing-value policy beyond behavior already present in the scalar model.
 - When wind is already measured at 2 m, the batch API returns the supplied wind
@@ -121,11 +125,13 @@ lwbgt_calc_batch_v1
 ```
 
 The release CI validates Linux with GCC, macOS with AppleClang, and Windows with
-MinGW GCC. MSVC is unsupported because it cannot compile the preserved GNU89
-numerical source. The public header is valid C and C++ and is tested through
-installed C and C++ consumers.
+MinGW GCC. MSVC is unsupported; the numerical target is built in GNU89 mode.
+The public header is valid C and C++ and is tested through installed C and C++
+consumers.
 
-## Official Python binding
+## Package bindings
+
+### Python
 
 The `lwbgt` Python distribution loads its bundled unversioned runtime through
 `importlib.resources` and `ctypes`. Its public `Input` and `Result` records map
@@ -134,3 +140,17 @@ both use `lwbgt_calc_batch_v1`; the latter submits the entire iterable in one
 native call. `esat` directly exposes the scalar symbol. The binding performs no
 unit conversion, domain validation, clamping, missing-data handling, or solver
 failure substitution.
+
+### R
+
+The R package compiles a synchronized copy of the numerical source into its
+own shared library. Its registered `.Call` bridge invokes the scalar
+`calc_wbgt` and `esat` symbols. The R layer adds vector recycling, missing-value
+and domain validation, stable R-specific statuses, warnings, and `NA` result
+substitution; those policies are not part of the native ABI.
+
+### SwiftPM
+
+The `CLWBGT` SwiftPM product compiles the canonical native sources and exposes
+`lwbgt.h` directly. It is a C-library target, not an idiomatic Swift wrapper.
+Downstream SwiftPM consumption is tested on Linux and macOS.

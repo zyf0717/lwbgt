@@ -9,7 +9,7 @@ Bundled Liljegren WBGT derivative: src/wbgt.c
   WBGT v1.1 terms.
   Original author: James C. Liljegren.
   Solar-position code author: Nels Larson.
-  Derivative modifications are attributed to Yifei/HeatStressDev in the
+  Derivative modifications are attributed to Yifei Zheng in the
   blanket derivative-work notice in src/wbgt.c.
   Full license text:
   LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt.

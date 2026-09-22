@@ -1,7 +1,7 @@
 # lwbgt 0.4.2
 
-- Added a SwiftPM `CLWBGT` C-library product backed by the canonical native
-  sources, with Linux and macOS downstream-consumer tests.
+- Synchronized the R package version with project release 0.4.2; the R API and
+  native numerical behavior are unchanged from 0.4.1.
 
 # lwbgt 0.4.1
 

@@ -43,7 +43,8 @@ before choosing or substituting a package.
 
 ## How does lwbgt differ from thermofeel?
 
-`lwbgt` is a narrow native Liljegren kernel with C/FFI and Python APIs.
+`lwbgt` is a narrow native Liljegren kernel with a stable C ABI, Python and R
+APIs, and a SwiftPM C-library product.
 `thermofeel` is a NumPy-based Python library covering multiple thermal comfort
 indices and multiple WBGT calculation functions. The
 [comparison page](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md)
@@ -63,10 +64,11 @@ matched compilers and floating-point flags must reproduce the retained oracle
 exactly for the tested outputs. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
 and the [test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
 
-## Can I call lwbgt from C, C++, R, or Julia?
+## Can I call lwbgt from C, C++, Swift, R, or Julia?
 
 Yes. The installed native package provides CMake and `pkg-config` metadata and
-a stable C ABI. The repository includes tested minimal
-[C/C++](https://github.com/zyf0717/lwbgt/tree/main/tests/consumer),
-[R](https://github.com/zyf0717/lwbgt/tree/main/examples/r), and
-[Julia](https://github.com/zyf0717/lwbgt/tree/main/examples/julia) examples.
+a stable C ABI. SwiftPM exposes that header through `CLWBGT`; the official R
+package is under [`r/`](https://github.com/zyf0717/lwbgt/tree/main/r). The
+repository also includes tested
+[C/C++](https://github.com/zyf0717/lwbgt/tree/main/tests/consumer) and
+[Julia](https://github.com/zyf0717/lwbgt/tree/main/examples/julia) consumers.

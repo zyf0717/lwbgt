@@ -37,6 +37,10 @@ libraries. `python_runtime_exports` audits the same three-symbol surface, and
 `python_runtime_exact_equivalence` reruns the frozen 454-case comparison through
 an executable linked to that target.
 
+As of v0.4.0, the upstream demonstration program is compiled only when
+`LWBGT_BUILD_DEMO` is defined and contributes no `main`, `printf`, or `exit`
+dependency to library builds.
+
 The archive also exposes these inherited implementation symbols:
 
 ```text
@@ -51,7 +55,6 @@ est_wind_speed
 evap
 h_cylinder_in_air
 h_sphere_in_air
-lwbgt_original_demo_main
 solarposition
 stab_srdt
 thermal_cond

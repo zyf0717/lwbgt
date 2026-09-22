@@ -113,8 +113,8 @@ cmake --install build --prefix /desired/prefix
 The install provides static and shared libraries, `lwbgt.h`, CMake package
 metadata, and `pkg-config` metadata. CMake consumers can select
 `lwbgt::static` or `lwbgt::shared` after `find_package(lwbgt CONFIG REQUIRED)`.
-GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC cannot compile the
-preserved K&R source.
+GCC, Clang/AppleClang, and MinGW GCC are supported. MSVC is unsupported; the
+numerical target is built in GNU89 mode.
 
 ## Documentation
 

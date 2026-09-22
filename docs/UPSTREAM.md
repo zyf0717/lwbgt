@@ -11,8 +11,9 @@ This is the exact Liljegren WBGT v1.1 source used by HeatStressBench's frozen
 canonical `liljegren-c` target. That target remains the behavioural oracle and
 is not replaced by this project.
 
-`src/wbgt.c` is a modified derivative maintained by Yifei/HeatStressDev. Each
-source modification is identified adjacent to the changed code.
+`src/wbgt.c` is a modified derivative maintained by Yifei Zheng and carries a
+file-level derivative-work notice. Git history records the individual source
+modifications.
 
 `LICENSING.md` defines the boundary between the UChicago Argonne terms that
 continue to govern the retained and modified numerical source and Apache-2.0,

@@ -12,7 +12,9 @@ the UChicago Argonne Liljegren WBGT v1.1 terms in
 
 - `upstream/wbgt.c.original`
 - `src/wbgt.c`
+- `r/src/wbgt.c`
 - `LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt`
+- `r/inst/LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt`
 
 Redistributions must comply with both applicable licence sets and retain the
 acknowledgements and restrictions in `NOTICE`. In particular, binary
