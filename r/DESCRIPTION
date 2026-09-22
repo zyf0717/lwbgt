@@ -21,6 +21,5 @@ URL: https://github.com/zyf0717/lwbgt,
     https://zyf0717.r-universe.dev/lwbgt
 BugReports: https://github.com/zyf0717/lwbgt/issues
 Depends: R (>= 4.3.0)
-SystemRequirements: USE_C90
 Encoding: UTF-8
 NeedsCompilation: yes
