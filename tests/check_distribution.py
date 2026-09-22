@@ -17,6 +17,13 @@ LICENSE_FILES = {
 SDIST_BUILD_FILES = {
     "CMakeLists.txt",
     "pyproject.toml",
+    "README.md",
+    "docs/ABI.md",
+    "docs/COMPARISON.md",
+    "docs/FAQ.md",
+    "docs/README.md",
+    "docs/RELEASING.md",
+    "docs/UPSTREAM.md",
     "include/lwbgt.h",
     "src/lwbgt_ffi.c",
     "src/wbgt.c",

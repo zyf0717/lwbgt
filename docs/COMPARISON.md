@@ -37,7 +37,7 @@ WBGT.
 ## Primary sources
 
 - `lwbgt` 0.4.1: [README](https://github.com/zyf0717/lwbgt/tree/v0.4.1),
-  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.1/ABI.md), and
+  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.1/docs/ABI.md), and
   [package metadata](https://github.com/zyf0717/lwbgt/blob/v0.4.1/pyproject.toml)
 - `pywbgt` 3.0.7: [README](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/README.md),
   [method selector list](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/src/pywbgt/constants.py),

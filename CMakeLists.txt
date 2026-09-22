@@ -319,7 +319,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lwbgt.pc"
 )
 install(FILES
     LICENSE
-    ABI.md
+    docs/ABI.md
     LICENSING.md
     NOTICE
     LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt

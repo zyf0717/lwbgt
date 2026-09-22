@@ -10,7 +10,7 @@ wind speed outputs.
 ## How do I calculate outdoor WBGT in Python?
 
 Install the binary wheel with `python -m pip install lwbgt`, populate an
-[`lwbgt.Input`](https://github.com/zyf0717/lwbgt#python-installation-and-quick-start),
+[`lwbgt.Input`](https://github.com/zyf0717/lwbgt#python),
 and pass it to `lwbgt.calculate`. Use `lwbgt.calculate_batch` for multiple
 records; it calls the native serial batch entry point rather than looping in
 Python.
@@ -21,7 +21,7 @@ The input record includes date and time, UTC offset, averaging interval,
 urban/rural flag, latitude, longitude, solar irradiance, pressure, air
 temperature, relative humidity, wind speed and measurement height, and
 vertical temperature difference. The authoritative field definitions and
-units are in [ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md).
+units are in the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
 
 ## Does lwbgt convert units?
 
@@ -38,7 +38,7 @@ belong in the calling application.
 
 No. Both expose Liljegren WBGT calculations, but their scope, APIs, unit
 handling, supported methods, and compatibility contracts differ. See
-[lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/COMPARISON.md)
+[lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md)
 before choosing or substituting a package.
 
 ## How does lwbgt differ from thermofeel?
@@ -46,7 +46,7 @@ before choosing or substituting a package.
 `lwbgt` is a narrow native Liljegren kernel with C/FFI and Python APIs.
 `thermofeel` is a NumPy-based Python library covering multiple thermal comfort
 indices and multiple WBGT calculation functions. The
-[comparison page](https://github.com/zyf0717/lwbgt/blob/main/COMPARISON.md)
+[comparison page](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md)
 lists the documented differences.
 
 ## Does lwbgt provide WBGT risk categories or exposure limits?
@@ -60,7 +60,7 @@ kernel.
 
 No cross-package equivalence is claimed. Within lwbgt's documented scope,
 matched compilers and floating-point flags must reproduce the retained oracle
-exactly for the tested outputs. See [ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md)
+exactly for the tested outputs. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
 and the [test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
 
 ## Can I call lwbgt from C, C++, R, or Julia?

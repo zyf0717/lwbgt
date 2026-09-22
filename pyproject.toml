@@ -44,7 +44,7 @@ dependencies = []
 
 [project.urls]
 Homepage = "https://github.com/zyf0717/lwbgt"
-Documentation = "https://github.com/zyf0717/lwbgt#readme"
+Documentation = "https://github.com/zyf0717/lwbgt/blob/main/docs/README.md"
 Source = "https://github.com/zyf0717/lwbgt"
 Issues = "https://github.com/zyf0717/lwbgt/issues"
 Changelog = "https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md"
@@ -70,15 +70,12 @@ sdist.include = [
   "/tests/**",
   "/examples/**",
   "/benchmarks/**",
-  "/ABI.md",
   "/CHANGELOG.md",
   "/CITATION.cff",
-  "/COMPARISON.md",
-  "/FAQ.md",
+  "/docs/**",
   "/LICENSE",
   "/LICENSES/**",
   "/LICENSING.md",
   "/NOTICE",
   "/README.md",
-  "/UPSTREAM.md",
 ]

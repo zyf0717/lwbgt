@@ -1,6 +1,6 @@
 # Exported-symbol and API review
 
-`ABI.md` is the authoritative compatibility contract for public symbols,
+`docs/ABI.md` is the authoritative compatibility contract for public symbols,
 layouts, units, ownership, and concurrency semantics.
 
 The v0.1.0 static archive was reviewed with:
