@@ -7,7 +7,13 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class Input:
-    """One ABI v1 calculation input, with units encoded in field names."""
+    """One ABI v1 calculation input, with units encoded in field names.
+
+    ``vertical_temperature_difference_c`` is the upper-minus-lower difference.
+    Only whether it is less than zero or not is used. It can affect results
+    only for rural nighttime records when ``wind_height_m`` differs from 2 m
+    and ``wind_speed_m_s`` is below 2.5.
+    """
 
     year: int
     month: int

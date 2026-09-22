@@ -50,7 +50,7 @@ point input is an ABI-boundary `double`.
 | 72 | `relative_humidity_percent` | `double` | Relative humidity, percent |
 | 80 | `wind_speed_m_s` | `double` | Wind speed, m/s |
 | 88 | `wind_height_m` | `double` | Wind measurement height, m |
-| 96 | `vertical_temperature_difference_c` | `double` | Upper-minus-lower temperature difference, °C |
+| 96 | `vertical_temperature_difference_c` | `double` | Upper-minus-lower temperature difference, °C; only whether it is `< 0` or `>= 0` is used. It can affect results only when `urban == 0`, it is nighttime, `wind_height_m != 2`, and `wind_speed_m_s < 2.5` |
 
 ### `lwbgt_output_v1`
 

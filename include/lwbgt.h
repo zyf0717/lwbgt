@@ -30,6 +30,8 @@ typedef struct lwbgt_input_v1 {
     double relative_humidity_percent;
     double wind_speed_m_s;
     double wind_height_m;
+    /* Upper minus lower, deg C; its sign is used only for rural nighttime wind
+     * scaling below 2.5 m/s. */
     double vertical_temperature_difference_c;
 } lwbgt_input_v1;
 
@@ -63,6 +65,8 @@ int calc_wbgt(
     double relative_humidity_percent,
     double wind_speed_m_s,
     double wind_height_m,
+    /* Upper minus lower, deg C; its sign is used only for rural nighttime wind
+     * scaling below 2.5 m/s. */
     double vertical_temperature_difference_c,
     int urban,
     float *estimated_wind_speed_m_s,

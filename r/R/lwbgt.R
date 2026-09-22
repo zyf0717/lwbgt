@@ -56,7 +56,9 @@
 #' @param wind_speed_m_s Wind speed in metres per second.
 #' @param wind_height_m Wind measurement height in metres.
 #' @param vertical_temperature_difference_c Upper-minus-lower temperature
-#'   difference in degrees Celsius.
+#'   difference in degrees Celsius. Only whether it is `< 0` or `>= 0` is used.
+#'   It can affect results only for rural nighttime records when `wind_height_m`
+#'   differs from 2 m and `wind_speed_m_s` is below 2.5.
 #'
 #' @return A plain data frame with the 17 native input columns.
 #' @export

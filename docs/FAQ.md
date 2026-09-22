@@ -23,6 +23,13 @@ temperature, relative humidity, wind speed and measurement height, and
 vertical temperature difference. The authoritative field definitions and
 units are in the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
 
+## What should I use when an input is unavailable?
+
+The library does not apply defaults. See the
+[input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
+for acceptable derivations and conditional fallbacks; core weather
+observations have no general fallback.
+
 ## Does lwbgt convert units?
 
 No. Units are explicit in Python field names and in the C ABI documentation.

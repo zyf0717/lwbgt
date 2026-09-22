@@ -38,7 +38,7 @@ weather = Input(
     solar_w_m2=742.0, pressure_hpa=1008.4,
     air_temperature_c=32.1, relative_humidity_percent=68.0,
     wind_speed_m_s=2.8, wind_height_m=10.0,
-    vertical_temperature_difference_c=-0.4,
+    vertical_temperature_difference_c=1,
 )
 
 result = calculate(weather)
@@ -51,7 +51,9 @@ print(esat(273.15, phase=0))
 
 `Input` and `Result` are immutable typed records. Field names, units, status
 codes, and failure behaviour are defined by the
-[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
+[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md). See the
+[input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
+before substituting unavailable observations.
 
 ## R
 

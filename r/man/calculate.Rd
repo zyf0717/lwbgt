@@ -27,7 +27,7 @@ input <- lwbgt_input(
   solar_w_m2 = 742, pressure_hpa = 1008.4,
   air_temperature_c = 32.1, relative_humidity_percent = 68,
   wind_speed_m_s = 2.8, wind_height_m = 10,
-  vertical_temperature_difference_c = -0.4
+  vertical_temperature_difference_c = 1
 )
 calculate(input)
 }

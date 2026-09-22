@@ -24,7 +24,9 @@ degrees east.}
 \item{wind_speed_m_s}{Wind speed in metres per second.}
 \item{wind_height_m}{Wind measurement height in metres.}
 \item{vertical_temperature_difference_c}{Upper-minus-lower temperature
-difference in degrees Celsius.}
+difference in degrees Celsius. Only whether it is \code{< 0} or \code{>= 0} is
+used. It can affect results only for rural nighttime records when
+\code{wind_height_m} differs from 2 m and \code{wind_speed_m_s} is below 2.5.}
 }
 \value{A plain data frame with the 17 native input columns.}
 \description{
@@ -39,6 +41,6 @@ input <- lwbgt_input(
   solar_w_m2 = 742, pressure_hpa = 1008.4,
   air_temperature_c = 32.1, relative_humidity_percent = 68,
   wind_speed_m_s = 2.8, wind_height_m = 10,
-  vertical_temperature_difference_c = -0.4
+  vertical_temperature_difference_c = 1
 )
 }
