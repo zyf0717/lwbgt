@@ -47,3 +47,18 @@ jobs:
         run: cmake --build build --parallel
       - name: Test
         run: ctest --test-dir build --output-on-failure
+      - name: Test SwiftPM consumer
+        if: runner.os == 'macOS'
+        run: swift test --package-path tests/swiftpm -c release
+
+  swiftpm-linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Test SwiftPM consumer
+        run: >-
+          docker run --rm
+          --volume "$PWD:/workspace"
+          --workdir /workspace
+          swift:6.2.4-noble
+          swift test --package-path tests/swiftpm -c release

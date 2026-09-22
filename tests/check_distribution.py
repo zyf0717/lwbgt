@@ -15,6 +15,7 @@ LICENSE_FILES = {
     "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 }
 SDIST_BUILD_FILES = {
+    "Package.swift",
     "CMakeLists.txt",
     "pyproject.toml",
     "README.md",
@@ -38,6 +39,8 @@ SDIST_BUILD_FILES = {
     "r/src/wbgt.c",
     "r/src/lwbgt.h",
     "r/src/lwbgt_r.c",
+    "tests/swiftpm/Package.swift",
+    "tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",
 }
 
 

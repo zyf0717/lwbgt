@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "lwbgt"
-version = "0.4.1"
+version = "0.4.2"
 description = "Reference-compatible Liljegren outdoor wet bulb globe temperature (WBGT) kernel with C/FFI, Python, and R APIs"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -60,6 +60,7 @@ wheel.packages = ["python/lwbgt"]
 wheel.py-api = "py3"
 wheel.reproducible = true
 sdist.include = [
+  "/Package.swift",
   "/CMakeLists.txt",
   "/cmake/**",
   "/include/**",

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.2 — 2026-09-22
+
+- Added a dependency-safe SwiftPM `CLWBGT` C-library product backed directly
+  by the canonical native sources and public header.
+- Added release-mode downstream SwiftPM consumer tests on Linux and macOS.
+
 ## v0.4.1 — 2026-09-19
 
 - Declared the CRAN-facing R package license as standard Apache License 2.0.

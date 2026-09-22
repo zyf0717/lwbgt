@@ -19,10 +19,11 @@ Argonne terms documented in the installed legal files.
 
 1. Set the same version in CMake, the C header, Python metadata, R
    `DESCRIPTION`, `CITATION.cff`, and the README. Add the changelog entry.
-2. Require green native, wheel, and R-package CI on the exact release commit.
+2. Require green native, SwiftPM, wheel, and R-package CI on the exact release
+   commit. SwiftPM is tested through a downstream package on Linux and macOS.
    The R workflow checks Linux/GCC, Linux/Clang with R-devel, Windows/Rtools,
-   and macOS/AppleClang. Its `r-source` artifact has passed a complete
-   `R CMD check`, including the PDF manual.
+   and macOS/AppleClang. Its `r-source` artifact has passed a complete `R CMD
+   check`, including the PDF manual.
 3. Download the CI artifacts and independently verify them:
 
    ```sh
@@ -30,15 +31,15 @@ Argonne terms documented in the installed legal files.
    python tests/check_r_sources.py
    python tests/check_distribution.py dist/*
    python -m twine check dist/*
-   R CMD check lwbgt_0.4.1.tar.gz
+   R CMD check lwbgt_0.4.2.tar.gz
    ```
 
 4. Create and push an annotated or signed tag only after every release gate
    passes:
 
    ```sh
-   git tag -s v0.4.1 -m "lwbgt v0.4.1"
-   git push origin v0.4.1
+   git tag -s v0.4.2 -m "lwbgt v0.4.2"
+   git push origin v0.4.2
    ```
 
 5. The tag workflow reruns the complete R and Python artifact gates, publishes

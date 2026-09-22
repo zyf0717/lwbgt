@@ -10,7 +10,8 @@
 `lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
 wet bulb globe temperature (WBGT) model. It preserves the original scalar ABI
 and documented numerical behaviour while removing repeated and dead work.
-Dependency-free Python and R bindings use the same native kernel.
+Dependency-free Python and R bindings use the same native kernel. SwiftPM
+exposes the stable C interface as `CLWBGT`.
 
 Use `lwbgt` as an auditable numerical backend. It deliberately leaves weather
 data ingestion, unit conversion, missing-data policy, heat-risk classification,
@@ -18,7 +19,7 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.1.** The tested release remains bit-identical to the
+**Release status: v0.4.2.** The tested release remains bit-identical to the
 retained oracle within the documented compatibility scope.
 
 ## Python
@@ -72,7 +73,35 @@ ordinary data frames, recycles scalar constructor arguments, and isolates
 invalid or non-convergent rows. See the
 [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md).
 
-## Native library
+## SwiftPM
+
+Add the package and its C-library product to a Swift target:
+
+```swift
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.2"),
+    ],
+    targets: [
+        .target(
+            name: "WeatherService",
+            dependencies: [
+                .product(name: "CLWBGT", package: "lwbgt"),
+            ]
+        ),
+    ]
+)
+```
+
+```swift
+import CLWBGT
+```
+
+`CLWBGT` exposes `lwbgt.h` directly; it is not an idiomatic Swift wrapper.
+SwiftPM builds the canonical C sources without vendoring or generated copies.
+Linux and macOS downstream consumption are tested in release mode.
+
+## Native C
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
