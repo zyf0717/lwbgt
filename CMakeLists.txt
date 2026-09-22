@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.4.1 LANGUAGES C)
+project(lwbgt VERSION 0.4.2 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -319,7 +319,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lwbgt.pc"
 )
 install(FILES
     LICENSE
-    ABI.md
+    docs/ABI.md
     LICENSING.md
     NOTICE
     LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt

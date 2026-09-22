@@ -1,6 +1,7 @@
 /build/
 /build-gcc16/
 /build-profile/
+.build/
 __pycache__/
 *.py[cod]
 /dist/

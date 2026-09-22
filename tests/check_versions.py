@@ -28,8 +28,8 @@ def main() -> None:
         "CITATION.cff": match("CITATION.cff", r"^version: ([0-9.]+)$"),
         "README.md": match("README.md", r"\*\*Release status: v([0-9.]+)\.\*\*"),
         "CHANGELOG.md": match("CHANGELOG.md", r"^## v([0-9.]+)"),
-        "COMPARISON.md": match(
-            "COMPARISON.md", r"documented public scope of `lwbgt` ([0-9.]+)"
+        "docs/COMPARISON.md": match(
+            "docs/COMPARISON.md", r"documented public scope of `lwbgt` ([0-9.]+)"
         ),
         "r/NEWS.md": match("r/NEWS.md", r"^# lwbgt ([0-9.]+)$"),
         "tests/RELEASE.md": match("tests/RELEASE.md", r"^# v([0-9.]+) release"),

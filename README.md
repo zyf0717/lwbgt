@@ -1,70 +1,35 @@
-# lwbgt: Liljegren wet bulb globe temperature kernel
+# lwbgt
 
 [![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
 [![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
 [![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
-[![R-universe version](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
-[![R-universe checks](https://zyf0717.r-universe.dev/lwbgt/badges/checks)](https://zyf0717.r-universe.dev/lwbgt)
-[![PyPI version](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
-[![Supported Python versions](https://img.shields.io/pypi/pyversions/lwbgt.svg)](https://pypi.org/project/lwbgt/)
+[![PyPI](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
+[![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
-`lwbgt` is a stable, low-level C/FFI computational kernel for Liljegren outdoor
-wet bulb globe temperature (WBGT). Derived from the Liljegren WBGT v1.1 C
-implementation, it preserves the original scalar ABI and documented numerical
-behaviour while removing demonstrably repeated or dead work. It is intended to
-be embedded as a numerical backend by higher-level scientific packages,
-services, and high-throughput data pipelines.
+`lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
+wet bulb globe temperature (WBGT) model. It preserves the original scalar ABI
+and documented numerical behaviour while removing repeated and dead work.
+Dependency-free Python and R bindings use the same native kernel. SwiftPM
+exposes the stable C interface as `CLWBGT`.
 
-Python and R provide official dependency-free bindings to that same native
-kernel. Install a self-contained Python wheel with `pip install lwbgt`; the R
-package is published through R-universe and can also be installed directly
-from the `r/` subdirectory on GitHub. Input units are explicit in field names
-and are never converted implicitly. The package intentionally does not add
-meteorological preprocessing, classifications, advisory policy, or alternate
-WBGT methods.
-For those higher-level workflows, consider
-[`pywbgt`](https://pypi.org/project/pywbgt/) or
+Use `lwbgt` as an auditable numerical backend. It deliberately leaves weather
+data ingestion, unit conversion, missing-data policy, heat-risk classification,
+and application defaults to callers. For a higher-level Python workflow,
+consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.1.** v0.1.0 is the frozen scalar-compatibility release.
-Its complete permitted optimization set measures
-1.316× on the primary GCC 13 benchmark and 1.289× in the GCC 16.2 container.
-The v0.2.0 position-independent static build measures 1.249× on the GCC 13
-host. All three results exceed the mandatory 1.20× gate with exact
-compatibility. These are narrowly supported throughput measurements on the
-documented environments and workloads, not broader portability claims.
+**Release status: v0.4.2.** The tested release remains bit-identical to the
+retained oracle within the documented compatibility scope.
 
-It is not affiliated with or endorsed by the original authors, UChicago
-Argonne, or the U.S. Department of Energy.
-
-This distribution contains a modified Liljegren WBGT v1.1 derivative. Binary
-and source redistributions must retain the UChicago Argonne/Department of
-Energy acknowledgement in
-[NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) and comply with
-[LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md).
-
-## Find the right documentation
-
-- **How do I calculate outdoor wet bulb globe temperature in Python?** Start
-  with the [installation and quick-start example](#python-installation-and-quick-start).
-- **How do I calculate it in R?** Start with the
-  [R quick-start example](#r-installation-and-quick-start).
-- **Which Python WBGT package should I use?** See the factual
-  [lwbgt vs pywbgt vs thermofeel comparison](https://github.com/zyf0717/lwbgt/blob/main/COMPARISON.md).
-- **What inputs, units, status codes, and native interfaces does lwbgt use?**
-  Read the [ABI and API contract](https://github.com/zyf0717/lwbgt/blob/main/ABI.md).
-- **Does lwbgt convert units, accept xarray objects, or classify heat risk?**
-  Read the [wet bulb globe temperature FAQ](https://github.com/zyf0717/lwbgt/blob/main/FAQ.md).
-
-## Python installation and quick start
+## Python
 
 ```sh
 python -m pip install lwbgt
 ```
 
 ```python
-from lwbgt import Input, calculate, esat
+from lwbgt import Input, calculate, calculate_batch, esat
 
 weather = Input(
     year=2024, month=4, day=15, hour=14, minute=30,
@@ -75,97 +40,68 @@ weather = Input(
     wind_speed_m_s=2.8, wind_height_m=10.0,
     vertical_temperature_difference_c=-0.4,
 )
+
 result = calculate(weather)
 assert result.status == 0
 print(result.wbgt_c)
+
+results = calculate_batch([weather, weather])
 print(esat(273.15, phase=0))
 ```
 
-Batch calculation uses the native serial batch entry point rather than a
-Python loop:
+`Input` and `Result` are immutable typed records. Field names, units, status
+codes, and failure behaviour are defined by the
+[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
 
-```python
-from lwbgt import calculate_batch
+## R
 
-results = calculate_batch([weather, weather])
-```
-
-`Input` and `Result` are immutable typed records. Their complete field names,
-units, solver status, and `-9999` failure convention map directly to ABI v1;
-see [ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md). No third-party
-Python runtime dependency is required.
-
-## R installation and quick start
-
-Install the latest release from R-universe:
+Install from R-universe:
 
 ```r
 install.packages("lwbgt", repos = "https://zyf0717.r-universe.dev")
 ```
 
-Alternatively, install the latest GitHub release directly from its `r/`
-subdirectory:
+Or install the latest GitHub release from the `r/` subdirectory:
 
 ```r
 install.packages("remotes", repos = "https://cloud.r-project.org")
-remotes::install_github("zyf0717/lwbgt/r@*release")
+remotes::install_github("zyf0717/lwbgt/r@*release", upgrade = "never")
 ```
 
-```r
-library(lwbgt)
+The R API provides `lwbgt_input()`, `calculate()`, and `esat()`. It returns
+ordinary data frames, recycles scalar constructor arguments, and isolates
+invalid or non-convergent rows. See the
+[R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md).
 
-weather <- lwbgt_input(
-    year = 2024, month = 4, day = 15, hour = 14, minute = 30,
-    gmt_offset_hours = 8, averaging_minutes = 60, urban = 1,
-    latitude_deg_north = 1.3521, longitude_deg_east = 103.8198,
-    solar_w_m2 = 742, pressure_hpa = 1008.4,
-    air_temperature_c = 32.1, relative_humidity_percent = 68,
-    wind_speed_m_s = 2.8, wind_height_m = 10,
-    vertical_temperature_difference_c = -0.4
+## SwiftPM
+
+Add the package and its C-library product to a Swift target:
+
+```swift
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.2"),
+    ],
+    targets: [
+        .target(
+            name: "WeatherService",
+            dependencies: [
+                .product(name: "CLWBGT", package: "lwbgt"),
+            ]
+        ),
+    ]
 )
-calculate(weather)
-esat(273.15)
 ```
 
-The R API returns ordinary data frames, recycles scalar constructor arguments,
-and reports invalid or missing rows without aborting the remaining batch. It
-has no package dependencies beyond R itself.
-
-## Purpose
-
-`lwbgt` owns the numerical Liljegren calculation, stable C/FFI contracts,
-reproducible compatibility evidence, low-level static/shared-library
-distribution, and the narrow R data-frame wrapper. Higher-level callers own
-meteorological data ingestion, unit conversion beyond the documented ABI,
-missing-data policy, additional domain validation, classification and advisory
-systems, orchestration and parallelism, and application-specific defaults.
-This narrow boundary is intentional.
-
-```text
-Applications / research pipelines
-              |
-      Python / R / Julia / services
-              |
-            lwbgt
-              |
-   Liljegren WBGT numerical model
+```swift
+import CLWBGT
 ```
 
-## When to use lwbgt
+`CLWBGT` exposes `lwbgt.h` directly; it is not an idiomatic Swift wrapper.
+SwiftPM builds the canonical C sources without vendoring or generated copies.
+Linux and macOS downstream consumption are tested in release mode.
 
-Use `lwbgt` when you need a stable C or FFI Liljegren backend; behaviour
-anchored to the original Liljegren C implementation; an embedded WBGT kernel
-for another package or service; high-volume calculation with preprocessing
-kept outside the kernel; or an auditable, reference-compatible numerical
-backend within the documented compatibility scope.
-
-## When not to use lwbgt directly
-
-A higher-level package is more appropriate when the primary requirement is
-automatic weather-data preprocessing, policy or heat-risk classifications, a
-batteries-included API, or GPU/JAX execution.
-
-## Native build and install
+## Native C
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -174,95 +110,31 @@ ctest --test-dir build --output-on-failure
 cmake --install build --prefix /desired/prefix
 ```
 
-The build produces `liblwbgt.a` and a versioned shared library and installs
-`lwbgt.h`, CMake package metadata, and `pkg-config` metadata. Core compilation is
-GNU89 with `-fno-fast-math -ffp-contract=off -fno-strict-aliasing`; LTO and
-architecture-specific flags are not enabled. GCC, Clang/AppleClang, and MinGW
-GCC are supported; MSVC cannot compile the preserved K&R source.
+The install provides static and shared libraries, `lwbgt.h`, CMake package
+metadata, and `pkg-config` metadata. CMake consumers can select
+`lwbgt::static` or `lwbgt::shared` after `find_package(lwbgt CONFIG REQUIRED)`.
+GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC cannot compile the
+preserved K&R source.
 
-Installed CMake consumers can select `lwbgt::static` or `lwbgt::shared` after
-`find_package(lwbgt CONFIG REQUIRED)`.
+## Documentation
 
-## Supported API and compatibility contract
+| Topic | Document |
+|---|---|
+| Inputs, units, layouts, status codes, and concurrency | [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md) |
+| Numerical compatibility and measured performance | [Compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md) |
+| Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
+| Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
+| Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |
+| Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
+| Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
 
-[ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md) defines the
-authoritative layouts, units, error behavior,
-concurrency rules, symbol surface, and compatibility policy.
+## Licence and attribution
 
-The legacy `calc_wbgt` and `esat` declarations in `include/lwbgt.h` remain the
-permanent scalar compatibility ABI. Scalar floating-point arguments use
-`double` at the ABI boundary because the original K&R `float` parameters undergo
-default argument promotion; output pointers remain `float *`.
+Project-authored files are Apache-2.0 licensed. The retained upstream source
+and modified derivative remain under the UChicago Argonne Liljegren WBGT v1.1
+terms. See [LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
+and retain the acknowledgement in
+[NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) when redistributing.
 
-The v1 FFI ABI adds fixed-layout `lwbgt_input_v1` and `lwbgt_output_v1`
-structures and `lwbgt_calc_batch_v1`. The batch call executes scalar calls in
-input order. It returns the supplied wind as the effective 2-m wind when no
-height conversion is needed, avoiding the legacy scalar routine's untouched
-output-pointer behavior. It performs no allocation, retains no caller pointers,
-and introduces no domain validation, clamping, unit conversion, or
-missing-value policy beyond inherited scalar behaviour. Input and output arrays
-must not overlap. Independent calls using separate buffers are thread-safe; a
-single batch call is serial.
-
-The shared library exports only `calc_wbgt`, `esat`, and
-`lwbgt_calc_batch_v1`. The static archive retains global helper symbols inherited
-from the source implementation; they remain unsupported implementation details.
-The exported-symbol review is recorded in `tests/API.md`.
-
-The maintained Python and R packages and minimal Julia example demonstrate the
-intended integration pattern: higher-level packages can bind the stable ABI
-while owning their user-facing policies. The low-level R and Julia examples
-remain tested interoperability examples; the package under `r/` is the
-supported R interface.
-
-The exact upstream source is retained unmodified at
-`upstream/wbgt.c.original`. `src/wbgt.c` is the modified derivative maintained
-by Yifei/HeatStressDev. HeatStressBench's frozen `liljegren-c` target remains
-the oracle and is not replaced or relabelled.
-
-Numerical provenance and the exact-compatibility scope are documented in
-[ABI.md](https://github.com/zyf0717/lwbgt/blob/main/ABI.md),
-[UPSTREAM.md](https://github.com/zyf0717/lwbgt/blob/main/UPSTREAM.md), and the
-[retained test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
-
-For matched compilers and floating-point flags, the acceptance policy is exact
-32-bit equality for return status, estimated wind speed, `Tg`, `Tnwb`, `Tpsy`,
-WBGT, and `esat`. The deterministic 454-case suite produces the same
-`087532603ebd6d3addad5bec4d99290eb3f1a9ed82bdfb141d5e9708194235ff`
-probe hash with GCC 13.3.0 and GCC 16.2.0.
-
-## Evidence
-
-| Environment | Exact result | Median overall speedup | Release gate |
-|---|---:|---:|---:|
-| Linux x86-64, GCC 13.3.0 | bit-identical | 1.316× | passed |
-| Linux x86-64 container, GCC 16.2.0 | bit-identical | 1.289× | passed |
-| Linux x86-64, GCC 13.3.0, v0.2.0 PIC build | bit-identical | 1.249× | passed |
-
-Every v0.1.0 benchmark cohort exceeds 1.25×. The v0.2.0 PIC build passes the
-unchanged overall and per-cohort gates, with a 1.210× slowest measured cohort.
-Detailed host results, hardware, flags, datasets, warm-up, CPU-affinity policy,
-repetitions, medians, and dispersion are under `benchmarks/`. HeatStressBench
-adapter evidence is under `tests/`.
-
-## Licence and provenance
-
-Project-authored files are licensed under
-[Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE). The retained
-upstream source and modified derivative remain under the UChicago Argonne
-Liljegren WBGT v1.1 terms.
-[LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md) defines
-the file-level boundary and redistribution requirements.
-
-`UPSTREAM.md` records the repository, pinned commit, blob, import date, and
-relationship to HeatStressBench. The complete upstream source licence is in
-`LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt`; the required
-Argonne/Department of Energy acknowledgement is in `NOTICE`.
-
-## Explicit non-goals
-
-This release adds no dataframe/xarray integration beyond the lean base-R API,
-unit conversion,
-meteorological ingestion, dew-point policy, classification thresholds,
-alternate solver, precision change, new physics, cache, parallelism, OpenMP,
-SIMD, GPU path, or fast-math mode.
+This project is not affiliated with or endorsed by the original authors,
+UChicago Argonne, or the U.S. Department of Energy.

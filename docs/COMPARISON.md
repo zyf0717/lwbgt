@@ -1,8 +1,8 @@
 # lwbgt vs pywbgt vs thermofeel
 
-This page compares the documented public scope of `lwbgt` 0.4.1, `pywbgt`
+This page compares the documented public scope of `lwbgt` 0.4.2, `pywbgt`
 3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-08-19;
-the lwbgt entry was updated on 2026-09-19. It is a package selection guide, not
+the lwbgt entry was updated on 2026-09-22. It is a package selection guide, not
 a numerical benchmark or a claim that similarly named methods produce
 interchangeable results.
 
@@ -10,7 +10,7 @@ interchangeable results.
 |---|---|---|---|
 | What is its primary scope? | A low-level, reference-compatible Liljegren kernel for embedding | A Python WBGT package with selectable estimation methods and higher-level meteorological data handling | A Python library for multiple heat and cold thermal comfort indices |
 | Which WBGT entry points or selectors are documented? | The preserved Liljegren v1.1 calculation | `liljegren`, `bernard`, `dimiceli`, and `dimiceli_nws` method selectors | `calculate_wbgt_simple`, `calculate_wbgt`, and `calculate_wbgt_liljegren` |
-| What interfaces does it expose? | Stable C ABI, CMake and `pkg-config` packages, FFI batch API, and a thin Python binding | Python API backed by Python, C, and Cython code; accepts arrays and xarray datasets | Python functions operating on NumPy-compatible array inputs |
+| What interfaces does it expose? | Stable C ABI, CMake, `pkg-config`, and SwiftPM packages, FFI batch API, and thin Python and R bindings | Python API backed by Python, C, and Cython code; accepts arrays and xarray datasets | Python functions operating on NumPy-compatible array inputs |
 | How are units handled? | Required units are fixed and named explicitly; no implicit conversion | Meteorological values use Pint/MetPy quantities and are converted by the package | Each function documents required units such as K, hPa, W/m², and m/s; inputs are numeric arrays rather than unit-bearing objects |
 | What are the Python runtime dependencies? | None outside the standard library; the binding uses `ctypes` | NumPy, Numba, MetPy, xarray, Pint, pandas, and pvlib | NumPy |
 | Does it cover thermal indices beyond WBGT? | No | No general thermal-comfort index suite | Yes; its documented indices include UTCI, apparent temperature, heat index, humidex, wind chill, and others |
@@ -36,9 +36,9 @@ WBGT.
 
 ## Primary sources
 
-- `lwbgt` 0.4.1: [README](https://github.com/zyf0717/lwbgt/tree/v0.4.1),
-  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.1/ABI.md), and
-  [package metadata](https://github.com/zyf0717/lwbgt/blob/v0.4.1/pyproject.toml)
+- `lwbgt` 0.4.2: [README](https://github.com/zyf0717/lwbgt/tree/v0.4.2),
+  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.2/docs/ABI.md), and
+  [package metadata](https://github.com/zyf0717/lwbgt/blob/v0.4.2/Package.swift)
 - `pywbgt` 3.0.7: [README](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/README.md),
   [method selector list](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/src/pywbgt/constants.py),
   and [package metadata](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/pyproject.toml)

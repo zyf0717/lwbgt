@@ -1,3 +1,8 @@
+# lwbgt 0.4.2
+
+- Added a SwiftPM `CLWBGT` C-library product backed by the canonical native
+  sources, with Linux and macOS downstream-consumer tests.
+
 # lwbgt 0.4.1
 
 - Declared the CRAN-facing package license as Apache License 2.0 while

@@ -1,12 +1,12 @@
-# v0.4.1 release verification
+# v0.4.2 release verification
 
-v0.4.1 declares the CRAN-facing R package license as standard Apache License
-2.0 while preserving the separate UChicago Argonne terms for the synchronized
-Liljegren-derived kernel. The C ABI remains version 1.
+v0.4.2 adds a dependency-safe SwiftPM C-library product backed directly by the
+canonical kernel sources and public header. The C ABI remains version 1.
 
 Release acceptance requires:
 
 - the full native CTest matrix and exact 454-case equivalence suite;
+- release-mode downstream SwiftPM consumer tests on Linux and macOS;
 - all installed-wheel, sdist, ABI, resource, and version-coherence tests;
 - base-R scalar, vector, recycling, empty, validation, failure-status, schema,
   and water/ice `esat` tests;
@@ -25,14 +25,12 @@ release; the `*release` entry in `zyf0717/zyf0717.r-universe.dev` then makes
 that release available through R-universe. A required source change after
 publication requires a unified version bump and a new release.
 
-Local release verification on 2026-09-19 passed version and R-source coherence,
-the Python runtime-version and distribution-license fixtures, `R CMD build`,
-and the full R test file under `R CMD check --as-cran`. The CRAN check completed
-with 0 errors and no license-related warnings or notes. Its environment emitted
-one warning for the unavailable optional `checkbashisms` script and two notes
-for a new submission and a compiler-injected flag. Full native, wheel,
-cross-platform, direct GitHub-install, and R-universe results remain pending
-until their respective local or CI release gates run.
+Local release verification on 2026-09-22 passed version and R-source coherence,
+the full native CTest suite, the Linux Swift 6.2.4 downstream-consumer tests,
+sdist content and metadata checks, all 17 tests against a source-built wheel,
+and `R CMD check` without the optional manual and vignette stages. macOS
+SwiftPM, full cross-platform wheel and R checks, direct GitHub installation,
+and R-universe results remain pending until their CI or publication gates run.
 
 Historical verification is retained in `RELEASE-0.1.0.md`,
 `RELEASE-0.2.0.md`, and `RELEASE-0.2.1.md`.
