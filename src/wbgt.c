@@ -804,22 +804,16 @@ int solarposition(int year, int month, double day, double days_1900,
     /* Construct Julian centuries since J2000 at 0 hours UT of date,
      * days.fraction since J2000, and UT hours.
      */
-    if (year >= 1950 && year <= 2049)
-    {
-      delta_years = year - 2000;
-      /* Preserve the original arithmetic in the legacy range. */
-      delta_days = delta_years * 365 + delta_years / 4 + daynumber;
-      if (year > 2000)
-        delta_days += 1;
-      days_J2000 = delta_days - 1.5;
-    }
-    else
-    {
-      /* Count Gregorian days at 0h UT; J2000 is 2000/01/01.5. */
+    delta_years = year - 2000;
+    /* delta_days is days from 2000/01/00 (1900's are negative). */
+    delta_days = delta_years * 365 + delta_years / 4 + daynumber;
+    if (year > 2000)
+      delta_days += 1;
+    if (year < 1950 || year > 2049)
       delta_days = days_before_year(year) - days_before_year(2000)
-                   + daynumber - 1;
-      days_J2000 = delta_days - 0.5;
-    }
+                   + daynumber;
+    /* J2000 is 2000/01/01.5 */
+    days_J2000 = delta_days - 1.5;
 
     cent_J2000 = days_J2000 / 36525.0;
 
