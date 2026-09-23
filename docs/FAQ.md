@@ -66,11 +66,12 @@ kernel.
 
 ## Is lwbgt numerically identical to every Liljegren implementation?
 
-No cross-package equivalence is claimed. Within lwbgt's documented scope,
-matched compilers and floating-point flags reproduce the retained oracle
-exactly for previously valid outputs except the corrected direct scalar 2 m
-wind output. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
-and the [test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
+No cross-package equivalence is claimed. In a 454-case comparison with matched
+compiler and floating-point settings, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`
+matched the retained original C bit for bit. Direct scalar estimated wind at
+2 m intentionally differs because the original left it unwritten. The test is
+not a proof for every valid input or platform. See the
+[compatibility evidence](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Can I call lwbgt from C, C++, Swift, R, or Julia?
 

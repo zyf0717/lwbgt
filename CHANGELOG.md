@@ -4,8 +4,8 @@
 
 - Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
   speed and initialized the optional demonstration's first `dT` argument.
-- Added an upstream deviation register and a compatibility gate that makes the
-  scalar wind-output exception explicit.
+- Added an upstream deviation register and a 454-case bit-comparison gate that
+  makes the scalar wind-output exception explicit.
 
 ## v0.4.2 — 2026-09-22
 
@@ -86,7 +86,8 @@ bit-identical and every benchmark cohort exceeds 1.25×.
 - Hoisted invariant atmospheric, surface, and solar radiation terms from the
   iterative globe and natural wet-bulb solves after profiling identified both
   solves as the remaining hot paths.
-- Proved exact output equality with GCC 13.3.0 and GCC 16.2.0.
+- Verified exact output equality for the frozen 454-case oracle cohort with GCC
+  13.3.0 and GCC 16.2.0.
 - Proved that all three existing HeatStressBench C adapters compile unchanged
   and produce byte-identical generated, decomposition, NASA POWER sample, and
   ERA5 sample results when only the link input changes.

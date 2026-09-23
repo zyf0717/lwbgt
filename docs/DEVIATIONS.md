@@ -30,9 +30,11 @@ git diff --no-index -- upstream/wbgt.c.original src/wbgt.c
 | [`solarposition`, lines 736–845](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L736-L845) | Removed obsolete local math/function declarations along with the K&R signature. The original year guard, day arithmetic, and internal `year == 0`/`days_1900` route are retained. | No numerical change from these declaration edits. Years outside 1950–2049 remain rejected; the corrected callers propagate that failure. |
 
 No model constants, convergence threshold, minimum wind speed, WBGT weighting,
-or wind-stability lookup table were changed. The compatibility gate compares
-all existing output bits with the retained oracle except the corrected direct
-scalar 2 m wind output. The historical exact-comparison mode remains available.
+or wind-stability lookup table were changed. In the 454-case retained-oracle
+comparison, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat` matched bit for bit. The
+direct scalar 2 m estimated-wind output is the intentional exception. This
+sampled comparison does not establish bit identity for every valid input or
+build environment. The historical exact-comparison mode remains available.
 
 The [original `solarposition()` bounds](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L770-L818)
 remain in effect. [`pywbgt`](https://github.com/kwodzicki/pywbgt) independently

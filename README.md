@@ -20,10 +20,11 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.2.** That release was bit-identical to the retained
-oracle within its documented compatibility scope. Current unreleased source
-corrects the direct scalar 2 m wind output and retains the original 1950–2049
-year support; see the
+**Release status: v0.4.2.** For the current unreleased source, the 454-case
+comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
+`Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
+guarantee. Direct scalar estimated wind at 2 m is corrected, and the original
+1950–2049 year range is retained. See the
 [compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Python

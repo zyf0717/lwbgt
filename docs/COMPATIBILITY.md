@@ -2,12 +2,16 @@
 
 The shared library exports only `calc_wbgt`, `esat`, and
 `lwbgt_calc_batch_v1`. Independent calls with separate buffers are thread-safe;
-a batch call is serial. For matched compilers and floating-point flags, the
-current compatibility gate requires exact 32-bit equality with the retained
-oracle for existing 1950–2049 results except the corrected direct scalar
-`estimated_wind_speed_m_s` output when wind is measured at 2 m. The corrected
-field must equal the supplied speed converted to `float`. Batch and R callers
-already initialized that field and retain their previous output bits.
+a batch call is serial. With matched compiler and floating-point settings, the
+454-case retained-oracle comparison found identical 32-bit values for `Tg`,
+`Tnwb`, `Tpsy`, WBGT, and `esat`. Estimated wind also matched except in direct
+scalar calls with wind measured at 2 m: the original left that output unwritten,
+while the derivative writes the supplied speed converted to `float`. The batch
+and R callers already initialized their 2 m estimated-wind output.
+
+The comparison covers its sampled inputs, not every valid 1950–2049 input or
+every compiler and platform. The original solar-position year guard and date
+arithmetic remain in place, including their historical behavior.
 
 The measurements below describe the earlier releases, before that scalar
 output correction.
@@ -23,5 +27,5 @@ Dates outside the original 1950–2049 solar-position range are rejected.
 Full methods, hardware and compiler details, workloads, and retained results
 are in the
 [benchmark documentation](https://github.com/zyf0717/lwbgt/tree/main/benchmarks).
-The exact compatibility scope, layouts, and API guarantees are defined by the
+The public compatibility scope, layouts, and API guarantees are defined by the
 [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
