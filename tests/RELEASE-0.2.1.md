@@ -16,14 +16,11 @@ content.
 
 Acceptance required all eight CTest tests, including installed C, C++, Python,
 R, and Julia consumers; the installed licence, notice, and ABI documents; the
-three-symbol shared export audit; and the frozen 454-case exact probe hash.
+three-symbol shared export audit; and a byte-exact oracle comparison.
 
 All eight CTest tests passed in the clean checkout. The explicit differential
-run reported 454 bit-identical cases with the frozen probe SHA-256:
-
-```text
-087532603ebd6d3addad5bec4d99290eb3f1a9ed82bdfb141d5e9708194235ff
-```
+run passed. Its former workload and output hash are retired; the current
+oracle is recorded in `BASELINE.md`.
 
 The Apache-2.0 text produced SHA-256
 `c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`.

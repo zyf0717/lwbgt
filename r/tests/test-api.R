@@ -190,7 +190,6 @@ day_of_year$day <- 366
 stopifnot(calculate(day_of_year)$status != 2L)
 day_of_year$year <- 2023
 stopifnot(calculate(day_of_year)$status == 2L)
-
 solver_failure <- singapore
 solver_failure$month <- 3
 solver_failure$day <- 20

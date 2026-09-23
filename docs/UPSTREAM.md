@@ -14,6 +14,8 @@ is not replaced by this project.
 `src/wbgt.c` is a modified derivative maintained by Yifei Zheng and carries a
 file-level derivative-work notice. Git history records the individual source
 modifications.
+The [deviation register](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md)
+accounts for the substantive differences from the retained original.
 
 `LICENSING.md` defines the boundary between the UChicago Argonne terms that
 continue to govern the retained and modified numerical source and Apache-2.0,

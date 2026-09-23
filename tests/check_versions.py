@@ -26,7 +26,9 @@ def main() -> None:
         ),
         "r/DESCRIPTION": match("r/DESCRIPTION", r"^Version: ([0-9.]+)$"),
         "CITATION.cff": match("CITATION.cff", r"^version: ([0-9.]+)$"),
-        "README.md": match("README.md", r"\*\*Release status: v([0-9.]+)\.\*\*"),
+        "README.md": match(
+            "README.md", r"\*\*(?:Release status|Version): v([0-9.]+)\.\*\*"
+        ),
         "CHANGELOG.md": match("CHANGELOG.md", r"^## v([0-9.]+)"),
         "docs/COMPARISON.md": match(
             "docs/COMPARISON.md", r"documented public scope of `lwbgt` ([0-9.]+)"

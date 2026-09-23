@@ -1,8 +1,8 @@
 # lwbgt vs pywbgt vs thermofeel
 
-This page compares the documented public scope of `lwbgt` 0.4.2, `pywbgt`
+This page compares the documented public scope of `lwbgt` 0.4.3, `pywbgt`
 3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22;
-the lwbgt entry was updated on 2026-09-22. It is a package selection guide, not
+the lwbgt entry was updated on 2026-09-23. It is a package selection guide, not
 a numerical benchmark or a claim that similarly named methods produce
 interchangeable results.
 
@@ -36,9 +36,9 @@ WBGT.
 
 ## Primary sources
 
-- `lwbgt` 0.4.2: [README](https://github.com/zyf0717/lwbgt/tree/v0.4.2),
-  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.2/docs/ABI.md), and
-  [package metadata](https://github.com/zyf0717/lwbgt/blob/v0.4.2/Package.swift)
+- `lwbgt` 0.4.3: [README](https://github.com/zyf0717/lwbgt/tree/v0.4.3),
+  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v0.4.3/docs/ABI.md), and
+  [package metadata](https://github.com/zyf0717/lwbgt/blob/v0.4.3/Package.swift)
 - `pywbgt` 3.0.7: [README](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/README.md),
   [method selector list](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/src/pywbgt/constants.py),
   and [package metadata](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/pyproject.toml)

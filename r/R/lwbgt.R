@@ -42,7 +42,8 @@
 #' contract. All arguments are required. Scalar arguments are recycled to the
 #' common length of the non-scalar arguments.
 #'
-#' @param year,month,day,hour,minute Integer-valued local date and time fields.
+#' @param year Integer-valued Gregorian year from 1950 through 2049.
+#' @param month,day,hour,minute Integer-valued local date and time fields.
 #'   A `month` of zero makes `day` a day-of-year value.
 #' @param gmt_offset_hours Local standard time minus GMT, in whole hours.
 #' @param averaging_minutes Input averaging interval, in minutes.
@@ -56,7 +57,9 @@
 #' @param wind_speed_m_s Wind speed in metres per second.
 #' @param wind_height_m Wind measurement height in metres.
 #' @param vertical_temperature_difference_c Upper-minus-lower temperature
-#'   difference in degrees Celsius.
+#'   difference in degrees Celsius. Only whether it is `< 0` or `>= 0` is used.
+#'   It can affect results only for rural nighttime records when `wind_height_m`
+#'   differs from 2 m and `wind_speed_m_s` is below 2.5.
 #'
 #' @return A plain data frame with the 17 native input columns.
 #' @export

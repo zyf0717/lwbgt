@@ -112,6 +112,7 @@ int	main(void)
  */
 		speed = u2m;
 		zspeed = 2.;
+		dT = 0.0f;
 		status = calc_wbgt(year, month, day, hour, minute, gmt, avg, lat, lon,
 				solar, Pair, Tair, RHair, speed, zspeed, dT, urban, &est_speed,
 				&Tg, &Tnwb, &Tpsy, &Twbg);
@@ -275,6 +276,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		*est_speed = *Tg = *Tnwb = *Tpsy = *Twbg = -9999.;
 		return -1;
 	}
+	*est_speed = speed;
 /* 
  *  estimate the wind speed, if necessary
  */

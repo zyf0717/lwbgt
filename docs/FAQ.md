@@ -23,6 +23,13 @@ temperature, relative humidity, wind speed and measurement height, and
 vertical temperature difference. The authoritative field definitions and
 units are in the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
 
+## What should I use when an input is unavailable?
+
+The library does not apply defaults. See the
+[input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
+for acceptable derivations and conditional fallbacks; core weather
+observations have no general fallback.
+
 ## Does lwbgt convert units?
 
 No. Units are explicit in Python field names and in the C ABI documentation.
@@ -59,10 +66,12 @@ kernel.
 
 ## Is lwbgt numerically identical to every Liljegren implementation?
 
-No cross-package equivalence is claimed. Within lwbgt's documented scope,
-matched compilers and floating-point flags must reproduce the retained oracle
-exactly for the tested outputs. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
-and the [test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
+No cross-package equivalence is claimed. In an 852-case comparison with matched
+compiler and floating-point settings, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`
+matched the retained original C bit for bit. Direct scalar estimated wind at
+2 m intentionally differs because the original left it unwritten. The test is
+not a proof for every valid input or platform. See the
+[compatibility evidence](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Can I call lwbgt from C, C++, Swift, R, or Julia?
 

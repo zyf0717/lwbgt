@@ -99,7 +99,7 @@ class BatchTests(unittest.TestCase):
                     for row in csv.DictReader(stream)
                 ]
         count = len(records)
-        self.assertEqual(count, 454)
+        self.assertEqual(count, 852)
         inputs = (_ffi._InputV1 * count)(*map(_ffi._as_native, records))
         outputs = (_ffi._OutputV1 * count)()
         self.assertEqual(_ffi._library().lwbgt_calc_batch_v1(inputs, outputs, count), 0)

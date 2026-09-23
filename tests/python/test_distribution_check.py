@@ -21,8 +21,8 @@ class DistributionCheckTests(unittest.TestCase):
     def test_wheel_license_directories_are_not_treated_as_files(self) -> None:
         checker = load_distribution_checker()
         with tempfile.TemporaryDirectory() as temporary:
-            wheel = Path(temporary, "lwbgt-0.4.2-py3-none-test.whl")
-            prefix = "lwbgt-0.4.2.dist-info/licenses/"
+            wheel = Path(temporary, "lwbgt-0.4.3-py3-none-test.whl")
+            prefix = "lwbgt-0.4.3.dist-info/licenses/"
             with zipfile.ZipFile(wheel, "w") as archive:
                 archive.writestr(prefix, "")
                 archive.writestr(f"{prefix}LICENSES/", "")

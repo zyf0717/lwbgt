@@ -10,7 +10,7 @@ extern "C" {
 
 #define LWBGT_VERSION_MAJOR 0
 #define LWBGT_VERSION_MINOR 4
-#define LWBGT_VERSION_PATCH 2
+#define LWBGT_VERSION_PATCH 3
 #define LWBGT_FFI_ABI_VERSION 1
 
 typedef struct lwbgt_input_v1 {
@@ -30,6 +30,8 @@ typedef struct lwbgt_input_v1 {
     double relative_humidity_percent;
     double wind_speed_m_s;
     double wind_height_m;
+    /* Upper minus lower, deg C; its sign is used only for rural nighttime wind
+     * scaling below 2.5 m/s. */
     double vertical_temperature_difference_c;
 } lwbgt_input_v1;
 
@@ -63,6 +65,8 @@ int calc_wbgt(
     double relative_humidity_percent,
     double wind_speed_m_s,
     double wind_height_m,
+    /* Upper minus lower, deg C; its sign is used only for rural nighttime wind
+     * scaling below 2.5 m/s. */
     double vertical_temperature_difference_c,
     int urban,
     float *estimated_wind_speed_m_s,

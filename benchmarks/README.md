@@ -4,42 +4,39 @@ The benchmark loads cases before timing, pins itself to the first CPU allowed by
 the process affinity mask on Linux, performs one warm-up, and consumes every
 output through a volatile checksum. `tests/compare.py benchmark` interleaves
 reference and candidate executions and reports median rows/s and relative median
-absolute deviation over seven repetitions.
+absolute deviation over seven repetitions. The timing harness excludes the
+`invalid` and `solver-boundary` cohorts; oracle comparisons still include them.
 
-The checked-in baseline used:
+## Current run
 
-- CPU: 13th Gen Intel Core i9-13900HK
-- OS/kernel: Linux 7.0.0-28-generic x86_64
-- Compiler: GCC 13.3.0
-- CMake: 3.28.3
-- Core flags: GNU89, `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`
-- Harness flags: C11, `-O2 -fno-fast-math -ffp-contract=off`
-- Workload: deterministic HeatStressBench generator/decomposition patterns,
-  representative NASA POWER and ERA5 rows, and a broad condition matrix
-- Iterations: 200 per case per execution
-- Repetitions: 7
+The current oracle input has 852 deterministic cases, including 400 successful
+cases that span every supported year and the changed numerical paths. The
+benchmark times 840 rows after excluding six `invalid` and six
+`solver-boundary` cases. The workload contains no downloaded weather dataset;
+the two `era5` rows are fixed London examples in
+[`tests/generate_cases.py`](../tests/generate_cases.py), with no recorded source
+provenance. Results for that cohort describe only those two rows.
 
-Exact host, compiler, container image, affinity, source, and harness metadata
-for the final runs is recorded in `optimization-3-environment.json`.
+On 2026-09-23, the workload was measured on the 13th Gen Intel Core
+i9-13900HK, Linux 7.0.0-31-generic x86-64, GCC 13.3.0, and CMake 3.28.3.
+The core used GNU89 and the harness used C11. Both used `-O2`,
+`-fno-fast-math`, `-ffp-contract=off`, and `-fno-strict-aliasing`.
+Each execution used 200 iterations per case, with seven interleaved repetitions.
 
-`baseline-gcc-13.3.0.json` compares two byte-identical source builds. Its 1.20×
-overall gate is expected to fail before optimization; the baseline establishes
-measurement parity and per-cohort noise.
+| Cohort | Reference median rows/s | Derivative median rows/s | Speedup | Gate |
+|---|---:|---:|---:|---|
+| Overall, 840 rows | 144,271 | 192,546 | 1.335× | passed, ≥1.20× |
 
-## Results
+Every per-cohort gate passed. The complete medians and variability are in
+[`expanded-gcc-13.3.0.json`](expanded-gcc-13.3.0.json).
 
-| Candidate | Compiler/environment | Overall median speedup | Slowest cohort | Gate |
-|---|---|---:|---:|---:|
-| Optimization 1 | GCC 13.3.0 host | 1.134× | 1.130× | failed |
-| Optimizations 1+2 | GCC 13.3.0 host | 1.162× | 1.123× | failed |
-| Optimizations 1+2 | GCC 16.2.0 container | 1.159× | 1.141× | failed |
-| Optimizations 1+2+3 | GCC 13.3.0 host | 1.316× | 1.279× | passed |
-| Optimizations 1+2+3 | GCC 16.2.0 container | 1.289× | 1.253× | passed |
-| v0.2.0 PIC static build | GCC 13.3.0 host | 1.249× | 1.210× | passed |
+Reproduce the measurement from the repository root:
 
-All measured cohorts exceed the no-regression floor. The v0.1.0 candidate
-passes the unchanged 1.20× overall gate on both required compilers. The v0.2.0
-rerun measures the position-independent object code now shared by the static
-and shared libraries; it also passes the overall and per-cohort gates. Its full
-result and environment are recorded in `v0.2.0-gcc-13.3.0.json` and
-`v0.2.0-environment.json`.
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+python3 tests/generate_cases.py build/cases.csv
+python3 tests/compare.py benchmark \
+  build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
+  build/benchmark.json 7 200
+```

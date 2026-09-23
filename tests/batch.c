@@ -8,7 +8,7 @@
 
 #define FIELD_COUNT 19
 #define LINE_CAPACITY 1024
-#define MAX_CASES 512
+#define MAX_CASES 1024
 
 static void fail(const char *message)
 {
@@ -149,27 +149,68 @@ static void check_argument_contract(const lwbgt_input_v1 *input)
         fail("null output was accepted");
 }
 
-static void check_invalid_date_failure(void)
+static void check_invalid_solar_failure(void)
 {
-    float estimated_wind = 1.0f;
-    float globe = 2.0f;
-    float natural_wet_bulb = 3.0f;
-    float psychrometric_wet_bulb = 4.0f;
-    float wbgt = 5.0f;
-    int status;
+    static const struct {
+        int year;
+        double lat, lon;
+    } cases[] = {
+        {1949, 0.0, 0.0}, {2050, 0.0, 0.0},
+        {2024, -90.01, 0.0}, {2024, 90.01, 0.0},
+        {2024, 0.0, -180.01}, {2024, 0.0, 180.01},
+    };
+    size_t index;
 
-    status = calc_wbgt(
-        1949, 1, 1, 12, 0, 0, 60, 0.0, 0.0, 500.0, 1013.0,
-        25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
-        &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
-    );
-    if (status != -1 ||
-        !same_float(estimated_wind, -9999.0f) ||
-        !same_float(globe, -9999.0f) ||
-        !same_float(natural_wet_bulb, -9999.0f) ||
-        !same_float(psychrometric_wet_bulb, -9999.0f) ||
-        !same_float(wbgt, -9999.0f))
-        fail("invalid date did not initialize failure outputs");
+    for (index = 0; index < sizeof(cases) / sizeof(cases[0]); ++index) {
+        float estimated_wind = 1.0f;
+        float globe = 2.0f;
+        float natural_wet_bulb = 3.0f;
+        float psychrometric_wet_bulb = 4.0f;
+        float wbgt = 5.0f;
+        int status = calc_wbgt(
+            cases[index].year, 1, 1, 12, 0, 0, 60,
+            cases[index].lat, cases[index].lon, 500.0, 1013.0,
+            25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
+            &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
+        );
+        if (status != -1 ||
+            !same_float(estimated_wind, -9999.0f) ||
+            !same_float(globe, -9999.0f) ||
+            !same_float(natural_wet_bulb, -9999.0f) ||
+            !same_float(psychrometric_wet_bulb, -9999.0f) ||
+            !same_float(wbgt, -9999.0f))
+            fail("invalid solar input did not initialize failure outputs");
+    }
+}
+
+static void check_scalar_2m_output(void)
+{
+    float estimated_wind = -1234.5f;
+    float globe, natural_wet_bulb, psychrometric_wet_bulb, wbgt;
+
+    if (calc_wbgt(
+            2024, 3, 21, 12, 0, 0, 0, 0.0, 0.0, 500.0, 1013.0,
+            25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
+            &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
+        ) != 0 || !same_float(estimated_wind, 2.0f))
+        fail("scalar 2 m wind output was not assigned");
+}
+
+static void check_supported_year_bounds(void)
+{
+    static const int years[] = {1950, 2049};
+    size_t index;
+
+    for (index = 0; index < sizeof(years) / sizeof(years[0]); ++index) {
+        float estimated_wind, globe, natural_wet_bulb, psychrometric_wet_bulb, wbgt;
+        int status = calc_wbgt(
+            years[index], 3, 1, 12, 0, 0, 0, 0.0, 0.0, 500.0, 1013.0,
+            25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
+            &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
+        );
+        if (status != 0 || !same_float(estimated_wind, 2.0f))
+            fail("supported year boundary was not calculated");
+    }
 }
 
 int main(int argc, char **argv)
@@ -204,7 +245,9 @@ int main(int argc, char **argv)
     if (count == 0) fail("no cases generated");
 
     check_argument_contract(&inputs[0]);
-    check_invalid_date_failure();
+    check_invalid_solar_failure();
+    check_scalar_2m_output();
+    check_supported_year_bounds();
     memset(actual, 0xa5, count * sizeof(*actual));
     if (lwbgt_calc_batch_v1(inputs, actual, count) != LWBGT_BATCH_OK)
         fail("batch call failed");

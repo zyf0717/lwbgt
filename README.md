@@ -8,8 +8,9 @@
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
 `lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
-wet bulb globe temperature (WBGT) model. It preserves the original scalar ABI
-and documented numerical behaviour while removing repeated and dead work.
+wet bulb globe temperature (WBGT) model. It preserves the original scalar
+binary ABI and legacy WBGT calculations while removing repeated and dead work;
+the current source corrects the scalar 2 m wind output.
 Dependency-free Python and R bindings use the same native kernel. SwiftPM
 exposes the stable C interface as `CLWBGT`.
 
@@ -19,8 +20,12 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.2.** The tested release remains bit-identical to the
-retained oracle within the documented compatibility scope.
+**Version: v0.4.3.** The 852-case
+comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
+`Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
+guarantee. Direct scalar estimated wind at 2 m is corrected, and the original
+1950–2049 year range is retained. See the
+[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Python
 
@@ -38,7 +43,7 @@ weather = Input(
     solar_w_m2=742.0, pressure_hpa=1008.4,
     air_temperature_c=32.1, relative_humidity_percent=68.0,
     wind_speed_m_s=2.8, wind_height_m=10.0,
-    vertical_temperature_difference_c=-0.4,
+    vertical_temperature_difference_c=1,
 )
 
 result = calculate(weather)
@@ -51,7 +56,9 @@ print(esat(273.15, phase=0))
 
 `Input` and `Result` are immutable typed records. Field names, units, status
 codes, and failure behaviour are defined by the
-[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
+[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md). See the
+[input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
+before substituting unavailable observations.
 
 ## R
 
@@ -80,7 +87,7 @@ Add the package and its C-library product to a Swift target:
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.2"),
+        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.3"),
     ],
     targets: [
         .target(
@@ -125,6 +132,7 @@ numerical target is built in GNU89 mode.
 | Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
 | Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
 | Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |
+| Source changes | [Deviations from original Liljegren C](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md) |
 | Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
 | Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
 

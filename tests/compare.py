@@ -3,13 +3,20 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import statistics
+import struct
 import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
+
+SUCCESS_COHORTS = {
+    "year-sweep", "calendar-boundary", "solar-geometry", "wind-stability",
+    "thermophysical", "float-conversion",
+}
 
 
 def run(command: list[str]) -> bytes:
@@ -35,6 +42,42 @@ def exact(reference: str, candidate: str, cases: str) -> None:
         "cases": max(0, len(expected.splitlines()) - 1),
         "sha256": hashlib.sha256(expected).hexdigest(),
         "status": "bit-identical",
+    }, sort_keys=True))
+
+
+def compatibility(reference: str, candidate: str, cases: str) -> None:
+    with Path(cases).open(encoding="ascii", newline="") as stream:
+        records = list(csv.DictReader(stream))
+    expected = run([reference, cases]).decode("ascii").splitlines()
+    actual = run([candidate, cases]).decode("ascii").splitlines()
+    if len(expected) != len(records) + 1 or len(actual) != len(expected):
+        raise SystemExit("compatibility output lengths differ")
+    if expected[0] != actual[0]:
+        raise SystemExit("compatibility output headers differ")
+
+    corrected = 0
+    for record, reference_line, candidate_line in zip(
+        records, expected[1:], actual[1:], strict=True
+    ):
+        reference_fields = reference_line.split(",")
+        candidate_fields = candidate_line.split(",")
+        if record["cohort"] in SUCCESS_COHORTS and reference_fields[1] != "0":
+            raise SystemExit(f"oracle failed for valid case {record['case_id']}")
+        if float(record["wind_height"]) == 2.0:
+            wind_bits = struct.unpack("=I", struct.pack("=f", float(record["wind"])))[0]
+            if candidate_fields[2] != f"{wind_bits:08x}":
+                raise SystemExit(f"incorrect scalar 2 m wind for {record['case_id']}")
+            reference_fields[2] = candidate_fields[2]
+            corrected += 1
+        if reference_fields != candidate_fields:
+            raise SystemExit(
+                f"compatibility mismatch for {record['case_id']}:\n"
+                f"reference: {reference_line}\ncandidate: {candidate_line}"
+            )
+    print(json.dumps({
+        "cases": len(records),
+        "corrected_2m_wind_cases": corrected,
+        "status": "bit-identical except corrected scalar 2 m wind",
     }, sort_keys=True))
 
 
@@ -97,12 +140,16 @@ def main() -> None:
     if len(sys.argv) == 5 and sys.argv[1] == "exact":
         exact(sys.argv[2], sys.argv[3], sys.argv[4])
         return
+    if len(sys.argv) == 5 and sys.argv[1] == "compat":
+        compatibility(sys.argv[2], sys.argv[3], sys.argv[4])
+        return
     if len(sys.argv) == 8 and sys.argv[1] == "benchmark":
         benchmark(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],
                   int(sys.argv[6]), int(sys.argv[7]))
         return
     raise SystemExit(
         "usage: compare.py exact REF CANDIDATE CASES | "
+        "compare.py compat REF CANDIDATE CASES | "
         "compare.py benchmark REF CANDIDATE CASES OUT REPS ITERATIONS"
     )
 

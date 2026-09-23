@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.4.2 LANGUAGES C)
+project(lwbgt VERSION 0.4.3 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -125,6 +125,10 @@ if(BUILD_TESTING)
     lwbgt_add_harness(lwbgt_benchmark benchmarks/benchmark.c lwbgt)
     lwbgt_add_harness(lwbgt_reference_benchmark benchmarks/benchmark.c lwbgt_reference)
     lwbgt_add_harness(lwbgt_batch_test tests/batch.c lwbgt)
+    add_executable(lwbgt_demo src/wbgt.c)
+    target_compile_definitions(lwbgt_demo PRIVATE LWBGT_BUILD_DEMO)
+    target_compile_options(lwbgt_demo PRIVATE ${LWBGT_FP_OPTIONS} ${LWBGT_LEGACY_OPTIONS})
+    target_link_libraries(lwbgt_demo PRIVATE m)
 
     set(LWBGT_CASES "${CMAKE_CURRENT_BINARY_DIR}/cases.csv")
     add_test(
@@ -137,22 +141,27 @@ if(BUILD_TESTING)
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_r_sources.py"
     )
     add_test(
-        NAME exact_equivalence
+        NAME compatibility_equivalence
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
-                exact "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_probe>"
+                compat "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_probe>"
                 "${LWBGT_CASES}"
     )
-    set_tests_properties(exact_equivalence PROPERTIES DEPENDS generate_cases)
+    set_tests_properties(compatibility_equivalence PROPERTIES DEPENDS generate_cases)
     add_test(
-        NAME python_runtime_exact_equivalence
+        NAME python_runtime_compatibility_equivalence
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
-                exact "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_python_probe>"
+                compat "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_python_probe>"
                 "${LWBGT_CASES}"
     )
-    set_tests_properties(python_runtime_exact_equivalence PROPERTIES DEPENDS generate_cases)
+    set_tests_properties(python_runtime_compatibility_equivalence PROPERTIES DEPENDS generate_cases)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)
+    add_test(
+        NAME demo_smoke
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_demo.py"
+                "$<TARGET_FILE:lwbgt_demo>"
+    )
 
     add_test(
         NAME shared_exports
@@ -320,6 +329,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lwbgt.pc"
 install(FILES
     LICENSE
     docs/ABI.md
+    docs/INPUTS.md
     LICENSING.md
     NOTICE
     LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
