@@ -35,7 +35,7 @@ point input is an ABI-boundary `double`.
 
 | Offset | Field | Type | Units and meaning |
 |---:|---|---|---|
-| 0 | `year` | `int32_t` | Four-digit Gregorian year; solar-position support is 1900–2100 inclusive |
+| 0 | `year` | `int32_t` | Four-digit Gregorian year; solar-position support is 1950–2049 inclusive |
 | 4 | `month` | `int32_t` | Month 1–12; 0 means `day` is day-of-year |
 | 8 | `day` | `int32_t` | Day of month, or day-of-year when `month == 0` |
 | 12 | `hour` | `int32_t` | Local standard-time hour, 0–23 |
@@ -106,10 +106,9 @@ to `calc_wbgt` use `double` at the ABI boundary because the original K&R
 liquid water; `phase == 1` computes saturation over ice. Other phase values are
 outside the supported contract.
 
-The original solar-position arithmetic is retained for 1950–2049. Gregorian
-day counting supports 1900–1949 and 2050–2100, but the original low-precision
-solar formulas have no established accuracy guarantee outside their stated
-1950–2050 precision period.
+The original solar-position arithmetic and 1950–2049 year bound are retained.
+Years outside that range fail with status `-1` and initialized scalar failure
+outputs.
 
 ## Concurrency and ownership
 

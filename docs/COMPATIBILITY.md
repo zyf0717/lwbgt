@@ -10,7 +10,7 @@ field must equal the supplied speed converted to `float`. Batch and R callers
 already initialized that field and retain their previous output bits.
 
 The measurements below describe the earlier releases, before that scalar
-output correction and the 1900–2100 year extension.
+output correction.
 
 | Environment | Exact result | Median overall speedup |
 |---|---:|---:|
@@ -19,9 +19,7 @@ output correction and the 1900–2100 year extension.
 | Linux x86-64, GCC 13.3.0, PIC build | bit-identical | 1.249× |
 
 These measurements apply only to the documented environments and workloads.
-The legacy solar formulas are used outside 1950–2049 with Gregorian day
-counting; their accuracy outside the stated 1950–2050 precision period has not
-been established. Newly admitted dates have no legacy valid-output comparison.
+Dates outside the original 1950–2049 solar-position range are rejected.
 Full methods, hardware and compiler details, workloads, and retained results
 are in the
 [benchmark documentation](https://github.com/zyf0717/lwbgt/tree/main/benchmarks).

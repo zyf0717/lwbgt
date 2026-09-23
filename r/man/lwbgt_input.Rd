@@ -10,7 +10,7 @@ lwbgt_input(
 )
 }
 \arguments{
-\item{year}{Integer-valued Gregorian year from 1900 through 2100.}
+\item{year}{Integer-valued Gregorian year from 1950 through 2049.}
 \item{month, day, hour, minute}{Integer-valued local date and time fields.
 A \code{month} of zero makes \code{day} a day-of-year value.}
 \item{gmt_offset_hours}{Local standard time minus GMT, in whole hours.}

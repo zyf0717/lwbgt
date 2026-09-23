@@ -730,13 +730,6 @@ float emis_atm(float Tair, float rh)
 #define	DEG_RAD	0.017453292519943295
 #define	RAD_DEG	57.295779513082323
 
-static int days_before_year(int year)
-{
-  int previous_year = year - 1;
-  return 365 * previous_year + previous_year / 4 - previous_year / 100
-         + previous_year / 400;
-}
-
 int solarposition(int year, int month, double day, double days_1900,
 		double latitude, double longitude, double *ap_ra, double *ap_dec,
 		double *altitude, double *refraction, double *azimuth,
@@ -784,7 +777,7 @@ int solarposition(int year, int month, double day, double days_1900,
   if (year != 0)
   /* Date given by {year, month, day} or {year, 0, daynumber}. */
   {
-    if (year < 1900 || year > 2100)
+    if (year < 1950 || year > 2049)
       return (-1);
     if (month != 0)
     {
@@ -809,9 +802,6 @@ int solarposition(int year, int month, double day, double days_1900,
     delta_days = delta_years * 365 + delta_years / 4 + daynumber;
     if (year > 2000)
       delta_days += 1;
-    if (year < 1950 || year > 2049)
-      delta_days = days_before_year(year) - days_before_year(2000)
-                   + daynumber;
     /* J2000 is 2000/01/01.5 */
     days_J2000 = delta_days - 1.5;
 

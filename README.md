@@ -22,7 +22,8 @@ consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 
 **Release status: v0.4.2.** That release was bit-identical to the retained
 oracle within its documented compatibility scope. Current unreleased source
-corrects the direct scalar 2 m wind output and extends year support; see the
+corrects the direct scalar 2 m wind output and retains the original 1950–2049
+year support; see the
 [compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Python

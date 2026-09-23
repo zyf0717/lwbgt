@@ -27,12 +27,17 @@ git diff --no-index -- upstream/wbgt.c.original src/wbgt.c
 | `h_cylinder_in_air`, lines 415–448; `h_sphere_in_air`, lines 494–522 | Reuse the `float` viscosity value already calculated for Reynolds number when calculating conductivity; mark the unused cylinder `length` argument explicitly unused. | Removes a repeated viscosity call. The conductivity expression uses the same rounded viscosity; retained-oracle tests check output bits. |
 | `Tglobe`, lines 448–494 | Compute loop-invariant atmospheric and solar radiation terms before the iteration, then reuse them. | Removes repeated work; retained-oracle tests check output bits. |
 | `esat`, lines 533–542 | Repaired malformed nested-comment text in three commented-out alternative moist-air corrections. | Comment-only; the executable saturation formula is unchanged. |
-| [`solarposition`, lines 736–845](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L736-L845) | Removed obsolete local math/function declarations along with the K&R signature. Added `days_before_year()` and support for Gregorian years 1900–2100. Years 1950–2049 still execute the original date arithmetic; newly admitted years use Gregorian leap-century day counts. The internal `year == 0`/`days_1900` route is unchanged. The original bounds establish the legacy limit; [`pywbgt`](https://github.com/kwodzicki/pywbgt) independently documents it but uses SPA instead of this Gregorian extension. | Previously rejected years 1900–1949 and 2050–2100 now produce results. Existing successful years retain their solar arithmetic. The original low-precision formulas state precision only for 1950–2050; accuracy outside that period is unverified. |
+| [`solarposition`, lines 736–845](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L736-L845) | Removed obsolete local math/function declarations along with the K&R signature. The original year guard, day arithmetic, and internal `year == 0`/`days_1900` route are retained. | No numerical change from these declaration edits. Years outside 1950–2049 remain rejected; the corrected callers propagate that failure. |
 
 No model constants, convergence threshold, minimum wind speed, WBGT weighting,
 or wind-stability lookup table were changed. The compatibility gate compares
 all existing output bits with the retained oracle except the corrected direct
 scalar 2 m wind output. The historical exact-comparison mode remains available.
+
+The [original `solarposition()` bounds](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L770-L818)
+remain in effect. [`pywbgt`](https://github.com/kwodzicki/pywbgt) independently
+documents this calendar limit and uses SPA; this derivative retains the original
+solar calculation.
 
 ## Project additions outside the original file
 

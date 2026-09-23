@@ -151,7 +151,7 @@ static void check_argument_contract(const lwbgt_input_v1 *input)
 
 static void check_invalid_date_failure(void)
 {
-    static const int years[] = {1899, 2101};
+    static const int years[] = {1949, 2050};
     size_t index;
 
     for (index = 0; index < sizeof(years) / sizeof(years[0]); ++index) {
@@ -188,33 +188,20 @@ static void check_scalar_2m_output(void)
         fail("scalar 2 m wind output was not assigned");
 }
 
-static void check_extended_years(void)
+static void check_supported_year_bounds(void)
 {
-    static const int years[] = {1900, 1949, 2050, 2100};
+    static const int years[] = {1950, 2049};
     size_t index;
 
     for (index = 0; index < sizeof(years) / sizeof(years[0]); ++index) {
         float estimated_wind, globe, natural_wet_bulb, psychrometric_wet_bulb, wbgt;
-        float ordinal_wind, ordinal_globe, ordinal_natural, ordinal_psychrometric;
-        float ordinal_wbgt;
         int status = calc_wbgt(
             years[index], 3, 1, 12, 0, 0, 0, 0.0, 0.0, 500.0, 1013.0,
             25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
             &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
         );
         if (status != 0 || !same_float(estimated_wind, 2.0f))
-            fail("extended year was not calculated");
-        status = calc_wbgt(
-            years[index], 0, 60, 12, 0, 0, 0, 0.0, 0.0, 500.0, 1013.0,
-            25.0, 50.0, 2.0, 2.0, 0.0, 0, &ordinal_wind, &ordinal_globe,
-            &ordinal_natural, &ordinal_psychrometric, &ordinal_wbgt
-        );
-        if (status != 0 || !same_float(ordinal_wind, estimated_wind) ||
-            !same_float(ordinal_globe, globe) ||
-            !same_float(ordinal_natural, natural_wet_bulb) ||
-            !same_float(ordinal_psychrometric, psychrometric_wet_bulb) ||
-            !same_float(ordinal_wbgt, wbgt))
-            fail("extended year calendar and ordinal dates differ");
+            fail("supported year boundary was not calculated");
     }
 }
 
@@ -252,7 +239,7 @@ int main(int argc, char **argv)
     check_argument_contract(&inputs[0]);
     check_invalid_date_failure();
     check_scalar_2m_output();
-    check_extended_years();
+    check_supported_year_bounds();
     memset(actual, 0xa5, count * sizeof(*actual));
     if (lwbgt_calc_batch_v1(inputs, actual, count) != LWBGT_BATCH_OK)
         fail("batch call failed");
