@@ -31,22 +31,22 @@ Argonne terms documented in the installed legal files.
    python tests/check_r_sources.py
    python tests/check_distribution.py dist/*
    python -m twine check dist/*
-   R CMD check lwbgt_0.4.2.tar.gz
+   R CMD check lwbgt_0.4.3.tar.gz
    ```
 
 4. Create and push an annotated or signed tag only after every release gate
    passes:
 
    ```sh
-   git tag -s v0.4.2 -m "lwbgt v0.4.2"
-   git push origin v0.4.2
+   git tag -s v0.4.3 -m "lwbgt v0.4.3"
+   git push origin v0.4.3
    ```
 
 5. The tag workflow reruns the complete R and Python artifact gates, publishes
    to TestPyPI, verifies byte identity and installation, publishes to PyPI, and
    creates a GitHub release containing the Python and R source artifacts.
-6. For the first R release, add this entry to `packages.json` in
-   `zyf0717/zyf0717.r-universe.dev`, preserving the existing entries:
+6. Verify that `packages.json` in `zyf0717/zyf0717.r-universe.dev` still
+   contains this entry; add it if missing, preserving the existing entries:
 
    ```json
    {
@@ -57,10 +57,8 @@ Argonne terms documented in the installed legal files.
    }
    ```
 
-   Do this after the v0.4 GitHub release exists: the preceding v0.3 release
-   does not contain the R package. The `subdir` is required because
-   `DESCRIPTION` is under `r/`; `*release` keeps later R-universe builds on the
-   latest published GitHub release.
+   The `subdir` is required because `DESCRIPTION` is under `r/`; `*release`
+   keeps R-universe builds on the latest published GitHub release.
 7. R-universe detects the new GitHub release through the `*release` registry
    entry and builds the package from `r/`. Require a successful build for the
    tagged commit at `https://zyf0717.r-universe.dev/lwbgt` before announcing

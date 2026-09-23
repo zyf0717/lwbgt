@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.4.3 — 2026-09-23
+
 - Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
   speed and initialized the optional demonstration's first `dT` argument.
 - Added an upstream deviation register and expanded the retained-oracle

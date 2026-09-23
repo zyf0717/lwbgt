@@ -1,36 +1,28 @@
-# v0.4.2 release verification
+# v0.4.3 release verification
 
-v0.4.2 adds a dependency-safe SwiftPM C-library product backed directly by the
-canonical kernel sources and public header. The C ABI remains version 1.
+v0.4.3 corrects direct scalar estimated wind at the 2 m reference height and
+initializes the optional demonstration's first `dT`. The original 1950–2049
+solar calculation and its valid-input numerical results remain unchanged in the
+852-case retained-original comparison, apart from that scalar wind output.
+The native ABI remains version 1. The unverified weather-source benchmark
+cohort and reports based on it were removed; the current 840-row timing result
+is recorded in `../benchmarks/README.md`.
 
-Release acceptance requires:
+Local verification on 2026-09-23 passed:
 
-- the full native CTest matrix and numerical equivalence suite;
-- release-mode downstream SwiftPM consumer tests on Linux and macOS;
-- all installed-wheel, sdist, ABI, resource, and version-coherence tests;
-- base-R scalar, vector, recycling, empty, validation, failure-status, schema,
-  and water/ice `esat` tests;
-- byte-identical canonical and `r/src` kernel/header sources;
-- registered forced R symbols, hidden internal symbols, and no compiled
-  demonstration `main`, `printf`, or `exit` dependency;
-- complete `R CMD check` runs on Linux/GCC, Linux/Clang with R-devel,
-  Windows/Rtools, and macOS/AppleClang, with the PDF manual checked on Linux;
-- installed legal files and no errors or warnings;
-- successful installation from the GitHub release and from R-universe; and
-- an R-universe build whose source commit matches the GitHub release tag.
+- `tests/check_versions.py` and `tests/check_r_sources.py`;
+- the Release CMake build and all 12 CTest tests, including both 852-case
+  compatibility comparisons and installed consumers;
+- Python source distribution and wheel content checks, `twine check`, a wheel
+  rebuilt from the source distribution, and all 17 tests against that wheel in
+  a clean environment;
+- `R CMD build r` and the complete `R CMD check` with PDF manual: `Status: OK`;
+- the downstream SwiftPM consumer in release mode with Swift 6.2.4 on Linux:
+  all three tests passed.
 
-The signed or annotated Git tag is created only after the source commit passes
-all local and CI gates. The tag workflow publishes the immutable GitHub
-release; the `*release` entry in `zyf0717/zyf0717.r-universe.dev` then makes
-that release available through R-universe. A required source change after
-publication requires a unified version bump and a new release.
+Release acceptance also requires green native, SwiftPM, wheel, and R CI on the
+exact candidate commit. The annotated tag and publication follow those gates;
+they have not been performed for this candidate.
 
-Local release verification on 2026-09-22 passed version and R-source coherence,
-the full native CTest suite, the Linux Swift 6.2.4 downstream-consumer tests,
-sdist content and metadata checks, all 17 tests against a source-built wheel,
-and `R CMD check` without the optional manual and vignette stages. macOS
-SwiftPM, full cross-platform wheel and R checks, direct GitHub installation,
-and R-universe results remain pending until their CI or publication gates run.
-
-Historical verification is retained in `RELEASE-0.1.0.md`,
-`RELEASE-0.2.0.md`, and `RELEASE-0.2.1.md`.
+The previous release's verification record is retained in
+`RELEASE-0.4.2.md`.

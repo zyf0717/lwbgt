@@ -4,4 +4,4 @@ from ._ffi import calculate, calculate_batch, esat
 from ._types import Input, Result
 
 __all__ = ["Input", "Result", "calculate", "calculate_batch", "esat"]
-__version__ = "0.4.2"
+__version__ = "0.4.3"

@@ -20,7 +20,7 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.2.** For the current unreleased source, the 852-case
+**Version: v0.4.3.** The 852-case
 comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
 `Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
 guarantee. Direct scalar estimated wind at 2 m is corrected, and the original
@@ -87,7 +87,7 @@ Add the package and its C-library product to a Swift target:
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.2"),
+        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.3"),
     ],
     targets: [
         .target(

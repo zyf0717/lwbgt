@@ -1,7 +1,7 @@
 Package: lwbgt
 Type: Package
 Title: Reference-Compatible Outdoor Wet Bulb Globe Temperature
-Version: 0.4.2
+Version: 0.4.3
 Authors@R: c(
     person("Yifei", "Zheng", email = "zyf0717@gmail.com",
            role = c("aut", "cre", "cph"),

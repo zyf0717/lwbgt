@@ -1,3 +1,11 @@
+# lwbgt 0.4.3
+
+- Synchronized the R package with project release 0.4.3. The direct C scalar
+  API now writes estimated wind for 2 m input; the R output and WBGT results
+  for valid inputs are unchanged.
+- Expanded the retained-original comparison and removed an unverified weather
+  cohort from the timing workload.
+
 # lwbgt 0.4.2
 
 - Synchronized the R package version with project release 0.4.2; the R API and
