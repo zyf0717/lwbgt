@@ -1,0 +1,116 @@
+{
+  "cohorts": {
+    "calendar-boundary": {
+      "candidate_median_rows_s": 184634.43149185576,
+      "candidate_relative_mad": 0.0007976057288219974,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 137846.68474647112,
+      "reference_relative_mad": 0.0011229435939378158,
+      "speedup": 1.3394187305370244
+    },
+    "domain-edge": {
+      "candidate_median_rows_s": 124323.38943635592,
+      "candidate_relative_mad": 0.0015180125950226488,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 93259.50606450698,
+      "reference_relative_mad": 0.004439540185255901,
+      "speedup": 1.3330907988121046
+    },
+    "era5": {
+      "candidate_median_rows_s": 169006.34887439336,
+      "candidate_relative_mad": 0.013935979976571625,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 128106.25640338089,
+      "reference_relative_mad": 0.006660105640283658,
+      "speedup": 1.3192669399551127
+    },
+    "float-conversion": {
+      "candidate_median_rows_s": 207634.51317594934,
+      "candidate_relative_mad": 0.0024515414786478915,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 156895.75466938197,
+      "reference_relative_mad": 0.001933231778098557,
+      "speedup": 1.3233915322532877
+    },
+    "hsb-generated": {
+      "candidate_median_rows_s": 171650.90791800982,
+      "candidate_relative_mad": 0.011355616495137097,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 130945.75608590017,
+      "reference_relative_mad": 0.00957033925912872,
+      "speedup": 1.3108550673868893
+    },
+    "matrix": {
+      "candidate_median_rows_s": 201173.65782919037,
+      "candidate_relative_mad": 0.001729000708179294,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 151257.60112257826,
+      "reference_relative_mad": 0.0013129429278133443,
+      "speedup": 1.330006930799864
+    },
+    "nasa-power": {
+      "candidate_median_rows_s": 220748.96848902534,
+      "candidate_relative_mad": 0.007012354031305322,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 175314.7999900122,
+      "reference_relative_mad": 0.011914054098249314,
+      "speedup": 1.2591576324508915
+    },
+    "overall": {
+      "candidate_median_rows_s": 192288.11611083493,
+      "candidate_relative_mad": 0.0009515137054477007,
+      "gate": 1.2,
+      "passed": true,
+      "reference_median_rows_s": 143896.29038205752,
+      "reference_relative_mad": 0.0013144927856240374,
+      "speedup": 1.336296548022835
+    },
+    "solar-geometry": {
+      "candidate_median_rows_s": 190120.04924604183,
+      "candidate_relative_mad": 0.00027401476036616017,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 141289.54897235046,
+      "reference_relative_mad": 0.0005136378082528043,
+      "speedup": 1.3456058896702063
+    },
+    "thermophysical": {
+      "candidate_median_rows_s": 162080.0872250427,
+      "candidate_relative_mad": 0.0015559547789866133,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 121330.30029260408,
+      "reference_relative_mad": 0.0012332153249394971,
+      "speedup": 1.3358582879475704
+    },
+    "wind-stability": {
+      "candidate_median_rows_s": 177990.3675023885,
+      "candidate_relative_mad": 0.0008882444572972907,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 134594.95352361767,
+      "reference_relative_mad": 0.0003992721684881196,
+      "speedup": 1.3224148665511157
+    },
+    "year-sweep": {
+      "candidate_median_rows_s": 189441.80752308262,
+      "candidate_relative_mad": 0.0007207484604518909,
+      "gate": 0.98,
+      "passed": true,
+      "reference_median_rows_s": 139861.07194961948,
+      "reference_relative_mad": 0.0006273935730289605,
+      "speedup": 1.3544998968070474
+    }
+  },
+  "iterations_per_case": 200,
+  "method": "single-thread, pinned CPU, one warm-up, interleaved executions",
+  "passed": true,
+  "repetitions": 7
+}

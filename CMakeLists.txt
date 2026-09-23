@@ -125,6 +125,10 @@ if(BUILD_TESTING)
     lwbgt_add_harness(lwbgt_benchmark benchmarks/benchmark.c lwbgt)
     lwbgt_add_harness(lwbgt_reference_benchmark benchmarks/benchmark.c lwbgt_reference)
     lwbgt_add_harness(lwbgt_batch_test tests/batch.c lwbgt)
+    add_executable(lwbgt_demo src/wbgt.c)
+    target_compile_definitions(lwbgt_demo PRIVATE LWBGT_BUILD_DEMO)
+    target_compile_options(lwbgt_demo PRIVATE ${LWBGT_FP_OPTIONS} ${LWBGT_LEGACY_OPTIONS})
+    target_link_libraries(lwbgt_demo PRIVATE m)
 
     set(LWBGT_CASES "${CMAKE_CURRENT_BINARY_DIR}/cases.csv")
     add_test(
@@ -153,6 +157,11 @@ if(BUILD_TESTING)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)
+    add_test(
+        NAME demo_smoke
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_demo.py"
+                "$<TARGET_FILE:lwbgt_demo>"
+    )
 
     add_test(
         NAME shared_exports

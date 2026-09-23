@@ -4,8 +4,9 @@
 
 - Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
   speed and initialized the optional demonstration's first `dT` argument.
-- Added an upstream deviation register and a 454-case bit-comparison gate that
-  makes the scalar wind-output exception explicit.
+- Added an upstream deviation register and expanded the retained-oracle
+  comparison to 854 cases across all supported years and changed numerical
+  paths, while making the scalar wind-output exception explicit.
 
 ## v0.4.2 — 2026-09-22
 

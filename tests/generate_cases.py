@@ -6,6 +6,7 @@ from __future__ import annotations
 import csv
 import itertools
 import sys
+from calendar import isleap
 from pathlib import Path
 
 HEADER = (
@@ -73,6 +74,73 @@ def main() -> None:
     ):
         add("invalid", 2049, 12, 31, 23, 59, 12, 30, -89.9, 179.9,
             solar, pressure, 25.0, rh, wind, height, 20.0, 0)
+
+    assert len(rows) == 454  # Preserve the historical oracle prefix.
+
+    # Every supported year, including the original leap-year arithmetic.
+    for year in range(1950, 2050):
+        month, day = ((3, 20), (9, 22))[year % 2]
+        hour = (0, 6, 12, 18)[year % 4]
+        add("year-sweep", year, month, day, hour, 0, 0, 0,
+            (-45.0, 0.0, 45.0)[year % 3], 0.0,
+            650.0 if hour == 12 else 0.0, 1013.0,
+            15.0 + 5.0 * (year % 5), 30.0 + 20.0 * (year % 3),
+            1.0 + (year % 4), (2.0, 10.0)[year % 2],
+            (-1.0, 0.0, 1.0)[year % 3], year % 2)
+
+    # Month/day and day-of-year forms around leap days and year boundaries.
+    for year in (1950, 1952, 1999, 2000, 2001, 2004, 2048, 2049):
+        dates = [(1, 1), (2, 28), (3, 1), (12, 31)]
+        if isleap(year):
+            dates.insert(2, (2, 29))
+        for month, day in dates:
+            add("calendar-boundary", year, month, day, 12, 0, 0, 0,
+                0.0, 0.0, 600.0, 1013.0, 25.0, 50.0, 2.0, 2.0, 0.0, 0)
+            if (month, day) in ((3, 1), (12, 31)):
+                ordinal = (60 + isleap(year)) if month == 3 else (365 + isleap(year))
+                add("calendar-boundary", year, 0, ordinal, 12, 0, 0, 0,
+                    0.0, 0.0, 600.0, 1013.0, 25.0, 50.0, 2.0, 2.0, 0.0, 0)
+
+    # Zero/nonzero radiation through different seasons, latitudes, and horizons.
+    for lat, (month, day), hour, solar in itertools.product(
+        (-60.0, 0.0, 60.0), ((3, 20), (6, 21), (9, 22), (12, 21)),
+        (5, 7, 17, 19), (0.0, 700.0),
+    ):
+        add("solar-geometry", 2024, month, day, hour, 0, 0, 0,
+            lat, 0.0, solar, 1013.0, 25.0, 50.0, 2.0, 2.0, 0.0, 0)
+
+    # All wind-stability sides near the 0.13, 2.0, and 2.5 m/s thresholds.
+    for wind, delta, urban, hour in itertools.product(
+        (0.129, 0.13, 0.131, 1.9999, 2.0, 2.4999, 2.5, 8.0),
+        (-1.0, 0.0, 1.0), (0, 1), (0, 12),
+    ):
+        add("wind-stability", 2024, 3, 20, hour, 0, 0, 0,
+            0.0, 0.0, 700.0 if hour == 12 else 0.0,
+            1013.0, 25.0, 50.0, wind, 10.0, delta, urban)
+
+    # Vary temperatures, pressures, humidity, and both radiative branches.
+    for air, pressure, rh, solar in itertools.product(
+        (-5.0, 15.0, 30.0, 40.0), (700.0, 900.0, 1013.0),
+        (20.0, 80.0), (0.0, 800.0),
+    ):
+        add("thermophysical", 2024, 7, 1, 12, 0, 0, 60,
+            25.0, 0.0, solar, pressure, air, rh,
+            0.5 if air < 20.0 else 3.7, 2.0 if solar == 0.0 else 10.0,
+            -0.5, 1)
+
+    # Scalar double inputs deliberately close to single-precision boundaries.
+    for index, wind in enumerate((
+        0.129999995, 0.130000009, 1.99999994, 2.00000006,
+        2.49999994, 2.50000006, 3.141592653589793, 8.765432198765,
+    )):
+        add("float-conversion", 2024, 4, 15, 10 + index % 4, 17, 0, 30,
+            23.4567890123, -45.6789012345,
+            0.0 if index % 2 else 653.123456789,
+            1013.567890123, 25.123456789 + index / 10,
+            67.987654321, wind, 2.0 if index % 2 else 10.0,
+            -0.123456789, index % 2)
+
+    assert len(rows) == 854
 
     output = Path(sys.argv[1])
     output.parent.mkdir(parents=True, exist_ok=True)

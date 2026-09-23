@@ -43,3 +43,15 @@ rerun measures the position-independent object code now shared by the static
 and shared libraries; it also passes the overall and per-cohort gates. Its full
 result and environment are recorded in `v0.2.0-gcc-13.3.0.json` and
 `v0.2.0-environment.json`.
+
+## Expanded oracle workload (unreleased)
+
+The 854-case corpus includes 400 new successful cases spanning every supported
+year and the changed numerical paths. On 2026-09-23, the expanded workload was
+remeasured on the 13th Gen Intel Core i9-13900HK, Linux 7.0.0-31-generic,
+GCC 13.3.0, and CMake 3.28.3 with the same floating-point flags, 200 iterations
+per case, and seven interleaved repetitions. The overall median speedup was
+**1.336×**; the slowest cohort was NASA POWER at **1.259×**. All overall and
+per-cohort gates passed. The full report is
+[`expanded-gcc-13.3.0.json`](expanded-gcc-13.3.0.json). Historical benchmark
+results above retain their original 454-case workload.

@@ -13,6 +13,11 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+SUCCESS_COHORTS = {
+    "year-sweep", "calendar-boundary", "solar-geometry", "wind-stability",
+    "thermophysical", "float-conversion",
+}
+
 
 def run(command: list[str]) -> bytes:
     return subprocess.run(command, check=True, stdout=subprocess.PIPE).stdout
@@ -56,6 +61,8 @@ def compatibility(reference: str, candidate: str, cases: str) -> None:
     ):
         reference_fields = reference_line.split(",")
         candidate_fields = candidate_line.split(",")
+        if record["cohort"] in SUCCESS_COHORTS and reference_fields[1] != "0":
+            raise SystemExit(f"oracle failed for valid case {record['case_id']}")
         if float(record["wind_height"]) == 2.0:
             wind_bits = struct.unpack("=I", struct.pack("=f", float(record["wind"])))[0]
             if candidate_fields[2] != f"{wind_bits:08x}":

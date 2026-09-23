@@ -30,11 +30,25 @@ git diff --no-index -- upstream/wbgt.c.original src/wbgt.c
 | [`solarposition`, lines 736–845](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L736-L845) | Removed obsolete local math/function declarations along with the K&R signature. The original year guard, day arithmetic, and internal `year == 0`/`days_1900` route are retained. | No numerical change from these declaration edits. Years outside 1950–2049 remain rejected; the corrected callers propagate that failure. |
 
 No model constants, convergence threshold, minimum wind speed, WBGT weighting,
-or wind-stability lookup table were changed. In the 454-case retained-oracle
+or wind-stability lookup table were changed. In the 854-case retained-oracle
 comparison, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat` matched bit for bit. The
 direct scalar 2 m estimated-wind output is the intentional exception. This
 sampled comparison does not establish bit identity for every valid input or
 build environment. The historical exact-comparison mode remains available.
+
+### Verification by change
+
+| Change or retained path | Verification | Limit |
+|---|---|---|
+| Derivative-work notice | Source inspection confirms it is comment-only. | No executable behavior to compare. |
+| Typed prototypes and scalar `double`-to-`float` conversion | The `float-conversion` cases exercise rounding near wind thresholds; all successful oracle cases compare output bits. | Sampled values cannot establish equivalence for every floating-point input. |
+| Demo isolation and initialized `dT` | `demo_smoke` compiles the optional driver and checks a valid 2 m row. | The upstream driver's first `dT` was indeterminate, so it has no reliable byte-exact oracle. |
+| Propagated solar-position failure | `batch_equivalence` checks initialized failure outputs for years 1949/2050 and out-of-range latitude/longitude. | The original caller consumed unwritten solar values on these inputs; no meaningful original-result comparison exists. |
+| Scalar 2 m estimated wind | `compatibility_equivalence` checks the corrected `float` value while comparing the other fields; `batch_equivalence` starts this output with a sentinel. | This output intentionally differs from the original at 2 m. |
+| Skipped or hoisted `Twb` radiation and hoisted `Tglobe` radiation | `matrix`, `solar-geometry`, and `thermophysical` cases cover zero/nonzero radiation, changing solar geometry, and changing thermal inputs. | The successful cases match the retained oracle bit for bit. |
+| Reused viscosity in cylinder and sphere heat transfer | `thermophysical` varies temperature, pressure, humidity, wind, and radiation; the resulting globe and wet-bulb bits are compared. | The successful cases match the retained oracle bit for bit. |
+| Comment-only `esat` edits | The probe compares `esat` bits for every case across varying air temperatures. | Comments have no executable effect. |
+| Retained solar year range and arithmetic | `year-sweep` covers 1950–2049; `calendar-boundary` covers leap days, year ends, and ordinal dates. | Rejected years are tested separately; they have no valid original output. |
 
 The [original `solarposition()` bounds](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original#L770-L818)
 remain in effect. [`pywbgt`](https://github.com/kwodzicki/pywbgt) independently

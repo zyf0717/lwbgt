@@ -11,7 +11,7 @@
 
 #define FIELD_COUNT 19
 #define LINE_CAPACITY 1024
-#define MAX_COHORTS 8
+#define MAX_COHORTS 16
 
 typedef struct {
     char cohort[32];
