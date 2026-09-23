@@ -137,19 +137,19 @@ if(BUILD_TESTING)
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_r_sources.py"
     )
     add_test(
-        NAME exact_equivalence
+        NAME compatibility_equivalence
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
-                exact "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_probe>"
+                compat "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_probe>"
                 "${LWBGT_CASES}"
     )
-    set_tests_properties(exact_equivalence PROPERTIES DEPENDS generate_cases)
+    set_tests_properties(compatibility_equivalence PROPERTIES DEPENDS generate_cases)
     add_test(
-        NAME python_runtime_exact_equivalence
+        NAME python_runtime_compatibility_equivalence
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
-                exact "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_python_probe>"
+                compat "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:lwbgt_python_probe>"
                 "${LWBGT_CASES}"
     )
-    set_tests_properties(python_runtime_exact_equivalence PROPERTIES DEPENDS generate_cases)
+    set_tests_properties(python_runtime_compatibility_equivalence PROPERTIES DEPENDS generate_cases)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)

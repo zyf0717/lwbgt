@@ -42,7 +42,8 @@
 #' contract. All arguments are required. Scalar arguments are recycled to the
 #' common length of the non-scalar arguments.
 #'
-#' @param year,month,day,hour,minute Integer-valued local date and time fields.
+#' @param year Integer-valued Gregorian year from 1900 through 2100.
+#' @param month,day,hour,minute Integer-valued local date and time fields.
 #'   A `month` of zero makes `day` a day-of-year value.
 #' @param gmt_offset_hours Local standard time minus GMT, in whole hours.
 #' @param averaging_minutes Input averaging interval, in minutes.

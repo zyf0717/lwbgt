@@ -112,6 +112,7 @@ int	main(void)
  */
 		speed = u2m;
 		zspeed = 2.;
+		dT = 0.0f;
 		status = calc_wbgt(year, month, day, hour, minute, gmt, avg, lat, lon,
 				solar, Pair, Tair, RHair, speed, zspeed, dT, urban, &est_speed,
 				&Tg, &Tnwb, &Tpsy, &Twbg);
@@ -275,6 +276,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		*est_speed = *Tg = *Tnwb = *Tpsy = *Twbg = -9999.;
 		return -1;
 	}
+	*est_speed = speed;
 /* 
  *  estimate the wind speed, if necessary
  */
@@ -728,6 +730,13 @@ float emis_atm(float Tair, float rh)
 #define	DEG_RAD	0.017453292519943295
 #define	RAD_DEG	57.295779513082323
 
+static int days_before_year(int year)
+{
+  int previous_year = year - 1;
+  return 365 * previous_year + previous_year / 4 - previous_year / 100
+         + previous_year / 400;
+}
+
 int solarposition(int year, int month, double day, double days_1900,
 		double latitude, double longitude, double *ap_ra, double *ap_dec,
 		double *altitude, double *refraction, double *azimuth,
@@ -775,7 +784,7 @@ int solarposition(int year, int month, double day, double days_1900,
   if (year != 0)
   /* Date given by {year, month, day} or {year, 0, daynumber}. */
   {
-    if (year < 1950 || year > 2049)
+    if (year < 1900 || year > 2100)
       return (-1);
     if (month != 0)
     {
@@ -795,13 +804,22 @@ int solarposition(int year, int month, double day, double days_1900,
     /* Construct Julian centuries since J2000 at 0 hours UT of date,
      * days.fraction since J2000, and UT hours.
      */
-    delta_years = year - 2000;
-    /* delta_days is days from 2000/01/00 (1900's are negative). */
-    delta_days = delta_years * 365 + delta_years / 4 + daynumber;
-    if (year > 2000)
-      delta_days += 1;
-    /* J2000 is 2000/01/01.5 */
-    days_J2000 = delta_days - 1.5;
+    if (year >= 1950 && year <= 2049)
+    {
+      delta_years = year - 2000;
+      /* Preserve the original arithmetic in the legacy range. */
+      delta_days = delta_years * 365 + delta_years / 4 + daynumber;
+      if (year > 2000)
+        delta_days += 1;
+      days_J2000 = delta_days - 1.5;
+    }
+    else
+    {
+      /* Count Gregorian days at 0h UT; J2000 is 2000/01/01.5. */
+      delta_days = days_before_year(year) - days_before_year(2000)
+                   + daynumber - 1;
+      days_J2000 = delta_days - 0.5;
+    }
 
     cent_J2000 = days_J2000 / 36525.0;
 

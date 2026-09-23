@@ -34,8 +34,11 @@ surface in CTest.
 
 v0.3.0 adds a wheel-only, unversioned shared runtime built from the same object
 libraries. `python_runtime_exports` audits the same three-symbol surface, and
-`python_runtime_exact_equivalence` reruns the frozen 454-case comparison through
-an executable linked to that target.
+`python_runtime_compatibility_equivalence` reruns the frozen 454-case
+comparison through an executable linked to that target. The compatibility
+comparison checks every bit except direct scalar 2 m estimated wind, which it
+checks against the supplied wind. The historical byte-exact comparison mode
+remains available in `tests/compare.py`.
 
 As of v0.4.0, the upstream demonstration program is compiled only when
 `LWBGT_BUILD_DEMO` is defined and contributes no `main`, `printf`, or `exit`

@@ -11,8 +11,9 @@ The project release version and FFI ABI version are independent:
 - `LWBGT_VERSION_MAJOR`, `LWBGT_VERSION_MINOR`, and `LWBGT_VERSION_PATCH`
   identify the project release.
 - `LWBGT_FFI_ABI_VERSION` identifies the versioned structure and batch API.
-- The `calc_wbgt` and `esat` scalar symbols retain the original compatibility
-  ABI.
+- The `calc_wbgt` and `esat` scalar symbols retain the original binary ABI.
+  `calc_wbgt` now writes the supplied speed to its output pointer at 2 m;
+  the original function left that pointer untouched.
 - The `lwbgt_input_v1`, `lwbgt_output_v1`, and `lwbgt_calc_batch_v1` names are
   permanent. Incompatible layouts or behavior require new `v2` names while the
   v1 entry point remains available.
@@ -34,7 +35,7 @@ point input is an ABI-boundary `double`.
 
 | Offset | Field | Type | Units and meaning |
 |---:|---|---|---|
-| 0 | `year` | `int32_t` | Four-digit Gregorian year; solar-position support is 1950–2049 |
+| 0 | `year` | `int32_t` | Four-digit Gregorian year; solar-position support is 1900–2100 inclusive |
 | 4 | `month` | `int32_t` | Month 1–12; 0 means `day` is day-of-year |
 | 8 | `day` | `int32_t` | Day of month, or day-of-year when `month == 0` |
 | 12 | `hour` | `int32_t` | Local standard-time hour, 0–23 |
@@ -91,10 +92,8 @@ int lwbgt_calc_batch_v1(
   other numerical outputs may remain valid.
 - Inputs are forwarded without domain validation, clamping, unit conversion, or
   missing-value policy beyond behavior already present in the scalar model.
-- When wind is already measured at 2 m, the batch API returns the supplied wind
-  as `estimated_wind_speed_m_s`. This makes the batch result deterministic; the
-  legacy scalar function instead leaves that output pointer untouched when no
-  estimation is performed.
+- When wind is already measured at 2 m, both scalar and batch APIs return the
+  supplied wind converted to `float` as `estimated_wind_speed_m_s`.
 
 ## Scalar ABI
 
@@ -106,6 +105,11 @@ to `calc_wbgt` use `double` at the ABI boundary because the original K&R
 `esat` accepts temperature in kelvin. `phase == 0` computes saturation over
 liquid water; `phase == 1` computes saturation over ice. Other phase values are
 outside the supported contract.
+
+The original solar-position arithmetic is retained for 1950–2049. Gregorian
+day counting supports 1900–1949 and 2050–2100, but the original low-precision
+solar formulas have no established accuracy guarantee outside their stated
+1950–2050 precision period.
 
 ## Concurrency and ownership
 

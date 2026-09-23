@@ -123,7 +123,7 @@ for (name in names(singapore)) {
 }
 
 invalid_cases <- list(
-    list("year", 1949), list("year", 2050), list("year", 2024.5),
+    list("year", 1899), list("year", 2101), list("year", 2024.5),
     list("month", -1), list("month", 13), list("month", 1.5),
     list("day", 0), list("day", 1.5),
     list("hour", -1), list("hour", 24), list("hour", 1.5),
@@ -157,7 +157,7 @@ for (case in invalid_cases) {
 }
 
 valid_boundaries <- list(
-    year = c(1950, 2049), month = c(0, 12), hour = c(0, 23),
+    year = c(1900, 1949, 2050, 2100), month = c(0, 12), hour = c(0, 23),
     minute = c(0, 59), gmt_offset_hours = c(-12, 14),
     averaging_minutes = c(0, 1440), urban = c(0, 1),
     latitude_deg_north = c(-90, 90), longitude_deg_east = c(-180, 180),
@@ -190,6 +190,14 @@ day_of_year$day <- 366
 stopifnot(calculate(day_of_year)$status != 2L)
 day_of_year$year <- 2023
 stopifnot(calculate(day_of_year)$status == 2L)
+for (century in c(1900, 2100)) {
+    century_day <- leap_day
+    century_day$year <- century
+    stopifnot(calculate(century_day)$status == 2L)
+    century_day$month <- 0
+    century_day$day <- 366
+    stopifnot(calculate(century_day)$status == 2L)
+}
 
 solver_failure <- singapore
 solver_failure$month <- 3

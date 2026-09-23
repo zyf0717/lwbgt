@@ -125,8 +125,8 @@ static int validate_row(double *columns[INPUT_FIELD_COUNT], R_xlen_t index,
     }
 
     value = columns[YEAR][index];
-    if (!integer_value(value) || value < 1950.0 || value > 2049.0) {
-        *message = "invalid input: year must be an integer from 1950 to 2049";
+    if (!integer_value(value) || value < 1900.0 || value > 2100.0) {
+        *message = "invalid input: year must be an integer from 1900 to 2100";
         return STATUS_INVALID_INPUT;
     }
     year = (int)value;

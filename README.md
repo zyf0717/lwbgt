@@ -8,8 +8,9 @@
 [![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
 `lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
-wet bulb globe temperature (WBGT) model. It preserves the original scalar ABI
-and documented numerical behaviour while removing repeated and dead work.
+wet bulb globe temperature (WBGT) model. It preserves the original scalar
+binary ABI and legacy WBGT calculations while removing repeated and dead work;
+the current source corrects the scalar 2 m wind output.
 Dependency-free Python and R bindings use the same native kernel. SwiftPM
 exposes the stable C interface as `CLWBGT`.
 
@@ -19,8 +20,10 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Release status: v0.4.2.** The tested release remains bit-identical to the
-retained oracle within the documented compatibility scope.
+**Release status: v0.4.2.** That release was bit-identical to the retained
+oracle within its documented compatibility scope. Current unreleased source
+corrects the direct scalar 2 m wind output and extends year support; see the
+[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Python
 
@@ -127,6 +130,7 @@ numerical target is built in GNU89 mode.
 | Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
 | Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
 | Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |
+| Source changes | [Deviations from original Liljegren C](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md) |
 | Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
 | Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
 

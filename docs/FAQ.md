@@ -67,8 +67,9 @@ kernel.
 ## Is lwbgt numerically identical to every Liljegren implementation?
 
 No cross-package equivalence is claimed. Within lwbgt's documented scope,
-matched compilers and floating-point flags must reproduce the retained oracle
-exactly for the tested outputs. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
+matched compilers and floating-point flags reproduce the retained oracle
+exactly for previously valid outputs except the corrected direct scalar 2 m
+wind output. See the [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md)
 and the [test evidence](https://github.com/zyf0717/lwbgt/tree/main/tests).
 
 ## Can I call lwbgt from C, C++, Swift, R, or Julia?

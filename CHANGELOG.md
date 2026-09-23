@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
+  speed and initialized the optional demonstration's first `dT` argument.
+- Extended Gregorian year support to 1900–2100 while preserving the original
+  1950–2049 arithmetic and documenting unverified solar accuracy outside the
+  formulas' stated precision period.
+- Added an upstream deviation register and a compatibility gate that makes the
+  scalar wind-output exception explicit.
+
 ## v0.4.2 — 2026-09-22
 
 - Added a dependency-safe SwiftPM `CLWBGT` C-library product backed directly
