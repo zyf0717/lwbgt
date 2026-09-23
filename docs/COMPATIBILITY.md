@@ -14,8 +14,15 @@ including 400 new successful cases. It does not cover every valid input or
 every compiler and platform. The original solar-position year guard and date
 arithmetic remain in place, including their historical behavior.
 
-The measurements below describe the earlier releases, before that scalar
-output correction.
+The current [expanded benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
+uses the 854-case oracle input but times 842 rows, excluding the six `invalid`
+and six `solver-boundary` cases. On GCC 13.3.0, the derivative measured 1.336×
+overall median speedup; the slowest cohort, NASA POWER, measured 1.259×. All
+gates passed. The [complete report](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/expanded-gcc-13.3.0.json)
+contains the per-cohort results.
+
+The measurements below describe earlier releases, before the scalar output
+correction, using the historical 454-case input (442 timed rows).
 
 | Environment | Exact result | Median overall speedup |
 |---|---:|---:|
@@ -25,10 +32,6 @@ output correction.
 
 These measurements apply only to the documented environments and workloads.
 Dates outside the original 1950–2049 solar-position range are rejected.
-
-On the expanded 854-case workload, a GCC 13.3.0 rerun measured 1.336× overall
-median speedup; the slowest cohort was 1.259×. See the
-[expanded benchmark report](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/expanded-gcc-13.3.0.json).
 
 Full methods, hardware and compiler details, workloads, and retained results
 are in the

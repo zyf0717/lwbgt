@@ -4,9 +4,33 @@ The benchmark loads cases before timing, pins itself to the first CPU allowed by
 the process affinity mask on Linux, performs one warm-up, and consumes every
 output through a volatile checksum. `tests/compare.py benchmark` interleaves
 reference and candidate executions and reports median rows/s and relative median
-absolute deviation over seven repetitions.
+absolute deviation over seven repetitions. The timing harness excludes the
+`invalid` and `solver-boundary` cohorts; oracle comparisons still include them.
 
-The checked-in baseline used:
+## Current expanded run
+
+The current oracle input has 854 cases, including 400 new successful cases that
+span every supported year and the changed numerical paths. The benchmark times
+842 rows after excluding six `invalid` and six `solver-boundary` cases. On
+2026-09-23, the expanded workload was measured on the 13th Gen Intel Core
+i9-13900HK, Linux 7.0.0-31-generic x86-64, GCC 13.3.0, and CMake 3.28.3.
+The core used GNU89 and the harness used C11. Both used `-O2`,
+`-fno-fast-math`, `-ffp-contract=off`, and `-fno-strict-aliasing`.
+Each execution used 200 iterations per case, with seven interleaved repetitions.
+
+| Cohort | Reference median rows/s | Derivative median rows/s | Speedup | Gate |
+|---|---:|---:|---:|---|
+| Overall, 842 rows | 143,896 | 192,288 | 1.336× | passed, ≥1.20× |
+| Slowest: NASA POWER | 175,315 | 220,749 | 1.259× | passed, ≥0.98× |
+
+All other per-cohort gates passed. The complete medians and variability are in
+[`expanded-gcc-13.3.0.json`](expanded-gcc-13.3.0.json). The expanded and
+historical speedups are measured on different workloads.
+
+## Historical 454-case runs
+
+The earlier benchmark input had 454 cases, of which 442 were timed after the
+same cohort exclusions. The checked-in baseline used:
 
 - CPU: 13th Gen Intel Core i9-13900HK
 - OS/kernel: Linux 7.0.0-28-generic x86_64
@@ -26,7 +50,7 @@ for the final runs is recorded in `optimization-3-environment.json`.
 overall gate is expected to fail before optimization; the baseline establishes
 measurement parity and per-cohort noise.
 
-## Results
+### Results
 
 | Candidate | Compiler/environment | Overall median speedup | Slowest cohort | Gate |
 |---|---|---:|---:|---:|
@@ -43,15 +67,3 @@ rerun measures the position-independent object code now shared by the static
 and shared libraries; it also passes the overall and per-cohort gates. Its full
 result and environment are recorded in `v0.2.0-gcc-13.3.0.json` and
 `v0.2.0-environment.json`.
-
-## Expanded oracle workload (unreleased)
-
-The 854-case corpus includes 400 new successful cases spanning every supported
-year and the changed numerical paths. On 2026-09-23, the expanded workload was
-remeasured on the 13th Gen Intel Core i9-13900HK, Linux 7.0.0-31-generic,
-GCC 13.3.0, and CMake 3.28.3 with the same floating-point flags, 200 iterations
-per case, and seven interleaved repetitions. The overall median speedup was
-**1.336×**; the slowest cohort was NASA POWER at **1.259×**. All overall and
-per-cohort gates passed. The full report is
-[`expanded-gcc-13.3.0.json`](expanded-gcc-13.3.0.json). Historical benchmark
-results above retain their original 454-case workload.
