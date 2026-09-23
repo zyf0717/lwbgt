@@ -11,12 +11,19 @@ The project release version and FFI ABI version are independent:
 - `LWBGT_VERSION_MAJOR`, `LWBGT_VERSION_MINOR`, and `LWBGT_VERSION_PATCH`
   identify the project release.
 - `LWBGT_FFI_ABI_VERSION` identifies the versioned structure and batch API.
+- The project release, numerical calculation, and FFI ABI have separate version
+  scopes. Release 1.0.0 retains the v1 calculation and FFI ABI; it does not
+  introduce a new numerical model.
 - The `calc_wbgt` and `esat` scalar symbols retain the original binary ABI.
   `calc_wbgt` now writes the supplied speed to its output pointer at 2 m;
   the original function left that pointer untouched.
 - The `lwbgt_input_v1`, `lwbgt_output_v1`, and `lwbgt_calc_batch_v1` names are
   permanent. Incompatible layouts or behavior require new `v2` names while the
   v1 entry point remains available.
+- Existing C, Python, and R calculation entry points keep the v1 calculation
+  as their default throughout the 1.x release series. Future changes to
+  defined valid-input numerical results require explicit versioned entry
+  points; a new calculation may be offered as an opt-in option.
 
 New symbols and backward-compatible documentation clarifications may be added
 without changing the v1 ABI. Fields must not be reordered, resized, removed, or
@@ -126,6 +133,9 @@ calc_wbgt
 esat
 lwbgt_calc_batch_v1
 ```
+
+The shared library retains SONAME `liblwbgt.so.0` on Linux in release 1.0.0
+because the C ABI is unchanged from 0.4.3.
 
 The release CI validates Linux with GCC, macOS with AppleClang, and Windows with
 MinGW GCC. MSVC is unsupported; the numerical target is built in GNU89 mode.

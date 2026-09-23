@@ -1,3 +1,9 @@
+# lwbgt 1.0.0
+
+- Stabilized the existing R interface and reference-compatible native v1
+  calculation. Numerical results and the default calculation are unchanged.
+- Future numerical revisions will use explicit versioned interfaces.
+
 # lwbgt 0.4.3
 
 - Synchronized the R package with project release 0.4.3. The direct C scalar

@@ -3,9 +3,9 @@ import XCTest
 
 final class CLWBGTConsumerTests: XCTestCase {
     func testVersionAndLayout() {
-        XCTAssertEqual(LWBGT_VERSION_MAJOR, 0)
-        XCTAssertEqual(LWBGT_VERSION_MINOR, 4)
-        XCTAssertEqual(LWBGT_VERSION_PATCH, 3)
+        XCTAssertEqual(LWBGT_VERSION_MAJOR, 1)
+        XCTAssertEqual(LWBGT_VERSION_MINOR, 0)
+        XCTAssertEqual(LWBGT_VERSION_PATCH, 0)
         XCTAssertEqual(LWBGT_FFI_ABI_VERSION, 1)
         XCTAssertEqual(MemoryLayout<lwbgt_input_v1>.size, 104)
         XCTAssertEqual(MemoryLayout<lwbgt_output_v1>.size, 24)

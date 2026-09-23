@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-#define LWBGT_VERSION_MAJOR 0
-#define LWBGT_VERSION_MINOR 4
-#define LWBGT_VERSION_PATCH 3
+#define LWBGT_VERSION_MAJOR 1
+#define LWBGT_VERSION_MINOR 0
+#define LWBGT_VERSION_PATCH 0
 #define LWBGT_FFI_ABI_VERSION 1
 
 typedef struct lwbgt_input_v1 {

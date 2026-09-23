@@ -14,6 +14,11 @@ including 400 new successful cases. It does not cover every valid input or
 every compiler and platform. The original solar-position year guard and date
 arithmetic remain in place, including their historical behavior.
 
+Package release 1.0.0 preserves this v1 calculation as the default for the
+1.x series. Future changes to defined valid-input numerical results will use
+explicit versioned APIs, with the v1 behavior still available. The v1 FFI ABI
+version and package release version are independent.
+
 The current [expanded benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
 uses the 852-case oracle input but times 840 rows, excluding the six `invalid`
 and six `solver-boundary` cases. On GCC 13.3.0, the derivative measured 1.335×

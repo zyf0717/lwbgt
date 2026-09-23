@@ -20,11 +20,12 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Version: v0.4.3.** The 852-case
+**Version: v1.0.0.** The 852-case
 comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
 `Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
 guarantee. Direct scalar estimated wind at 2 m is corrected, and the original
-1950–2049 year range is retained. See the
+1950–2049 year range is retained. The v1 calculation remains the default;
+future numerical revisions require explicit versioned APIs. See the
 [compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Python
@@ -87,7 +88,7 @@ Add the package and its C-library product to a Swift target:
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "0.4.3"),
+        .package(url: "https://github.com/zyf0717/lwbgt.git", from: "1.0.0"),
     ],
     targets: [
         .target(

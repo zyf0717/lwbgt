@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 0.4.3 LANGUAGES C)
+project(lwbgt VERSION 1.0.0 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
@@ -49,7 +49,8 @@ set_target_properties(lwbgt_shared PROPERTIES
     EXPORT_NAME shared
     OUTPUT_NAME lwbgt
     VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
+    # The C ABI is unchanged by the package's 1.0 release.
+    SOVERSION 0
 )
 set_target_properties(lwbgt_python PROPERTIES
     OUTPUT_NAME lwbgt
