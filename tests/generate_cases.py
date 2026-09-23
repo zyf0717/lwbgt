@@ -30,11 +30,7 @@ def main() -> None:
     add("hsb-generated", 2024, 9, 22, 13, 0, 0, 0, 11.359619, 11.997070,
         933.496093, 1010.0, 20.215454, 52.0, 3.763891, 2.0, 0.0, 0)
 
-    # Representative normalized NASA POWER and ERA5 rows.
-    add("nasa-power", 2024, 4, 15, 14, 30, 8, 60, 1.3521, 103.8198,
-        742.0, 1008.4, 32.1, 68.0, 2.8, 10.0, -0.4, 1)
-    add("nasa-power", 2024, 4, 15, 2, 30, 8, 60, 1.3521, 103.8198,
-        0.0, 1009.7, 27.0, 88.0, 1.1, 10.0, 0.2, 1)
+    # Fixed London weather examples; source provenance is not recorded.
     add("era5", 2023, 7, 18, 15, 30, 0, 60, 51.5074, -0.1278,
         612.5, 1004.2, 28.4, 55.0, 4.7, 10.0, -0.8, 0)
     add("era5", 2023, 1, 18, 3, 30, 0, 60, 51.5074, -0.1278,
@@ -46,7 +42,7 @@ def main() -> None:
         (0, 12), (0.0, 80.0, 950.0), (5.0, 50.0, 99.0),
         (0.0, 0.13, 8.0), (2.0, 10.0), (0, 1), (0, 60),
     ):
-        if len(rows) >= 438:
+        if len(rows) >= 436:
             break
         add("matrix", 2024, 6, 21, hour, 30, 0, avg, 35.0, -80.0,
             solar, 1010.0, 35.0, rh, wind, height, 1.5, urban)
@@ -74,8 +70,6 @@ def main() -> None:
     ):
         add("invalid", 2049, 12, 31, 23, 59, 12, 30, -89.9, 179.9,
             solar, pressure, 25.0, rh, wind, height, 20.0, 0)
-
-    assert len(rows) == 454  # Preserve the historical oracle prefix.
 
     # Every supported year, including the original leap-year arithmetic.
     for year in range(1950, 2050):
@@ -140,7 +134,7 @@ def main() -> None:
             67.987654321, wind, 2.0 if index % 2 else 10.0,
             -0.123456789, index % 2)
 
-    assert len(rows) == 854
+    assert len(rows) == 852
 
     output = Path(sys.argv[1])
     output.parent.mkdir(parents=True, exist_ok=True)

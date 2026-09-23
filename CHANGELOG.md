@@ -5,8 +5,10 @@
 - Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
   speed and initialized the optional demonstration's first `dT` argument.
 - Added an upstream deviation register and expanded the retained-oracle
-  comparison to 854 cases across all supported years and changed numerical
+  comparison to 852 cases across all supported years and changed numerical
   paths, while making the scalar wind-output exception explicit.
+- Removed an unverified weather-source cohort and retired reports that
+  depended on it. Reran the 840-row timing workload.
 
 ## v0.4.2 — 2026-09-22
 
@@ -67,14 +69,15 @@
 - Verified the final static and shared artifacts on Linux/GCC,
   macOS/AppleClang, and Windows/MinGW, including installed consumers and all
   three language examples.
-- Revalidated the position-independent static build at 1.249× overall median
-  throughput with exact compatibility and all release gates passing.
+- Revalidated the position-independent static build with exact compatibility
+  and all release gates passing.
 
 ## v0.1.0 — 2026-08-18
 
-The release gate passes with 1.316× median single-thread throughput on GCC
-13.3.0 and 1.289× on GCC 16.2.0. All 454 compatibility cases remain
-bit-identical and every benchmark cohort exceeds 1.25×.
+The release gate passed with exact compatibility on its historical test
+workload. The current oracle and benchmark are recorded in
+[`tests/BASELINE.md`](tests/BASELINE.md) and
+[`benchmarks/README.md`](benchmarks/README.md).
 
 - Pinned Liljegren WBGT v1.1 commit
   `cd672a886880b67f3f27bdbf75038d8f7ff0bac2` and source blob
@@ -87,11 +90,8 @@ bit-identical and every benchmark cohort exceeds 1.25×.
 - Hoisted invariant atmospheric, surface, and solar radiation terms from the
   iterative globe and natural wet-bulb solves after profiling identified both
   solves as the remaining hot paths.
-- Verified exact output equality for the frozen 454-case oracle cohort with GCC
-  13.3.0 and GCC 16.2.0.
-- Proved that all three existing HeatStressBench C adapters compile unchanged
-  and produce byte-identical generated, decomposition, NASA POWER sample, and
-  ERA5 sample results when only the link input changes.
+- Verified exact output equality for the original release's oracle cohort with
+  GCC 13.3.0 and GCC 16.2.0.
 - Audited the static archive export surface and fixed the permanent supported
   API at `calc_wbgt` and `esat`; inherited helper exports remain implementation
   details.

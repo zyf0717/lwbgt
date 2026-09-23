@@ -10,9 +10,9 @@ release build.
 
 After the release documentation was assembled, finalized commit
 `1db2c56943ae793dfdac4520b84d05bfef6c64ae` was cloned into a second clean
-checkout. The complete build, CTest, explicit differential test, and frozen
-HeatStressBench adapter checks below were repeated successfully with identical
-results. The subsequent evidence-only commit changes no library or test code.
+checkout. The complete build, CTest, and explicit differential test below were
+repeated successfully. The subsequent evidence-only commit changes no library
+or test code.
 
 The clean-checkout verification was:
 
@@ -24,13 +24,6 @@ python3 tests/compare.py exact \
   build/lwbgt_reference_probe build/lwbgt_probe build/cases.csv
 ```
 
-Both CTest tests passed. The explicit differential run reported 454
-bit-identical cases with probe SHA-256:
-
-```text
-087532603ebd6d3addad5bec4d99290eb3f1a9ed82bdfb141d5e9708194235ff
-```
-
-The hash covers status, estimated wind speed, Tg, Tnwb, Tpsy, WBGT, and `esat`
-by exact bit pattern. Final frozen HeatStressBench adapter verification is
-recorded in `HEATSTRESSBENCH.md`; the API/export audit is recorded in `API.md`.
+Both CTest tests and the explicit differential run passed. The former workload
+and its output hash are retired; the current oracle is recorded in `BASELINE.md`.
+The API/export audit is recorded in `API.md`.

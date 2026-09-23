@@ -34,7 +34,7 @@ surface in CTest.
 
 v0.3.0 adds a wheel-only, unversioned shared runtime built from the same object
 libraries. `python_runtime_exports` audits the same three-symbol surface. The
-current `python_runtime_compatibility_equivalence` test reruns the expanded 854-case
+current `python_runtime_compatibility_equivalence` test reruns the 852-case
 comparison through an executable linked to that target. For those sampled
 inputs, the compatibility comparison checks the bits of `Tg`, `Tnwb`, `Tpsy`,
 WBGT, and `esat` against the retained original. It also checks estimated wind,
@@ -42,8 +42,7 @@ except at 2 m, where it requires the supplied wind converted to `float`. These
 tests do not prove bit identity for every valid input or build environment. The
 historical byte-exact comparison mode remains available in `tests/compare.py`.
 
-The first 454 rows and their historical oracle hash remain unchanged. All 400
-new rows must succeed in the upstream oracle; they cover every supported year,
+All 400 added rows must succeed in the upstream oracle; they cover every supported year,
 calendar and solar geometry boundaries, wind stability thresholds, varied
 thermophysical inputs, and scalar float conversion.
 

@@ -5,7 +5,7 @@ canonical kernel sources and public header. The C ABI remains version 1.
 
 Release acceptance requires:
 
-- the full native CTest matrix and exact 454-case equivalence suite;
+- the full native CTest matrix and numerical equivalence suite;
 - release-mode downstream SwiftPM consumer tests on Linux and macOS;
 - all installed-wheel, sdist, ABI, resource, and version-coherence tests;
 - base-R scalar, vector, recycling, empty, validation, failure-status, schema,
