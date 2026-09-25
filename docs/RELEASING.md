@@ -1,6 +1,6 @@
 # Release process
 
-The v0.4 release consists of one checked R source package, five
+The v1.0 release consists of one checked R source package, five
 Python-ABI-independent platform wheels, and one Python source distribution.
 The R package is distributed from GitHub and R-universe and uses a standard
 Apache License 2.0 declaration for its CRAN-facing package metadata. The
@@ -31,15 +31,15 @@ Argonne terms documented in the installed legal files.
    python tests/check_r_sources.py
    python tests/check_distribution.py dist/*
    python -m twine check dist/*
-   R CMD check lwbgt_0.4.3.tar.gz
+   R CMD check lwbgt_1.0.0.tar.gz
    ```
 
 4. Create and push an annotated or signed tag only after every release gate
    passes:
 
    ```sh
-   git tag -s v0.4.3 -m "lwbgt v0.4.3"
-   git push origin v0.4.3
+   git tag -s v1.0.0 -m "lwbgt v1.0.0"
+   git push origin v1.0.0
    ```
 
 5. The tag workflow reruns the complete R and Python artifact gates, publishes

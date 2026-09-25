@@ -63,10 +63,8 @@ calc_solar_parameters
 daynum
 dew_point
 diffusivity
-emis_atm
 est_wind_speed
 evap
-h_cylinder_in_air
 h_sphere_in_air
 solarposition
 stab_srdt

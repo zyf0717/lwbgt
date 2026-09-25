@@ -9,6 +9,10 @@ endfunction()
 
 run_checked("${CMAKE_COMMAND}" --install "${BUILD_DIR}" --config "${CONFIG}"
             --prefix "${INSTALL_DIR}")
+if(SYSTEM_NAME STREQUAL "Linux" AND
+   NOT EXISTS "${INSTALL_DIR}/${INSTALL_LIBDIR}/liblwbgt.so.0")
+    message(FATAL_ERROR "installed library is missing the preserved SONAME")
+endif()
 foreach(DOCUMENT LICENSE ABI.md LICENSING.md NOTICE
         LicenseRef-UChicago-Argonne-WBGT-1.1.txt)
     if(NOT EXISTS "${INSTALL_DIR}/${INSTALL_DATADIR}/doc/lwbgt/${DOCUMENT}")
