@@ -214,21 +214,26 @@ int	main(void)
 #define	CONVERGENCE	0.02
 #define	MAX_ITER	50
 
+struct wbgt_atmosphere {
+	float eair;
+	float tdew;
+	double fatm_base;
+};
+
 int calc_solar_parameters(int year, int month, double day, float lat,
 		float lon, float *solar, float *cza, float *fdir);
-float Twb(float Tair, float rh, float Pair, float speed, float solar,
-		float fdir, float cza, int rad);
-float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
-		float speed);
-float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
-		float fdir, float cza);
+float Twb(float Tair, float Pair, float speed, float solar,
+		float fdir, float cza, int rad, const struct wbgt_atmosphere *atmosphere);
+static float h_cylinder_from_properties(float diameter, float speed,
+		float density, float mu);
+float Tglobe(float Tair, float Pair, float speed, float solar,
+		float fdir, float cza, const struct wbgt_atmosphere *atmosphere);
 float h_sphere_in_air(float diameter, float Tair, float Pair, float speed);
 float dew_point(float e, int phase);
 float viscosity(float Tair);
 float thermal_cond(float Tair);
 float diffusivity(float Tair, float Pair);
 float evap(float Tair);
-float emis_atm(float Tair, float rh);
 int solarposition(int year, int month, double day, double days_1900,
 		double latitude, double longitude, double *ap_ra, double *ap_dec,
 		double *altitude, double *refraction, double *azimuth,
@@ -260,6 +265,9 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		dT = (float)dT_arg;
 	
 	double hour_gmt, dday;
+	double tair4;
+	float esat_air, emis_air;
+	struct wbgt_atmosphere atmosphere;
 	
 	int	daytime, stability_class;
 /* 
@@ -294,13 +302,21 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
  */
 	tk = Tair + 273.15; /* degC to kelvin */
 	rh = 0.01 * relhum; /* % to fraction  */
+	/* Prepare the shared atmospheric terms with the original rounding steps. */
+	esat_air = esat(tk,0);
+	atmosphere.eair = rh * esat_air;
+	atmosphere.tdew = dew_point(atmosphere.eair,0);
+	/* Atmospheric emissivity: Oke, 2nd edition, page 373. */
+	emis_air = 0.575 * pow(atmosphere.eair,0.143);
+	tair4 = pow(tk,4.);
+	atmosphere.fatm_base = 0.5*( emis_air*tair4 + EMIS_SFC*tair4 );
 /*
  *  calculate the globe, natural wet bulb, psychrometric wet bulb, and 
  *  outdoor wet bulb globe temperatures
  */
-	*Tg   = Tglobe(tk, rh, pres, speed, solar, fdir, cza);
-	*Tnwb = Twb(tk, rh, pres, speed, solar, fdir, cza, 1);
-	*Tpsy = Twb(tk, rh, pres, speed, solar, fdir, cza, 0);
+	*Tg   = Tglobe(tk, pres, speed, solar, fdir, cza, &atmosphere);
+	*Tnwb = Twb(tk, pres, speed, solar, fdir, cza, 1, &atmosphere);
+	*Tpsy = Twb(tk, pres, speed, solar, fdir, cza, 0, &atmosphere);
 	*Twbg = 0.1 * Tair + 0.2 * (*Tg) + 0.7 * (*Tnwb); 
 		
 	if ( *Tg == -9999 || *Tnwb == -9999 ) {
@@ -370,33 +386,29 @@ int calc_solar_parameters(int year, int month, double day, float lat,
  *		 Argonne National Laboratory
  */
  
-float Twb(float Tair, float rh, float Pair, float speed, float solar,
-		float fdir, float cza, int rad)
+float Twb(float Tair, float Pair, float speed, float solar,
+		float fdir, float cza, int rad, const struct wbgt_atmosphere *atmosphere)
 		
 {
 	static float a = 0.56; /* from Bedingfield and Drew */
 	
-	float	sza, Tsfc, Tdew, Tref, Twb_prev, Twb_new,
-		eair, ewick, density, 
+	float	sza, Tref, Twb_prev, Twb_new,
+		ewick, density, mu,
 		Sc,	/* Schmidt number */
 		h,	/* convective heat transfer coefficient */
 		Fatm; /* radiative heating term */
-	double	Fatm_base, solar_base;
+	double	solar_base;
 		
 	int	converged, iter;
 	
-	Tsfc = Tair;
 	/* Skip dead radiative work when rad == 0. */
 	if ( rad )
 		sza = acos(cza); /* solar zenith angle, radians */
 	else
 		sza = 0.0f;
-	eair = rh * esat(Tair,0);
-	Tdew = dew_point(eair,0);
-	Twb_prev = Tdew; /* first guess is the dew point temperature */
+	Twb_prev = atmosphere->tdew; /* first guess is the dew point temperature */
 	/* Hoist loop-invariant radiation work. */
 	if ( rad ) {
-		Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
 		solar_base = (1.-ALB_WICK) * solar *
 		       ( (1.-fdir)*(1.+0.25*D_WICK/L_WICK) + fdir*((tan(sza)/PI)+0.25*D_WICK/L_WICK) + ALB_SFC );
 	}
@@ -405,17 +417,19 @@ float Twb(float Tair, float rh, float Pair, float speed, float solar,
 	do {
 		iter++;
 		Tref = 0.5*( Twb_prev + Tair );	/* evaluate properties at the average temperature */
-		h = h_cylinder_in_air(D_WICK, L_WICK, Tref, Pair, speed);
+		/* Share the rounded air properties with convection and mass transfer. */
+		mu = viscosity(Tref);
+		density = Pair * 100. / ( R_AIR * Tref );
+		h = h_cylinder_from_properties(D_WICK, speed, density, mu);
 		if ( rad )
 			Fatm = STEFANB * EMIS_WICK *
-			       ( Fatm_base - pow(Twb_prev,4.) )
+			       ( atmosphere->fatm_base - pow(Twb_prev,4.) )
 			     + solar_base;
 		else
 			Fatm = 0.0f;
 		ewick = esat(Twb_prev,0);
-		density = Pair * 100. / (R_AIR * Tref);
-		Sc = viscosity(Tref)/(density*diffusivity(Tref,Pair));
-		Twb_new = Tair - evap(Tref)/RATIO * (ewick-eair)/(Pair-ewick) * pow(Pr/Sc,a) + (Fatm/h * rad);
+		Sc = mu/(density*diffusivity(Tref,Pair));
+		Twb_new = Tair - evap(Tref)/RATIO * (ewick-atmosphere->eair)/(Pair-ewick) * pow(Pr/Sc,a) + (Fatm/h * rad);
 		if ( fabs(Twb_new-Twb_prev) < CONVERGENCE ) converged = TRUE;
 		Twb_prev = 0.9*Twb_prev + 0.1*Twb_new;
 	} while (!converged && iter < MAX_ITER);
@@ -433,25 +447,18 @@ float Twb(float Tair, float rh, float Pair, float speed, float solar,
  *
  */
  
-float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
-		float speed)
-	
+static float h_cylinder_from_properties(float diameter, float speed,
+		float density, float mu)
 {
 	static float a = 0.56,  /* parameters from Bedingfield and Drew */
 			 b = 0.281,
 			 c = 0.4;
 			 
-	float	density,
-		mu,
-		conductivity,
+	float	conductivity,
 		Re,	/* Reynolds number								*/
 		Nu;	/* Nusselt number									*/
 
-	(void)length;
-		
 	/* Reuse rounded viscosity in conductivity. */
-	mu = viscosity(Tair);
-	density = Pair * 100. / ( R_AIR * Tair );
 	Re = max(speed,MIN_SPEED) * density * diameter / mu;
 	Nu = b * pow(Re,(1.-c)) * pow(Pr,(1.-a));
 	conductivity = ( Cp + 1.25 * R_AIR ) * mu;
@@ -466,19 +473,17 @@ float h_cylinder_in_air(float diameter, float length, float Tair, float Pair,
  *		 Argonne National Laboratory
  */
  
-float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
-		float fdir, float cza)
+float Tglobe(float Tair, float Pair, float speed, float solar,
+		float fdir, float cza, const struct wbgt_atmosphere *atmosphere)
 	
 {
-	float	Tsfc, Tref, Tglobe_prev, Tglobe_new, h;
-	double	Fatm_base, solar_base;
+	float	Tref, Tglobe_prev, Tglobe_new, h;
+	double	solar_base;
 		
 	int	converged, iter;
 	
-	Tsfc = Tair;
 	Tglobe_prev = Tair; /* first guess is the air temperature */
-	/* Hoist loop-invariant radiation work. */
-	Fatm_base = 0.5*( emis_atm(Tair,rh)*pow(Tair,4.) + EMIS_SFC*pow(Tsfc,4.) );
+	/* Use the atmospheric radiation term prepared for this row. */
 	solar_base = solar/(2.*STEFANB*EMIS_GLOBE)*(1.-ALB_GLOBE)*
 		     (fdir*(1./(2.*cza)-1.)+1.+ ALB_SFC);
 	converged = FALSE;
@@ -488,7 +493,7 @@ float Tglobe(float Tair, float rh, float Pair, float speed, float solar,
 		Tref = 0.5*( Tglobe_prev + Tair );	/* evaluate properties at the average temperature */
 		h = h_sphere_in_air(D_GLOBE, Tref, Pair, speed);
 		Tglobe_new = pow( 
-				Fatm_base
+				atmosphere->fatm_base
 				- h/(STEFANB*EMIS_GLOBE)*(Tglobe_prev - Tair)
 				+ solar_base
 				, 0.25);
@@ -649,21 +654,6 @@ float evap(float Tair)
 
 {			 
 	return( (313.15 - Tair)/30. * (-71100.) + 2.4073E6 );
-}
-
-/* ============================================================================
- *  Purpose: calculate the atmospheric emissivity.
- *
- *  Reference: Oke (2nd edition), page 373.
- */
- 
-float emis_atm(float Tair, float rh)
-
-{
-	float e;
-	
-	e = rh * esat(Tair,0);
-	return( 0.575 * pow(e, 0.143) );
 }
 
 /* ============================================================================

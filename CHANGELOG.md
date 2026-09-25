@@ -2,13 +2,16 @@
 
 ## Unreleased
 
-## v1.0.0 — 2026-09-23
+## v1.0.0 — 2026-09-25
 
 - Stabilized the existing reference-compatible v1 calculation and public C/FFI,
   Python, R, and SwiftPM interfaces without changing numerical results.
 - Committed to explicit versioned APIs for future changes to valid-input
   numerical results. The v1 calculation remains the default in the 1.x series.
 - Kept the shared library's existing SONAME because the C ABI is unchanged.
+- Shared atmospheric and wet-bulb intermediate values in the C kernel while
+  preserving the 852-case v1 numerical comparison; simplified the source
+  deviation notes and documented pinned-core throughput against the original.
 
 ## v0.4.3 — 2026-09-23
 

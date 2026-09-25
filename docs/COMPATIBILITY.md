@@ -19,13 +19,12 @@ Package release 1.0.0 preserves this v1 calculation as the default for the
 explicit versioned APIs, with the v1 behavior still available. The v1 FFI ABI
 version and package release version are independent.
 
-The current [expanded benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
+The [benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
 uses the 852-case oracle input but times 840 rows, excluding the six `invalid`
-and six `solver-boundary` cases. On GCC 13.3.0, the derivative measured 1.335×
-overall median speedup; all per-cohort gates passed. The
-[complete report](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/expanded-gcc-13.3.0.json)
-contains the per-cohort results. The weather-labeled rows in this workload are
-fixed examples, not a verified dataset extract.
+and six `solver-boundary` cases. On GCC 13.3.0 with execution pinned to one
+core, the current kernel measured 1.603× the retained original in median
+throughput; all per-cohort gates passed. The weather-labeled rows in this
+workload are fixed examples, not a verified dataset extract.
 
 These measurements apply only to the documented environments and workloads.
 Dates outside the original 1950–2049 solar-position range are rejected.
