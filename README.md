@@ -23,8 +23,10 @@ consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 **Version: v1.0.0.** The 852-case
 comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
 `Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
-guarantee. Direct scalar estimated wind at 2 m is corrected, and the original
-1950–2049 year range is retained. The v1 calculation remains the default;
+guarantee. When wind is measured at 2 m, the scalar function now writes the
+supplied speed, rounded to `float`, to its wind output; the original left that
+output unwritten. The original 1950–2049 year range is retained. The v1
+calculation remains the default;
 future numerical revisions require explicit versioned APIs. See the
 [compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 

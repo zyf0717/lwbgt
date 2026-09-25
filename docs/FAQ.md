@@ -68,8 +68,9 @@ kernel.
 
 No cross-package equivalence is claimed. In an 852-case comparison with matched
 compiler and floating-point settings, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`
-matched the retained original C bit for bit. Direct scalar estimated wind at
-2 m intentionally differs because the original left it unwritten. The test is
+matched the retained original C bit for bit. When wind is measured at 2 m,
+the scalar wind output intentionally differs: it now holds the supplied speed,
+rounded to `float`, whereas the original left it unwritten. The test is
 not a proof for every valid input or platform. See the
 [compatibility evidence](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
