@@ -43,6 +43,8 @@ SDIST_BUILD_FILES = {
     "tests/generate_cases.py",
     "tests/baseline.json",
     "tests/check_benchmark.py",
+    "tests/compare_compilers.py",
+    "tests/test_compiler_checks.py",
     "benchmarks/benchmark.c",
     "benchmarks/compare.py",
     "tests/branch_probe.c",

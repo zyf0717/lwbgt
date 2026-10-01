@@ -6,6 +6,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 EXPECTED = {"calc_wbgt", "esat", "lwbgt_calc_batch_v1"}
 
@@ -18,6 +19,12 @@ def run(*command: str) -> str:
 
 def exported(system: str, library: str, nm: str, objdump: str) -> set[str]:
     if system == "Windows":
+        if Path(objdump).stem.lower() == "dumpbin":
+            output = run(objdump, "/nologo", "/exports", library)
+            return set(re.findall(
+                r"^\s*\d+\s+[0-9A-Fa-f]+\s+[0-9A-Fa-f]+\s+(\w+)\s*$",
+                output, re.MULTILINE,
+            ))
         output = run(objdump, "-p", library)
         table = output.split("[Ordinal/Name Pointer] Table", 1)
         if len(table) != 2:

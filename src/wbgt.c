@@ -64,7 +64,7 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
  */		
  
 /* Preserve v1 rounding in source-built consumers, including SwiftPM. */
-#if defined(__FAST_MATH__) || (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ > 0)
+#if defined(__FAST_MATH__) || defined(_M_FP_FAST) || (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ > 0)
 #error "lwbgt requires floating-point semantics without fast-math or finite-math-only"
 #endif
 #ifdef __clang__

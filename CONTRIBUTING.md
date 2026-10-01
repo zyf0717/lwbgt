@@ -55,5 +55,8 @@ swift test --package-path tests/swiftpm -c release -Xcc -march=native
 ```
 
 Performance claims require the [benchmark method](benchmarks/README.md).
+Windows CI also tests an opt-in MSVC build (`LWBGT_EXPERIMENTAL_MSVC=ON`) and
+uploads cross-compiler numerical reports. Inspect those reports before claiming
+MSVC numerical compatibility; matching statuses alone is insufficient.
 Report the compiler/platform and any checks you could not run in the PR.
 Follow [RELEASING.md](docs/RELEASING.md) for publication.

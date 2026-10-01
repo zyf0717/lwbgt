@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add opt-in MSVC compatibility testing for native libraries, installed C/C++
+  consumers, Python loading, and cross-compiler numerical diagnostics.
+- Reuse the Linux native build for SwiftPM, combine Linux/R-release checking
+  with the complete source-package check, and avoid retesting Python 3.10 wheels.
 - Build production CMake and SwiftPM sources as C11; retain GNU89 for the
   original test oracle. Preserve SwiftPM floating-point rounding without unsafe
   dependency flags, reject fast-math builds, and test native Linux Clang in CI.
