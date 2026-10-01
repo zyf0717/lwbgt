@@ -116,7 +116,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: x64
         run: |
           python -m pip install build
-          python -m build --wheel --outdir msvc-wheel -Ccmake.define.LWBGT_EXPERIMENTAL_MSVC=ON
+          python -m build --wheel --outdir msvc-wheel --config-setting "cmake.define.LWBGT_EXPERIMENTAL_MSVC=ON"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m venv msvc-test
           msvc-test/Scripts/python -m pip install --no-index (Get-ChildItem msvc-wheel/*.whl).FullName
