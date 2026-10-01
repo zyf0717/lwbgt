@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## v1.0.2 — 2026-10-01
-
 - Use one 35,976-row retained-original WBGT corpus, including 10,000 seeded
   nominal/stress cases, with per-cohort convergence counts and output hashes.
 - Check adjacent binary32 wind/radiation thresholds, wind-height rounding,

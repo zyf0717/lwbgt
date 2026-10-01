@@ -15,7 +15,7 @@ def float_bits(value: float) -> bytes:
 
 class ApiTests(unittest.TestCase):
     def test_public_surface_and_version(self) -> None:
-        self.assertEqual(lwbgt.__version__, "1.0.2")
+        self.assertEqual(lwbgt.__version__, "1.0.1")
         self.assertEqual(
             lwbgt.__all__, ["Input", "Result", "calculate", "calculate_batch", "esat"]
         )

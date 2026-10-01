@@ -233,7 +233,7 @@
   },
   "oracle_blob": "7bc6e6ddd76a538d6454b27e9b252667846e6c9b",
   "platform": "Linux x86_64",
-  "release": "1.0.2",
   "seed": 20261001,
-  "seeded_rows": 10000
+  "seeded_rows": 10000,
+  "version": "1.0.1"
 }

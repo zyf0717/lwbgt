@@ -1,5 +1,9 @@
 # Releasing
 
+Test, benchmark, and documentation changes can merge without a package
+release. Keep the current version and record them under `Unreleased`. Publishing
+new package artifacts requires a new version.
+
 Release from a commit with passing native, SwiftPM, Python wheel, and R CI.
 Use the workflow definitions as the source of truth for supported platforms.
 

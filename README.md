@@ -21,7 +21,7 @@ classify heat risk. For a higher-level Python workflow, consider
 
 ## Compatibility policy
 
-**Version: v1.0.2.** The v1 calculation remains the default throughout the 1.x
+**Version: v1.0.1.** The v1 calculation remains the default throughout the 1.x
 series. Changes to defined valid-input numerical results require explicit
 versioned APIs, with v1 still available. The original solar-position year
 range, 1950–2049, is retained.
