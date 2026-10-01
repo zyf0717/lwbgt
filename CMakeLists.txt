@@ -7,7 +7,7 @@ include(CMakePackageConfigHelpers)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     message(FATAL_ERROR
-        "lwbgt requires GCC, Clang, AppleClang, or MinGW GCC; MSVC cannot compile the preserved GNU89 source"
+        "lwbgt supports GCC, Clang, AppleClang, and MinGW GCC; MSVC build settings and numerical compatibility are not validated"
     )
 endif()
 
@@ -24,11 +24,12 @@ set(LWBGT_LEGACY_OPTIONS
 )
 
 add_library(lwbgt_core OBJECT src/wbgt.c)
-target_compile_options(lwbgt_core PRIVATE ${LWBGT_FP_OPTIONS} ${LWBGT_LEGACY_OPTIONS})
+set_target_properties(lwbgt_core PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
+target_compile_options(lwbgt_core PRIVATE ${LWBGT_FP_OPTIONS} -Wall -Wextra -Werror)
 set_target_properties(lwbgt_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(lwbgt_ffi OBJECT src/lwbgt_ffi.c)
-target_compile_features(lwbgt_ffi PRIVATE c_std_11)
+set_target_properties(lwbgt_ffi PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
 target_compile_options(lwbgt_ffi PRIVATE ${LWBGT_FP_OPTIONS} -Wall -Wextra -Werror)
 target_include_directories(lwbgt_ffi PRIVATE include)
 set_target_properties(lwbgt_ffi PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -145,7 +146,8 @@ if(BUILD_TESTING)
     lwbgt_add_harness(lwbgt_batch_test tests/batch.c lwbgt)
     add_executable(lwbgt_demo src/wbgt.c)
     target_compile_definitions(lwbgt_demo PRIVATE LWBGT_BUILD_DEMO)
-    target_compile_options(lwbgt_demo PRIVATE ${LWBGT_FP_OPTIONS} ${LWBGT_LEGACY_OPTIONS})
+    set_target_properties(lwbgt_demo PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
+    target_compile_options(lwbgt_demo PRIVATE ${LWBGT_FP_OPTIONS})
     target_link_libraries(lwbgt_demo PRIVATE m)
 
     set(LWBGT_CASES "${CMAKE_CURRENT_BINARY_DIR}/cases.csv")

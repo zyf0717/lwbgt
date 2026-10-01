@@ -17,6 +17,8 @@ jobs:
         include:
           - os: ubuntu-latest
             cc: gcc
+          - os: ubuntu-latest
+            cc: clang
           - os: macos-15-intel
             cc: clang
           - os: windows-latest
@@ -54,16 +56,28 @@ jobs:
         run: ctest --test-dir build --output-on-failure
       - name: Test SwiftPM consumer
         if: runner.os == 'macOS'
-        run: swift test --package-path tests/swiftpm -c release
+        run: |
+          build/lwbgt_probe build/cases.csv > build/swift-expected.csv
+          LWBGT_CASES="$PWD/build/cases.csv" \
+          LWBGT_EXPECTED="$PWD/build/swift-expected.csv" \
+          swift test --package-path tests/swiftpm -c release -Xcc -march=native
 
   swiftpm-linux:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Build native numerical comparison
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target lwbgt_probe --parallel
+          python3 tests/generate_cases.py build/cases.csv
+          build/lwbgt_probe build/cases.csv > build/swift-expected.csv
       - name: Test SwiftPM consumer
         run: >-
           docker run --rm
           --volume "$PWD:/workspace"
           --workdir /workspace
+          --env LWBGT_CASES=/workspace/build/cases.csv
+          --env LWBGT_EXPECTED=/workspace/build/swift-expected.csv
           swift:6.2.4-noble
-          swift test --package-path tests/swiftpm -c release
+          swift test --package-path tests/swiftpm -c release -Xcc -march=native

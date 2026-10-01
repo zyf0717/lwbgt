@@ -104,9 +104,18 @@ input or output pointers.
 
 ## Platforms and bindings
 
-GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC is not. The numerical
-source builds in GNU89 mode. Linux keeps SONAME `liblwbgt.so.0` while the ABI is
-unchanged. CI tests native builds and installed C/C++ consumers.
+GCC, Clang/AppleClang, and MinGW GCC are supported. MSVC build settings and
+numerical compatibility have not been validated. CMake and SwiftPM build the
+production sources as C11; R uses its configured C dialect. Only the retained
+original test oracle builds in GNU89 mode. Linux keeps SONAME `liblwbgt.so.0`
+while the ABI is unchanged. CI tests native builds and installed C/C++ consumers.
+
+CMake and R disable fast math and floating-point contraction. The kernel also
+disables contraction through a Clang source pragma for SwiftPM, without unsafe
+package flags, and rejects fast-math or finite-math-only compilation. Custom
+builds must preserve these settings; `-ffp-contract=fast` can override the Clang
+pragma. Compiler, architecture, and math-library differences can still affect
+output bits; see [COMPATIBILITY.md](COMPATIBILITY.md).
 
 | Binding | Behavior |
 |---|---|
