@@ -3,6 +3,7 @@ from __future__ import annotations
 import ctypes
 import struct
 import unittest
+from importlib.metadata import version
 
 import lwbgt
 from _fixtures import SINGAPORE, SOLVER_FAILURE
@@ -15,7 +16,7 @@ def float_bits(value: float) -> bytes:
 
 class ApiTests(unittest.TestCase):
     def test_public_surface_and_version(self) -> None:
-        self.assertEqual(lwbgt.__version__, "1.0.1")
+        self.assertEqual(lwbgt.__version__, version("lwbgt"))
         self.assertEqual(
             lwbgt.__all__, ["Input", "Result", "calculate", "calculate_batch", "esat"]
         )
@@ -24,7 +25,15 @@ class ApiTests(unittest.TestCase):
         result = lwbgt.calculate(SINGAPORE)
         native_input = _ffi._as_native(SINGAPORE)
         values = [ctypes.c_float(SINGAPORE.wind_speed_m_s) for _ in range(5)]
-        status = _ffi._library().calc_wbgt(
+        scalar = _ffi._library().calc_wbgt
+        scalar.argtypes = (
+            (ctypes.c_int,) * 7
+            + (ctypes.c_double,) * 9
+            + (ctypes.c_int,)
+            + (ctypes.POINTER(ctypes.c_float),) * 5
+        )
+        scalar.restype = ctypes.c_int
+        status = scalar(
             native_input.year,
             native_input.month,
             native_input.day,

@@ -42,11 +42,6 @@ def main() -> None:
         match("include/lwbgt.h", r"LWBGT_VERSION_PATCH ([0-9]+)"),
     )
     versions["include/lwbgt.h"] = ".".join(header)
-    versions["tests/swiftpm"] = ".".join(
-        match("tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",
-              rf"XCTAssertEqual\(LWBGT_VERSION_{part}, ([0-9]+)\)")
-        for part in ("MAJOR", "MINOR", "PATCH")
-    )
     expected = next(iter(versions.values()))
     disagreements = {
         path: version for path, version in versions.items() if version != expected

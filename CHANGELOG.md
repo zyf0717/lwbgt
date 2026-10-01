@@ -19,6 +19,8 @@
   checks and Conventional Commits in `CONTRIBUTING.md`.
 - Remove redundant standalone binding examples and their CMake tests; use the
   Python and R packages and their dedicated CI for language bindings.
+- Keep Python scalar binding setup in its regression test and remove repeated
+  release numbers from Python and Swift tests.
 
 ## v1.0.1 — 2026-10-01
 
