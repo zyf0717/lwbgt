@@ -27,21 +27,26 @@ jobs:
             os: ubuntu-24.04
             r: release
             compiler: gcc
+            check_args: ''
           - name: Linux Clang / R-devel
             os: ubuntu-24.04
             r: devel
             compiler: clang
+            check_args: --no-manual
           - name: Windows Rtools / R release
             os: windows-2025
             r: release
             compiler: rtools
+            check_args: --no-manual
           - name: macOS AppleClang / R release
             os: macos-15
             r: release
             compiler: appleclang
+            check_args: --no-manual
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
+        if: matrix.compiler == 'gcc'
         with:
           python-version: '3.10'
       - uses: r-lib/actions/setup-r@v2
@@ -64,13 +69,16 @@ jobs:
         if: matrix.compiler == 'clang'
         run: echo "R_MAKEVARS_USER=$GITHUB_WORKSPACE/.github/R-Makevars-clang" >> "$GITHUB_ENV"
       - name: Verify synchronized sources and versions
+        if: matrix.compiler == 'gcc'
         run: |
           python tests/check_versions.py
           python tests/check_r_sources.py
-      - name: Build and check without the PDF manual
+      - uses: r-lib/actions/setup-tinytex@v2
+        if: matrix.compiler == 'gcc'
+      - name: Build and check the R package
         run: |
           R CMD build r
-          R CMD check --no-manual lwbgt_*.tar.gz
+          R CMD check ${{ matrix.check_args }} lwbgt_*.tar.gz
           ! grep -Eq '^Status:.*(ERROR|WARNING)' lwbgt.Rcheck/00check.log
       - name: Require Clang compilation
         if: matrix.compiler == 'clang'
@@ -102,33 +110,8 @@ jobs:
               ;;
           esac
 
-  r-source:
-    name: Checked R source package
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.10'
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: release
-          use-public-rspm: true
-      - name: Install complete shell-script checking support
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends devscripts
-      - uses: r-lib/actions/setup-tinytex@v2
-      - name: Verify synchronized sources and versions
-        run: |
-          python tests/check_versions.py
-          python tests/check_r_sources.py
-      - name: Build and run the complete R package check
-        run: |
-          R CMD build r
-          R CMD check lwbgt_*.tar.gz
-          ! grep -Eq '^Status:.*(ERROR|WARNING)' lwbgt.Rcheck/00check.log
       - name: Upload the checked R source package
+        if: matrix.compiler == 'gcc'
         uses: actions/upload-artifact@v7
         with:
           name: r-source

@@ -45,8 +45,19 @@ ctest --test-dir build --output-on-failure
 For Python changes, build and install a wheel in a clean environment, then run
 `python -m unittest discover -s tests/python -v`. For R changes, run
 `R CMD build r` and `R CMD check` on the archive. Run downstream SwiftPM tests
-for C interface or packaging changes.
+for C interface or packaging changes, including the native numerical comparison:
+
+```sh
+build/lwbgt_probe build/cases.csv > build/swift-expected.csv
+LWBGT_CASES="$PWD/build/cases.csv" \
+LWBGT_EXPECTED="$PWD/build/swift-expected.csv" \
+swift test --package-path tests/swiftpm -c release -Xcc -march=native
+```
 
 Performance claims require the [benchmark method](benchmarks/README.md).
+Windows CI also tests an opt-in MSVC build (`LWBGT_EXPERIMENTAL_MSVC=ON`) and
+uploads cross-compiler numerical reports. Finite values must match exactly;
+NaN payload differences are allowed. Inspect those reports before claiming
+compatibility beyond the tested corpus and platform.
 Report the compiler/platform and any checks you could not run in the PR.
 Follow [RELEASING.md](docs/RELEASING.md) for publication.

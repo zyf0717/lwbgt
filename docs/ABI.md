@@ -104,9 +104,27 @@ input or output pointers.
 
 ## Platforms and bindings
 
-GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC is not. The numerical
-source builds in GNU89 mode. Linux keeps SONAME `liblwbgt.so.0` while the ABI is
-unchanged. CI tests native builds and installed C/C++ consumers.
+GCC, Clang/AppleClang, and MinGW GCC are supported. MSVC builds are experimental
+and require `-DLWBGT_EXPERIMENTAL_MSVC=ON` with CMake 3.21 or newer. CMake and
+SwiftPM build the
+production sources as C11; R uses its configured C dialect. Only the retained
+original test oracle builds in GNU89 mode. Linux keeps SONAME `liblwbgt.so.0`
+while the ABI is unchanged. CI tests native builds and installed C/C++ consumers.
+
+CMake and R disable fast math and floating-point contraction. The kernel also
+disables contraction through a Clang source pragma for SwiftPM, without unsafe
+package flags, and rejects fast-math or finite-math-only compilation. Custom
+builds must preserve these settings; `-ffp-contract=fast` can override the Clang
+pragma. Compiler, architecture, and math-library differences can still affect
+output bits; see [COMPATIBILITY.md](COMPATIBILITY.md).
+
+The Windows CI job tests MSVC with `/fp:strict`, including static and DLL APIs,
+exports, installed C/C++ consumers, and a Python wheel. MinGW first verifies
+the retained GNU89 oracle; cross-compiler reports then measure differences on
+the same runner. Status or finite/non-finite/failure-sentinel changes fail the
+comparison, as do finite numerical differences. Signed zeros compare equal;
+NaN payload differences are reported but allowed. The POSIX benchmark harness
+and original oracle are not compiled by MSVC.
 
 | Binding | Behavior |
 |---|---|

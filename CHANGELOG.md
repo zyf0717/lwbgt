@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add opt-in MSVC compatibility testing for native libraries, installed C/C++
+  consumers, Python loading, and exact finite cross-compiler comparisons.
+- Reuse the Linux native build for SwiftPM, combine Linux/R-release checking
+  with the complete source-package check, and avoid retesting Python 3.10 wheels.
+- Build production CMake and SwiftPM sources as C11; retain GNU89 for the
+  original test oracle. Preserve SwiftPM floating-point rounding without unsafe
+  dependency flags, reject fast-math builds, and test native Linux Clang in CI.
+- Compare SwiftPM with CMake bit for bit on the full WBGT corpus with native
+  CPU targeting enabled on Linux and macOS.
 - Move the canonical Argonne license beside the C kernel in `src/`; keep
   shipping it in Python and native distributions and retain the R package copy.
 - Use one 35,976-row retained-original WBGT corpus, including 10,000 seeded

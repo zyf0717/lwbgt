@@ -7,5 +7,5 @@ Name: lwbgt
 Description: Exact-compatible optimized Liljegren WBGT implementation
 Version: @PROJECT_VERSION@
 Libs: -L${libdir} -llwbgt
-Libs.private: -lm
+Libs.private: @LWBGT_PC_PRIVATE_LIBS@
 Cflags: -I${includedir}
