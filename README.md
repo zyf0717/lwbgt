@@ -5,31 +5,37 @@
 [![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
 [![PyPI](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
-[![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
-`lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
-wet bulb globe temperature (WBGT) model. It preserves the original scalar
-binary ABI and legacy WBGT calculations while removing repeated and dead work;
-the current source corrects the scalar 2 m wind output.
-Dependency-free Python and R bindings use the same native kernel. SwiftPM
-exposes the stable C interface as `CLWBGT`.
+`lwbgt` implements the Liljegren outdoor wet bulb globe temperature (WBGT)
+model in C. It provides a stable numerical backend for weather and heat-stress
+software.
 
-Use `lwbgt` as an auditable numerical backend. It deliberately leaves weather
-data ingestion, unit conversion, missing-data policy, heat-risk classification,
-and application defaults to callers. For a higher-level Python workflow,
-consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
+Dependency-free Python and R bindings use the same C kernel. SwiftPM exposes
+the C interface as `CLWBGT`, and the native C/FFI interface supports other
+language bindings.
+
+Callers supply weather data, convert units, choose missing-data policies, and
+classify heat risk. For a higher-level Python workflow, consider
+[`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Version: v1.0.2.** The 35,976-case WBGT
-comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
-`Tpsy`, WBGT, and `esat` under matched build settings. An additional 1,682
-cases compare water/ice `esat`, and 996 diagnostics check internal branches.
-These sampled comparisons are not an all-input guarantee. When wind is measured
-at 2 m, the scalar function now writes the supplied speed, rounded to `float`, to its wind output; the original left that
-output unwritten. The original 1950–2049 year range is retained. The v1
-calculation remains the default;
-future numerical revisions require explicit versioned APIs. See the
-[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
+## Compatibility policy
+
+**Version: v1.0.2.** The v1 calculation remains the default throughout the 1.x
+series. Changes to defined valid-input numerical results require explicit
+versioned APIs, with v1 still available. The original solar-position year
+range, 1950–2049, is retained.
+
+Under matched build settings, 35,976 WBGT cases match the retained original C
+bit for bit for `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`. Another 1,682 cases check
+water/ice `esat`, and 996 diagnostics check internal branches. These sampled
+comparisons do not guarantee equivalence for every input or platform.
+
+The original scalar binary ABI is preserved. The intentional output correction
+is estimated wind at 2 m: the scalar function now writes the supplied speed,
+rounded to `float`; the original left that output unwritten. See
+[compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md)
+for the comparison scope and limitations.
 
 ## Python
 
