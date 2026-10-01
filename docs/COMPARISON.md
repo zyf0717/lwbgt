@@ -1,47 +1,28 @@
-# lwbgt vs pywbgt vs thermofeel
+# lwbgt, pywbgt, and thermofeel
 
 This page compares the documented public scope of `lwbgt` 1.0.2, `pywbgt`
-3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22;
-the lwbgt entry was updated on 2026-09-23. It is a package selection guide, not
-a numerical benchmark or a claim that similarly named methods produce
-interchangeable results.
+3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22.
 
-| Question | lwbgt | pywbgt | thermofeel |
+| Aspect | lwbgt | pywbgt | thermofeel |
 |---|---|---|---|
-| What is its primary scope? | A low-level, reference-compatible Liljegren kernel for embedding | A Python WBGT package with selectable estimation methods and higher-level meteorological data handling | A Python library for multiple heat and cold thermal comfort indices |
-| Which WBGT entry points or selectors are documented? | The preserved Liljegren v1.1 calculation | `liljegren`, `bernard`, `dimiceli`, and `dimiceli_nws` method selectors | `calculate_wbgt_simple`, `calculate_wbgt`, and `calculate_wbgt_liljegren` |
-| What interfaces does it expose? | Stable C ABI, CMake, `pkg-config`, and SwiftPM packages, FFI batch API, and thin Python and R bindings | Python API backed by Python, C, and Cython code; accepts arrays and xarray datasets | Python functions operating on NumPy-compatible array inputs |
-| How are units handled? | Required units are fixed and named explicitly; no implicit conversion | Meteorological values use Pint/MetPy quantities and are converted by the package | Each function documents required units such as K, hPa, W/m², and m/s; inputs are numeric arrays rather than unit-bearing objects |
-| What are the Python runtime dependencies? | None outside the standard library; the binding uses `ctypes` | NumPy, Numba, MetPy, xarray, Pint, pandas, and pvlib | NumPy |
-| Does it cover thermal indices beyond WBGT? | No | No general thermal-comfort index suite | Yes; its documented indices include UTCI, apparent temperature, heat index, humidex, wind chill, and others |
-| Where does preprocessing live? | The caller owns ingestion, conversion, missing-data policy, and orchestration | The package provides unit-aware and xarray-oriented handling around its WBGT methods | The caller supplies the documented meteorological or derived inputs; the package also provides supporting thermal and meteorological calculations |
+| Scope | Native Liljegren kernel for embedding | Python WBGT workflow with selectable methods | Multiple heat/cold comfort indices |
+| WBGT methods | Preserved Liljegren v1.1 calculation | `liljegren`, `bernard`, `dimiceli`, `dimiceli_nws` | `calculate_wbgt_simple`, `calculate_wbgt`, `calculate_wbgt_liljegren` |
+| Interfaces | C ABI, FFI batch, Python, R, SwiftPM, CMake, `pkg-config` | Python; arrays and xarray datasets | Python; NumPy-compatible arrays |
+| Units | Explicit required units; caller converts | Pint/MetPy quantities; package converts | Numeric arrays in each function's documented units |
+| Python dependencies | Standard library only | NumPy, Numba, MetPy, xarray, Pint, pandas, pvlib | NumPy |
+| Preprocessing | Caller owns ingestion and missing-data policy | Unit-aware and xarray-oriented handling | Caller supplies inputs; supporting meteorological functions are available |
 
-## Which package should I choose?
+Use `lwbgt` for its native compatibility contract, `pywbgt` for a higher-level
+WBGT workflow, or `thermofeel` for a broader thermal-comfort workflow. Pin
+versions and methods, match units and preprocessing, and compare intermediate
+and final results before substituting packages. This table is not a numerical
+benchmark or an equivalence claim.
 
-Choose `lwbgt` when you need the project's explicit Liljegren compatibility
-contract, a stable native ABI, dependency-free Python runtime integration, or
-a narrow kernel inside another system.
+## Sources
 
-Choose `pywbgt` when you want a high-level Python WBGT workflow with selectable
-methods, Pint/MetPy unit conversion, or xarray dataset support.
-
-Choose `thermofeel` when WBGT is one part of a broader NumPy-based thermal
-comfort workflow, or when its specific simple, composite, or Liljegren entry
-point matches your data and method requirements.
-
-For reproducible comparisons, pin the package version and method, normalize
-units and preprocessing, and compare intermediate as well as final outputs.
-Do not substitute one package solely because each returns a value labelled
-WBGT.
-
-## Primary sources
-
-- `lwbgt` 1.0.0: [README](https://github.com/zyf0717/lwbgt/tree/v1.0.0),
-  [ABI contract](https://github.com/zyf0717/lwbgt/blob/v1.0.0/docs/ABI.md), and
-  [package metadata](https://github.com/zyf0717/lwbgt/blob/v1.0.0/Package.swift)
+- `lwbgt`: [README](../README.md), [ABI](ABI.md), [package metadata](../Package.swift)
 - `pywbgt` 3.0.7: [README](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/README.md),
-  [method selector list](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/src/pywbgt/constants.py),
-  and [package metadata](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/pyproject.toml)
-- `thermofeel` 2.3.0: [documentation](https://thermofeel.readthedocs.io/),
-  [WBGT functions](https://github.com/ecmwf/thermofeel/blob/2.3.0/thermofeel/thermofeel.py),
-  and [package metadata](https://github.com/ecmwf/thermofeel/blob/2.3.0/pyproject.toml)
+  [methods](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/src/pywbgt/constants.py),
+  [metadata](https://github.com/kwodzicki/pywbgt/blob/v3.0.7/pyproject.toml)
+- `thermofeel` 2.3.0: [WBGT functions](https://github.com/ecmwf/thermofeel/blob/2.3.0/thermofeel/thermofeel.py),
+  [metadata](https://github.com/ecmwf/thermofeel/blob/2.3.0/pyproject.toml)

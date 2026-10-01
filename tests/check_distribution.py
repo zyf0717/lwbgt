@@ -10,7 +10,6 @@ from pathlib import Path
 
 LICENSE_FILES = {
     "LICENSE",
-    "LICENSING.md",
     "NOTICE",
     "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 }

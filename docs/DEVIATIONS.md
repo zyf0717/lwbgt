@@ -1,67 +1,32 @@
-# Deviations from the original Liljegren C source
+# Changes from the original C source
 
-The reference is Liljegren WBGT v1.1 at upstream commit
-[`cd672a8`](https://github.com/mdljts/wbgt/blob/cd672a886880b67f3f27bdbf75038d8f7ff0bac2/src/wbgt.c.original),
-retained verbatim as `upstream/wbgt.c.original`. The modified kernel is
-`src/wbgt.c`; the R package compiles a byte-identical copy at `r/src/wbgt.c`.
-The source keeps the original copyright, license, acknowledgement, and a
-notice identifying the derivative work. For the complete source diff, run
-`git diff --no-index -- upstream/wbgt.c.original src/wbgt.c`.
+[UPSTREAM.md](UPSTREAM.md) identifies the retained oracle. The modified kernel
+is `src/wbgt.c`, with a byte-identical copy in `r/src/wbgt.c`. Inspect the full
+diff with:
 
-## Changes and impact
+```sh
+git diff --no-index -- upstream/wbgt.c.original src/wbgt.c
+```
 
-- **Modern C declarations.** Typed prototypes replace K&R definitions and
-  implicit declarations. The scalar ABI still accepts `double` arguments and
-  converts them to `float` at function entry, matching the original calling
-  convention and rounding.
-- **Defined failure outputs.** Solar-position errors now return `-1` with all
-  five scalar outputs set to `-9999`, rather than consuming unwritten values.
-  Valid solar calculations retain their original path.
-- **Defined 2 m wind output.** A direct scalar call now writes the supplied wind
-  speed, rounded to `float`, when no height adjustment is needed. The original
-  left this output unwritten. This is the intentional compatibility exception;
-  the temperature and WBGT outputs are unchanged.
-- **Shared calculation state.** Each row prepares vapor pressure, dew point,
-  atmospheric emissivity, and the common long-wave term once. The globe and
-  wet-bulb solvers reuse them. Each wet-bulb iteration also reuses its rounded
-  viscosity and density for convection and mass transfer. The original
-  equations, intermediate precision, convergence rule, and WBGT weights remain
-  unchanged. Internal helpers whose only role was recomputing these values
-  were removed.
-- **Less repeated radiation work.** The psychrometric solve skips unused
-  radiation calculations. Solar terms are calculated before the globe and
-  natural wet-bulb iterations. The retained-oracle comparison checks that
-  these changes preserve output bits on the finite sampled compatibility cases.
-  Non-finite weather values can differ: with NaN solar input the original
-  psychrometric path fails, while the derivative can return a finite `Tpsy`
-  because it skips unused radiation work. No upstream bit-equivalence is
-  claimed for non-finite weather inputs; a separate 64-row suite checks
-  consistency between current scalar, batch, and Python runtime outputs.
-- **Isolated demonstration program.** Library builds omit the demonstration
-  `main` and its I/O dependencies. The demo initializes its first, unused
-  temperature difference, removing an uninitialized read. Comment repairs in
-  `esat` do not change the formula.
+| Change | Effect |
+|---|---|
+| Typed C declarations | Replace K&R definitions and implicit declarations. Scalar inputs still enter as `double` and round to `float`, preserving the calling convention. |
+| Solar error handling | Return -1 and set all five outputs to -9999 instead of consuming unwritten solar outputs. |
+| Scalar wind output at 2 m | Write the supplied speed rounded to `float`; the original left this output unwritten. Temperature and WBGT outputs are unchanged on the comparison corpus. |
+| Shared atmospheric state | Prepare vapor pressure, dew point, emissivity, and long-wave terms once per row; reuse rounded viscosity and density within wet-bulb iterations. |
+| Less radiation work | Hoist invariant solar terms and skip unused psychrometric radiation calculations. |
+| Separate demonstration | Omit `main` and its I/O dependencies from library builds; initialize the demo's first temperature difference. |
 
-The public C header preserves `calc_wbgt` and `esat` and adds the versioned
-batch ABI. Python, R, and SwiftPM use the same C kernel; the batch entry point
-calls the scalar calculation for each row. Packaging and input-policy additions
-are described in the [ABI contract](ABI.md) and [input assumptions](INPUTS.md).
+Equations, constants, intermediate precision, WBGT weights, convergence rules,
+wind-stability table, and solar-position date arithmetic are preserved.
+Redundant internal helpers were removed; comment repairs in `esat` do not
+change its formula.
 
-## Numerical checks
+Non-finite weather can behave differently. With NaN solar input, the original
+psychrometric path fails while the derivative can return finite `Tpsy` after
+skipping unused radiation work. Those inputs have separate current-API
+consistency checks and no upstream bit-equivalence claim.
 
-The 35,976-case retained-oracle WBGT comparison includes every supported year,
-thermophysical and wind boundaries, radiation branches, and near-`float`
-conversion inputs. On the matched GCC build, `Tg`, `Tnwb`, `Tpsy`, WBGT, and
-`esat` match bit for bit; estimated wind matches except for the corrected
-scalar 2 m output. The historical 852-case corpus also matches the v1.0.0
-kernel exactly.
-The additional rows, water/ice saturation tests, and internal branch diagnostics
-are documented in [the baseline](../tests/BASELINE.md).
-Batch tests check scalar equivalence and deterministic failure outputs for
-unsupported years and out-of-range solar coordinates. These sampled checks
-are not a proof for every input or compiler.
-
-No model constants, solar-position year range, wind-stability table, or
-convergence threshold were changed. The retained source, its lineage, and the
-license boundary are documented in [Upstream provenance](UPSTREAM.md) and
-[Licensing](../LICENSING.md).
+[BASELINE.md](../tests/BASELINE.md) records the finite-input oracle comparisons
+and failure tests. The historical 852 cases also match the v1.0.0 kernel
+exactly. [ABI.md](ABI.md) defines the public interface and failure contract.

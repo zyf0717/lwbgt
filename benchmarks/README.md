@@ -1,25 +1,26 @@
 # Benchmark
 
-The benchmark compares the retained original Liljegren C with the current
-kernel on the same 840 deterministic rows. The historical 852-case corpus is used for
-numerical comparison; timing excludes six `invalid` and six `solver-boundary`
-rows. The harness loads cases before timing, pins execution to one CPU, warms
-up each run, and consumes all outputs through a volatile checksum. The two
-variants run in alternating order for seven repetitions of 200 iterations per
-case. Reported rates are medians.
+The fixed workload contains 840 rows from the historical 852-case corpus,
+excluding six `invalid` and six `solver-boundary` rows. The expanded numerical
+suite stays separate so the timing workload remains comparable.
 
-On 2026-09-25, the current kernel measured **1.603×** the retained original on
-GCC 13.3.0, Linux 7.0.0-31-generic, and an Intel Core i9-13900HK restricted
-to CPU 12, which has no sibling hardware thread. Both kernels used GNU89,
-`-O2`, `-fno-fast-math`, `-ffp-contract=off`, and `-fno-strict-aliasing`.
+The harness loads input before timing, pins execution to one CPU, warms each
+run, and consumes outputs through a volatile checksum. It alternates original
+and current kernels for seven repetitions of 200 iterations per case and
+reports medians.
+
+On 2026-09-25, median throughput was **1.603×** the retained original:
 
 | Overall, 840 rows | Original | Current |
 |---|---:|---:|
 | Median rows/s | 60,423 | 96,834 |
 | Relative median absolute deviation | 0.50% | 0.57% |
 
-Every cohort met the existing performance gate. Reproduce this comparison from
-the repository root on the same machine with:
+All cohort gates passed. Environment: GCC 13.3.0, Linux 7.0.0-31-generic,
+Intel Core i9-13900HK, CPU 12 without a sibling hardware thread. Both kernels
+used GNU89 and `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
+
+Reproduce on the same machine from the repository root:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -30,12 +31,7 @@ taskset -c 12 python3 tests/compare.py benchmark \
   build/benchmark.json 7 200
 ```
 
-The workload contains no downloaded weather dataset. Its two `era5` rows are
-fixed London examples with no recorded source provenance, so that cohort is
-not evidence about ERA5-wide performance. Throughput depends on the CPU,
-compiler, and workload.
-
-The additional v1.0.2 compatibility corpus is separate from this timing
-workload. Its convergence cases and wider parameter distribution would change
-the workload and invalidate comparisons with the retained throughput report.
-See [tests/BASELINE.md](../tests/BASELINE.md) to reproduce the expanded checks.
+Results depend on hardware, compiler, and workload. The two `era5` rows are
+fixed London examples without recorded dataset provenance, so they do not
+establish ERA5-wide performance. See [the numerical baseline](../tests/BASELINE.md)
+for expanded correctness checks.

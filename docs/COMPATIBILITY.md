@@ -1,41 +1,33 @@
 # Compatibility and performance
 
-The shared library exports only `calc_wbgt`, `esat`, and
-`lwbgt_calc_batch_v1`. Independent calls with separate buffers are thread-safe;
-a batch call is serial. With matched compiler and floating-point settings, the
-35,976-case retained-oracle WBGT comparison found identical 32-bit values for
-`Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`. Estimated wind also matched except in direct
-scalar calls with wind measured at 2 m: the original left that output unwritten,
-while the derivative writes the supplied speed converted to `float`. The batch
-and R callers already initialized their 2 m estimated-wind output.
+The v1 calculation remains the default throughout 1.x. Changes to defined
+valid-input numerical results require explicit versioned APIs, with v1 still
+available. Package versions and FFI ABI versions are independent.
 
-The comparison covers every supported year and targeted numerical branches,
-including the historical 852 rows and 35,124 additional rows (10,000 seeded).
-Separate tests cover 1,682 water/ice saturation-pressure cases and 996 internal
-stability and solar diagnostics. Convergence outcomes, seeds, ranges, and
-reproduction commands are recorded in [the baseline](../tests/BASELINE.md).
-It does not cover every valid input or every compiler and platform. The original solar-position year guard and date
-arithmetic remain in place, including their historical behavior. Non-finite
-weather inputs have separate current-API consistency tests and are excluded
-from upstream equivalence claims; see [the deviation register](DEVIATIONS.md).
+## Numerical comparison
 
-Package release 1.0.0 preserves this v1 calculation as the default for the
-1.x series. Future changes to defined valid-input numerical results will use
-explicit versioned APIs, with the v1 behavior still available. The v1 FFI ABI
-version and package release version are independent.
+Under matched compiler and floating-point settings, 35,976 WBGT cases match
+the retained original C bit for bit for `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`.
+Estimated wind also matches except for direct scalar calls at 2 m: the
+original left that output unwritten; `lwbgt` writes the supplied speed rounded
+to `float`. Batch and R callers already initialized that output.
 
-The [benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
-uses the 852-case oracle input but times 840 rows, excluding the six `invalid`
-and six `solver-boundary` cases. On GCC 13.3.0 with execution pinned to one
-core, the current kernel measured 1.603× the retained original in median
-throughput; all per-cohort gates passed. The weather-labeled rows in this
-workload are fixed examples, not a verified dataset extract.
+The suite covers every supported year, targeted branches, and 10,000 seeded
+inputs. Separate tests cover 1,682 water/ice `esat` cases and 996 internal
+branch diagnostics. [tests/BASELINE.md](../tests/BASELINE.md) records ranges,
+seeds, convergence counts, hashes, and reproduction commands.
 
-These measurements apply only to the documented environments and workloads.
-Dates outside the original 1950–2049 solar-position range are rejected.
+These are sampled checks, not an all-input or all-platform guarantee.
+Non-finite weather inputs have separate API consistency tests; their outputs
+can differ from the original. See [DEVIATIONS.md](DEVIATIONS.md). The original
+1950–2049 year guard and historical date arithmetic are retained.
 
-Full methods, hardware and compiler details, workloads, and retained results
-are in the
-[benchmark documentation](https://github.com/zyf0717/lwbgt/tree/main/benchmarks).
-The public compatibility scope, layouts, and API guarantees are defined by the
-[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
+## Performance
+
+The fixed 840-row benchmark measured **1.603×** median throughput against the
+retained original on GCC 13.3.0 with execution pinned to one CPU; all cohort
+gates passed. Its weather-labeled rows are synthetic examples, not a verified
+dataset extract. Results depend on hardware, compiler, and workload.
+
+[benchmarks/README.md](../benchmarks/README.md) records the method and results.
+[ABI.md](ABI.md) defines the public layouts, symbols, and API guarantees.

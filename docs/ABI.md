@@ -1,39 +1,24 @@
 # ABI contract
 
-This document defines the supported binary interface for lwbgt. Public symbols
-and layouts described here are compatibility commitments; other link-visible
-symbols in the static archive are implementation details.
+The public interface is `include/lwbgt.h`. The shared library exports
+`calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1`; other static-library symbols are
+implementation details. The header supports C and C++.
 
 ## Versioning
 
-The project release version and FFI ABI version are independent:
+`LWBGT_VERSION_MAJOR/MINOR/PATCH` identify the package release;
+`LWBGT_FFI_ABI_VERSION` identifies the structure and batch ABI. These versions
+are independent of the numerical calculation version.
 
-- `LWBGT_VERSION_MAJOR`, `LWBGT_VERSION_MINOR`, and `LWBGT_VERSION_PATCH`
-  identify the project release.
-- `LWBGT_FFI_ABI_VERSION` identifies the versioned structure and batch API.
-- The project release, numerical calculation, and FFI ABI have separate version
-  scopes. Release 1.0.0 retains the v1 calculation and FFI ABI; it does not
-  introduce a new numerical model.
-- The `calc_wbgt` and `esat` scalar symbols retain the original binary ABI.
-  `calc_wbgt` now writes the supplied speed to its output pointer at 2 m;
-  the original function left that pointer untouched.
-- The `lwbgt_input_v1`, `lwbgt_output_v1`, and `lwbgt_calc_batch_v1` names are
-  permanent. Incompatible layouts or behavior require new `v2` names while the
-  v1 entry point remains available.
-- Existing C, Python, and R calculation entry points keep the v1 calculation
-  as their default throughout the 1.x release series. Future changes to
-  defined valid-input numerical results require explicit versioned entry
-  points; a new calculation may be offered as an opt-in option.
-
-New symbols and backward-compatible documentation clarifications may be added
-without changing the v1 ABI. Fields must not be reordered, resized, removed, or
-repurposed.
+The v1 symbols, layouts, and default calculation remain available throughout
+1.x. Incompatible interfaces or changes to defined valid-input results require
+new versioned entrypoints. Do not reorder, resize, remove, or repurpose fields.
+See [the compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
 
 ## Data model and layout
 
-The v1 ABI requires 8-bit bytes, 32-bit `int32_t` and `float`, 64-bit `double`,
-and the field offsets below. Supported release builds enforce the total sizes
-and boundary offsets with compile-time assertions.
+The ABI requires 8-bit bytes, 32-bit `int32_t` and `float`, and 64-bit `double`.
+Builds enforce structure sizes and boundary offsets with compile-time assertions.
 
 ### `lwbgt_input_v1`
 
@@ -83,87 +68,48 @@ int lwbgt_calc_batch_v1(
 );
 ```
 
-- `count == 0` returns `LWBGT_BATCH_OK`; either pointer may be null.
-- For nonzero `count`, a null pointer returns
-  `LWBGT_BATCH_INVALID_ARGUMENT` without modifying outputs.
-- The caller owns both arrays and must provide at least `count` elements. The
-  input and output storage must not overlap.
-- Records execute serially, in ascending array order, by calling the scalar
-  implementation once per record.
-- The function return value reports call validity. Each output `status` reports
-  that record's scalar result: 0 for success and -1 for either invalid
-  solar-position inputs or failure of the globe or natural wet-bulb solver to
-  converge.
-- Invalid solar-position inputs set all five numerical outputs to `-9999`. On
-  solver non-convergence, the failed temperature and `wbgt_c` are `-9999`;
-  other numerical outputs may remain valid.
-- Inputs are forwarded without domain validation, clamping, unit conversion, or
-  missing-value policy beyond behavior already present in the scalar model.
-- When wind is already measured at 2 m, both scalar and batch APIs return the
-  supplied wind converted to `float` as `estimated_wind_speed_m_s`.
+- With `count == 0`, return `LWBGT_BATCH_OK`; either pointer may be null.
+- Otherwise, null input or output returns `LWBGT_BATCH_INVALID_ARGUMENT`
+  without modifying outputs.
+- The caller owns both arrays and supplies at least `count` elements. Input
+  and output storage must not overlap.
+- Rows execute serially in input order through the scalar calculation.
+  The function return reports call validity; each row has its own `status`.
+- Row status is 0 on success or -1 for solar-position rejection or failure of
+  the globe or natural wet-bulb solver to converge.
+- Solar rejection sets all five numerical outputs to -9999. On solver
+  non-convergence, the failed temperature and WBGT are -9999; other outputs
+  may remain valid.
+- Native inputs are forwarded without additional validation, unit conversion,
+  clamping, or missing-data policy beyond the scalar model.
+- At 2 m wind height, estimated wind is the supplied speed rounded to `float`.
 
-## Scalar ABI
+## Scalar calls
 
-The declarations in `lwbgt.h` are authoritative. Scalar floating-point inputs
-to `calc_wbgt` use `double` at the ABI boundary because the original K&R
-`float` parameters undergo default argument promotion. Output pointers remain
-`float *`.
+`calc_wbgt` accepts scalar floating-point inputs as `double` and rounds them
+at entry to `float`, matching the original K&R argument promotions. Outputs
+are `float *`. Local standard time is converted to GMT; interval centering
+subtracts half of `averaging_minutes`. Its 2 m wind output is now assigned; the original left it
+unwritten. Solar-position support remains 1950–2049 with historical date
+arithmetic. Unsupported years return -1 and initialized failure outputs.
 
-`esat` accepts temperature in kelvin. `phase == 0` computes saturation over
-liquid water; `phase == 1` computes saturation over ice. Other phase values are
-outside the supported contract.
+`esat` accepts temperature in kelvin and returns saturation pressure in hPa.
+Phase 0 selects liquid water; phase 1 selects ice. Other phases are unsupported.
 
-The original solar-position arithmetic and 1950–2049 year bound are retained.
-Years outside that range fail with status `-1` and initialized scalar failure
-outputs.
+## Ownership and concurrency
 
-## Concurrency and ownership
+Independent scalar and batch calls are thread-safe with separate output
+buffers. A batch call is serial. The API performs no allocation and retains no
+input or output pointers.
 
-The implementation has no mutable shared calculation state. Independent scalar
-or batch calls are thread-safe when callers use separate output buffers. A
-single batch call is serial and does not create threads. The API retains no
-input or output pointers after return and performs no allocation.
+## Platforms and bindings
 
-## Symbols and platforms
+GCC, Clang/AppleClang, and MinGW GCC are supported; MSVC is not. The numerical
+source builds in GNU89 mode. Linux keeps SONAME `liblwbgt.so.0` while the ABI is
+unchanged. CI tests native builds and installed C/C++ consumers.
 
-The shared library exports only:
-
-```text
-calc_wbgt
-esat
-lwbgt_calc_batch_v1
-```
-
-The shared library retains SONAME `liblwbgt.so.0` on Linux in release 1.0.0
-because the C ABI is unchanged from 0.4.3.
-
-The release CI validates Linux with GCC, macOS with AppleClang, and Windows with
-MinGW GCC. MSVC is unsupported; the numerical target is built in GNU89 mode.
-The public header is valid C and C++ and is tested through installed C and C++
-consumers.
-
-## Package bindings
-
-### Python
-
-The `lwbgt` Python distribution loads its bundled unversioned runtime through
-`importlib.resources` and `ctypes`. Its public `Input` and `Result` records map
-field-for-field to the v1 structures above. `calculate` and `calculate_batch`
-both use `lwbgt_calc_batch_v1`; the latter submits the entire iterable in one
-native call. `esat` directly exposes the scalar symbol. The binding performs no
-unit conversion, domain validation, clamping, missing-data handling, or solver
-failure substitution.
-
-### R
-
-The R package compiles a synchronized copy of the numerical source into its
-own shared library. Its registered `.Call` bridge invokes the scalar
-`calc_wbgt` and `esat` symbols. The R layer adds vector recycling, missing-value
-and domain validation, stable R-specific statuses, warnings, and `NA` result
-substitution; those policies are not part of the native ABI.
-
-### SwiftPM
-
-The `CLWBGT` SwiftPM product compiles the canonical native sources and exposes
-`lwbgt.h` directly. It is a C-library target, not an idiomatic Swift wrapper.
-Downstream SwiftPM consumption is tested on Linux and macOS.
+| Binding | Behavior |
+|---|---|
+| Python | `Input` and `Result` map to the v1 structures. Both calculation functions use the batch ABI; `esat` calls the scalar symbol. The bundled runtime loads through `ctypes` and `importlib.resources`. No extra input or failure policy. |
+| R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
+| SwiftPM | `CLWBGT` builds the canonical C sources and exposes the header directly. It is a C-library product, not a Swift wrapper. |

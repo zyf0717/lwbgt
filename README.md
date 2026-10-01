@@ -146,15 +146,8 @@ numerical target is built in GNU89 mode.
 | Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
 | Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
 
-## Licence and attribution
+## License
 
-Project-authored files are Apache-2.0 licensed. The retained upstream source
-and modified derivative remain under the UChicago Argonne Liljegren WBGT v1.1
-terms. See [LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
-and retain the acknowledgement in
-[NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) when redistributing.
-
-This project is not affiliated with or endorsed by the original authors,
-UChicago Argonne, or the U.S. Department of Energy.
+Project license: [Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for validation and Conventional Commits.

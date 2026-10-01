@@ -1,14 +1,11 @@
 # Language binding examples
 
-These dependency-light examples call the versioned `lwbgt_calc_batch_v1` C ABI.
-They demonstrate the intended integration pattern: higher-level language
-packages can bind the stable ABI while owning their user-facing policies. The
-official PyPI package under `python/lwbgt` supersedes the Python example for
-normal use. The R package under `r/` likewise supersedes the low-level R
-example. The R and Julia examples remain interoperability checks and starting
-points, with no compatibility commitment for third-party wrappers.
+These examples call `lwbgt_calc_batch_v1` through Python `ctypes`, Julia
+`ccall`, and a registered R `.Call` bridge. Use the official
+[Python](../README.md#python) or [R](../r/README.md) package for normal use;
+these examples demonstrate lower-level interoperability.
 
-Build the shared library and run every installed-language example through CTest:
+Build and run the available-language examples with CTest:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -16,7 +13,5 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-Python uses `ctypes`, Julia uses `ccall`, and R uses a small registered `.Call`
-bridge because R cannot directly marshal arrays of C structures. Missing R or
-Julia runtimes are skipped locally; use `-DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON`
-to make all three mandatory.
+Missing R or Julia runtimes are skipped. Set
+`-DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON` to require all three.

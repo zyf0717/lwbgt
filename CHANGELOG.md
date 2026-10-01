@@ -16,7 +16,8 @@
   rejected-solar-input checks and add 64 invalid/non-finite weather consistency
   cases. Preserve the numerical kernel, ABI, historical
   852-case corpus, and 840-row timing workload.
-- Document contribution checks and Conventional Commits in `CONTRIBUTING.md`.
+- Streamline project documentation and release guidance; document contribution
+  checks and Conventional Commits in `CONTRIBUTING.md`.
 
 ## v1.0.1 — 2026-10-01
 
@@ -53,8 +54,6 @@
 ## v0.4.1 — 2026-09-19
 
 - Declared the CRAN-facing R package license as standard Apache License 2.0.
-- Preserved the original UChicago Argonne license, attribution, and required
-  acknowledgement for the bundled Liljegren-derived source.
 
 ## v0.4.0 — 2026-09-18
 
@@ -84,8 +83,7 @@
 
 ## v0.2.1 — 2026-08-18
 
-- Licensed project-authored files under Apache-2.0 while preserving the
-  Liljegren-derived numerical files under their UChicago Argonne terms.
+- Licensed project-authored files under Apache-2.0.
 - Added the authoritative v1 ABI contract covering layouts, units, status and
   ownership semantics, concurrency, symbols, and compatibility policy.
 - Added an installed C++ consumer that validates public-header compatibility,

@@ -11,29 +11,21 @@
 - Compiler: GCC 13.3.0
 - Floating-point flags: `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`
 
-The 852-case compatibility comparison matches every output bit except the
-corrected direct scalar 2 m estimated wind. The 400 new cases must all succeed
-in the upstream oracle. This is sampled evidence, not a proof for all inputs.
-
-Both hashes cover the return status, estimated wind speed, `Tg`, `Tnwb`, `Tpsy`,
-WBGT, and `esat` result for every case, with every float serialized as its exact
-32-bit hexadecimal representation.
+The comparison matches every output bit except the corrected scalar 2 m wind.
+The 400 added boundary cases must converge. Hashes cover status, wind, all four
+temperatures/indices, and `esat`, with floats serialized as binary32 hexadecimal.
 
 ## v1.0.2 expanded comparison
 
-The default suite adds 35,124 WBGT cases to the historical 852, for **35,976
-WBGT oracle comparisons**. The historical generator and 840-row timing workload
-remain unchanged. All extended status and output bits match the retained
-original on Linux x86_64 with GCC 13.3.0 and Clang 18.1.3, except for the
-existing scalar 2 m wind correction. Wind height is compared after binary32
-conversion, including double inputs that round to exactly 2 m.
+The suite adds 35,124 WBGT cases for **35,976 total oracle comparisons**.
+Extended statuses and output bits match the original on Linux x86_64 with
+GCC 13.3.0 and Clang 18.1.3, except for the scalar 2 m wind correction. Height
+is compared after binary32 conversion, including doubles that round to 2 m.
 
-[expanded-baseline.json](expanded-baseline.json) records the input hashes,
-compiler settings, output hashes, and convergence counts. Its extended WBGT
-candidate hash is
-`0ff8d055116430322ec8291778a23c7ff2ccfe1f3ec3b9c4954cfed7cc39da05`.
-Both documented compiler builds produced the same recorded hashes; this does
-not imply equality across every compiler, architecture, or math library.
+[expanded-baseline.json](expanded-baseline.json) records input/output hashes,
+compiler settings, and convergence counts. Both builds produced the same
+recorded hashes; other compiler, architecture, and math-library combinations
+are not guaranteed.
 
 | Additional cohort | Cases | Oracle non-convergence | Coverage |
 |---|---:|---:|---|
@@ -85,11 +77,10 @@ Additional checks:
   through current scalar and batch calls. They cover year bounds including
   integer extremes, invalid calendar fields, and out-of-range coordinates.
 
-Native and Python-runtime probes compare against independently compiled
-retained-source probes. The installed Python wrapper checks the entire expanded
-WBGT and invalid-weather corpora against direct native batch calls. The C batch
-harness processes arbitrarily large input files in chunks of at most 1,024 rows
-and compares every field with scalar calls.
+Native and Python-runtime probes use independently compiled oracle probes.
+Installed-wheel tests check both WBGT and invalid-weather corpora against
+native batch calls. The C harness compares scalar/batch fields in chunks of
+up to 1,024 rows.
 
 Reproduce the default suites with:
 
@@ -107,8 +98,7 @@ python3 tests/compare.py compat build/lwbgt_reference_probe build/lwbgt_probe \
   build/extended-large.csv
 ```
 
-The default CTest suite took approximately three seconds on the local Linux
-machine, so the 10,000 seeded cases run in normal CI. Sample counts and seeds
-are configurable for additional investigations; preserve any new failure as a
-permanent regression. Compatibility sampling does not establish scientific
-accuracy against independent observations or prove equivalence for all inputs.
+The default suite took about three seconds locally and runs in normal CI.
+Counts and seeds are configurable; retain new failures as regressions.
+Sampling neither proves all-input equivalence nor validates scientific accuracy
+against independent observations.
