@@ -157,5 +157,3 @@ numerical target is built in GNU89 mode.
 ## License
 
 Project license: [Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE).
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for validation and Conventional Commits.
