@@ -110,6 +110,10 @@ if(BUILD_TESTING)
         )
         target_include_directories(${target} PRIVATE include)
         target_link_libraries(${target} PRIVATE ${core} m)
+        if(MINGW)
+            # MSVCRT lacks C99 formats such as %zu; use MinGW's stdio wrappers.
+            target_compile_definitions(${target} PRIVATE __USE_MINGW_ANSI_STDIO=1)
+        endif()
     endfunction()
 
     lwbgt_add_harness(lwbgt_probe tests/probe.c lwbgt)
