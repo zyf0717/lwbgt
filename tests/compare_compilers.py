@@ -96,6 +96,9 @@ def compare_outputs(reference: bytes, candidate: bytes,
     report["status_and_classification_match"] = not (
         report["status_mismatches"] or report["classification_mismatch_rows"]
     )
+    report["finite_values_match"] = not any(
+        field["max_ulp_difference"] for field in fields.values()
+    )
     return report
 
 
@@ -105,6 +108,8 @@ def main() -> None:
     parser.add_argument("candidate")
     parser.add_argument("output", type=Path)
     parser.add_argument("--cases", type=Path)
+    parser.add_argument("--exact-finite", action="store_true",
+                        help="also reject finite numerical differences (signed zeros compare equal)")
     args = parser.parse_args()
     arguments = [str(args.cases)] if args.cases else []
     reference = subprocess.check_output([args.reference, *arguments])
@@ -124,7 +129,10 @@ def main() -> None:
     report.update(reference=args.reference, candidate=args.candidate)
     args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps(report, sort_keys=True, allow_nan=False))
-    raise SystemExit(0 if report["status_and_classification_match"] else 1)
+    passed = report["status_and_classification_match"] and (
+        not args.exact_finite or report["finite_values_match"]
+    )
+    raise SystemExit(0 if passed else 1)
 
 
 if __name__ == "__main__":

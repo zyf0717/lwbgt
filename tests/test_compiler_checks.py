@@ -12,6 +12,7 @@ class CompilerChecks(unittest.TestCase):
         report = compare_outputs(b"case_id,status,Tg\na,0,3f800000\n",
                                  b"case_id,status,Tg\na,0,3f800001\n", {"a": "nominal"})
         self.assertTrue(report["status_and_classification_match"])
+        self.assertFalse(report["finite_values_match"])
         self.assertEqual(report["fields"]["Tg"]["max_ulp_difference"], 1)
         self.assertEqual(report["fields"]["Tg"]["max_absolute_difference"], 2**-23)
         self.assertEqual(report["cohorts"]["nominal"]["differing_rows"], 1)
@@ -32,6 +33,7 @@ class CompilerChecks(unittest.TestCase):
         self.assertTrue(report["status_and_classification_match"])
         self.assertEqual(report["fields"]["esat"]["different_bits"], 2)
         self.assertEqual(report["fields"]["esat"]["max_ulp_difference"], 0)
+        self.assertTrue(report["finite_values_match"])
 
     def test_missing_reordered_or_malformed_rows_fail(self):
         expected = b"case_id,status,Tg\na,0,3f800000\nb,0,3f800000\n"

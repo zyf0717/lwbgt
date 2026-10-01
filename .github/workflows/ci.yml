@@ -100,7 +100,7 @@ jobs:
           )
           foreach ($probe in $probes) {
             $comparisonArgs = @("tests/compare_compilers.py", "build/$($probe.executable).exe",
-              "build-msvc/Release/$($probe.executable).exe", "build-msvc/reports/$($probe.name).json")
+              "build-msvc/Release/$($probe.executable).exe", "build-msvc/reports/$($probe.name).json", "--exact-finite")
             if ($probe.cases) { $comparisonArgs += @("--cases", $probe.cases) }
             python @comparisonArgs
             if ($LASTEXITCODE -ne 0) { $failed = 1 }

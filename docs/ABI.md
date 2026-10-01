@@ -122,9 +122,9 @@ The Windows CI job tests MSVC with `/fp:strict`, including static and DLL APIs,
 exports, installed C/C++ consumers, and a Python wheel. MinGW first verifies
 the retained GNU89 oracle; cross-compiler reports then measure differences on
 the same runner. Status or finite/non-finite/failure-sentinel changes fail the
-comparison. Finite numerical differences are reported without a tolerance;
-this exploratory check does not establish bitwise MSVC compatibility. The
-POSIX benchmark harness and original oracle are not compiled by MSVC.
+comparison, as do finite numerical differences. Signed zeros compare equal;
+NaN payload differences are reported but allowed. The POSIX benchmark harness
+and original oracle are not compiled by MSVC.
 
 | Binding | Behavior |
 |---|---|
