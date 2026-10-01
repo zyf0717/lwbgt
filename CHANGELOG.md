@@ -17,6 +17,8 @@
   rows, with interleaved timings, call counts, and retained results.
 - Streamline project documentation and release guidance; document contribution
   checks and Conventional Commits in `CONTRIBUTING.md`.
+- Remove redundant standalone binding examples and their CMake tests; use the
+  Python and R packages and their dedicated CI for language bindings.
 
 ## v1.0.1 — 2026-10-01
 

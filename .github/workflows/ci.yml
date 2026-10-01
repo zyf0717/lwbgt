@@ -31,18 +31,23 @@ jobs:
           python-version: '3.10'
       - name: Check version coherence
         run: python tests/check_versions.py
-      - uses: r-lib/actions/setup-r@v2
+      - name: Provision standalone MinGW GCC
+        if: runner.os == 'Windows'
+        id: mingw
+        uses: egor-tensin/setup-mingw@v3
         with:
-          r-version: '4.3'
-          windows-path-include-mingw: true
-      - uses: julia-actions/setup-julia@v3
-        with:
-          version: '1.10'
+          platform: x64
+          version: 12.2.0
+      - name: Select MinGW compilers
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          "CC=${{ steps.mingw.outputs.gcc }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CXX=${{ steps.mingw.outputs.gxx }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Configure
         run: >-
           cmake -S . -B build -G Ninja
           -DCMAKE_BUILD_TYPE=Release
-          -DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON
       - name: Build
         run: cmake --build build --parallel
       - name: Test

@@ -42,7 +42,6 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-Use `-DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON` to require R and Julia runtimes.
 For Python changes, build and install a wheel in a clean environment, then run
 `python -m unittest discover -s tests/python -v`. For R changes, run
 `R CMD build r` and `R CMD check` on the archive. Run downstream SwiftPM tests
