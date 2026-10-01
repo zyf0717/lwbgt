@@ -10,6 +10,8 @@ Local verification on 2026-10-01 passed:
 - all 12 existing CTest tests on GCC 13.3 and Clang 18.1, including the
   unchanged 852-case retained-original comparisons;
 - all 17 Python tests against a rebuilt Linux wheel;
+- all 3 release-mode SwiftPM downstream consumer tests using Swift 6.2.4
+  on Linux;
 - `R CMD build r` and `R CMD check --as-cran` on R 4.6.1 with GCC and Clang,
   and on R 4.6.1 built with `--disable-long-double` (capability confirmed
   false), including the PDF manual. No errors or warnings; regular R checks
