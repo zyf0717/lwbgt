@@ -1,3 +1,33 @@
+# v1.0.2 release verification
+
+v1.0.2 expands numerical regression coverage and adds contribution guidance.
+The numerical kernel, floating-point flags, v1 ABI, historical 852-case corpus,
+and 840-row benchmark workload are unchanged.
+
+The default comparison adds 35,124 WBGT rows, 1,682 water/ice `esat` cases,
+and 996 internal stability/solar diagnostics. The WBGT rows run through both
+the static library and Python runtime; batch and installed-wheel tests also
+exercise the expanded corpus. Rejected solar inputs are checked separately
+against the current scalar and batch contracts; 64 invalid/non-finite weather
+rows separately check current-API consistency.
+
+Local verification on 2026-10-01 passed:
+
+- all 20 CTest checks under GCC 13.3.0 and Clang 18.1.3 on Linux x86_64,
+  including both expanded library comparisons and installed C/C++ consumers;
+- all 19 Python tests against a wheel rebuilt from the source distribution;
+- distribution-content checks, version coherence, and R-source synchronization;
+- all three release-mode SwiftPM consumer tests under Swift 6.2.4 on Linux;
+- `R CMD build r` and `R CMD check` on R 4.6.1, including tests and the PDF
+  manual: `Status: OK`.
+
+The extracted local Clang toolchain requires its `libomp` directory in
+`LD_LIBRARY_PATH` for the R binding example. No kernel or linker-policy change
+was needed. Reproduction details and numerical evidence are recorded in
+[BASELINE.md](BASELINE.md). Release acceptance requires green native, SwiftPM,
+wheel, and R CI on the exact candidate commit. Tagging and publication remain
+separate release steps after those gates pass.
+
 # v1.0.1 release verification
 
 v1.0.1 changes only the R test-suite tolerance for five floating-point golden

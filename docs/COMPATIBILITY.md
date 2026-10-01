@@ -3,16 +3,21 @@
 The shared library exports only `calc_wbgt`, `esat`, and
 `lwbgt_calc_batch_v1`. Independent calls with separate buffers are thread-safe;
 a batch call is serial. With matched compiler and floating-point settings, the
-852-case retained-oracle comparison found identical 32-bit values for `Tg`,
-`Tnwb`, `Tpsy`, WBGT, and `esat`. Estimated wind also matched except in direct
+35,976-case retained-oracle WBGT comparison found identical 32-bit values for
+`Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`. Estimated wind also matched except in direct
 scalar calls with wind measured at 2 m: the original left that output unwritten,
 while the derivative writes the supplied speed converted to `float`. The batch
 and R callers already initialized their 2 m estimated-wind output.
 
 The comparison covers every supported year and targeted numerical branches,
-including 400 new successful cases. It does not cover every valid input or
-every compiler and platform. The original solar-position year guard and date
-arithmetic remain in place, including their historical behavior.
+including the historical 852 rows and 35,124 additional rows (10,000 seeded).
+Separate tests cover 1,682 water/ice saturation-pressure cases and 996 internal
+stability and solar diagnostics. Convergence outcomes, seeds, ranges, and
+reproduction commands are recorded in [the baseline](../tests/BASELINE.md).
+It does not cover every valid input or every compiler and platform. The original solar-position year guard and date
+arithmetic remain in place, including their historical behavior. Non-finite
+weather inputs have separate current-API consistency tests and are excluded
+from upstream equivalence claims; see [the deviation register](DEVIATIONS.md).
 
 Package release 1.0.0 preserves this v1 calculation as the default for the
 1.x series. Future changes to defined valid-input numerical results will use

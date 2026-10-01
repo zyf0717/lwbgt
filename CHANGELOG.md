@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## v1.0.2 — 2026-10-01
+
+- Add 35,124 retained-original WBGT comparisons, including 10,000 seeded
+  nominal/stress cases, with per-cohort convergence counts and output hashes.
+- Check adjacent binary32 wind/radiation thresholds, wind-height rounding,
+  inversion signs, polar and horizon geometry, radiation clipping, UTC and
+  averaging rollover, calendar forms, and extreme thermophysical inputs.
+- Add 996 internal branch diagnostics and 1,682 water/ice saturation-pressure
+  cases, including rounding boundaries and non-finite temperatures.
+- Run extended comparisons through native and Python runtime libraries,
+  scalar/batch APIs, and the installed Python wrapper. Expand deterministic
+  rejected-solar-input checks and add 64 invalid/non-finite weather consistency
+  cases. Preserve the numerical kernel, ABI, historical
+  852-case corpus, and 840-row timing workload.
+- Document contribution checks and Conventional Commits in `CONTRIBUTING.md`.
+
 ## v1.0.1 — 2026-10-01
 
 - Use native single-precision tolerance for R test-suite golden values on

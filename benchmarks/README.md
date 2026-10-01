@@ -1,7 +1,7 @@
 # Benchmark
 
 The benchmark compares the retained original Liljegren C with the current
-kernel on the same 840 deterministic rows. The full 852-case corpus is used for
+kernel on the same 840 deterministic rows. The historical 852-case corpus is used for
 numerical comparison; timing excludes six `invalid` and six `solver-boundary`
 rows. The harness loads cases before timing, pins execution to one CPU, warms
 up each run, and consumes all outputs through a volatile checksum. The two
@@ -34,3 +34,8 @@ The workload contains no downloaded weather dataset. Its two `era5` rows are
 fixed London examples with no recorded source provenance, so that cohort is
 not evidence about ERA5-wide performance. Throughput depends on the CPU,
 compiler, and workload.
+
+The additional v1.0.2 compatibility corpus is separate from this timing
+workload. Its convergence cases and wider parameter distribution would change
+the workload and invalidate comparisons with the retained throughput report.
+See [tests/BASELINE.md](../tests/BASELINE.md) to reproduce the expanded checks.

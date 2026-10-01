@@ -31,7 +31,12 @@ notice identifying the derivative work. For the complete source diff, run
 - **Less repeated radiation work.** The psychrometric solve skips unused
   radiation calculations. Solar terms are calculated before the globe and
   natural wet-bulb iterations. The retained-oracle comparison checks that
-  these changes preserve output bits on the sampled cases.
+  these changes preserve output bits on the finite sampled compatibility cases.
+  Non-finite weather values can differ: with NaN solar input the original
+  psychrometric path fails, while the derivative can return a finite `Tpsy`
+  because it skips unused radiation work. No upstream bit-equivalence is
+  claimed for non-finite weather inputs; a separate 64-row suite checks
+  consistency between current scalar, batch, and Python runtime outputs.
 - **Isolated demonstration program.** Library builds omit the demonstration
   `main` and its I/O dependencies. The demo initializes its first, unused
   temperature difference, removing an uninitialized read. Comment repairs in
@@ -44,11 +49,14 @@ are described in the [ABI contract](ABI.md) and [input assumptions](INPUTS.md).
 
 ## Numerical checks
 
-The 852-case retained-oracle comparison includes every supported year,
+The 35,976-case retained-oracle WBGT comparison includes every supported year,
 thermophysical and wind boundaries, radiation branches, and near-`float`
 conversion inputs. On the matched GCC build, `Tg`, `Tnwb`, `Tpsy`, WBGT, and
 `esat` match bit for bit; estimated wind matches except for the corrected
-scalar 2 m output. The same corpus also matches the v1.0.0 kernel exactly.
+scalar 2 m output. The historical 852-case corpus also matches the v1.0.0
+kernel exactly.
+The additional rows, water/ice saturation tests, and internal branch diagnostics
+are documented in [the baseline](../tests/BASELINE.md).
 Batch tests check scalar equivalence and deterministic failure outputs for
 unsupported years and out-of-range solar coordinates. These sampled checks
 are not a proof for every input or compiler.

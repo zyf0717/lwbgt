@@ -66,7 +66,7 @@ kernel.
 
 ## Is lwbgt numerically identical to every Liljegren implementation?
 
-No cross-package equivalence is claimed. In an 852-case comparison with matched
+No cross-package equivalence is claimed. In a 35,976-case WBGT comparison with matched
 compiler and floating-point settings, `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`
 matched the retained original C bit for bit. When wind is measured at 2 m,
 the scalar wind output intentionally differs: it now holds the supplied speed,

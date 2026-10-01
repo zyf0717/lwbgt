@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "lwbgt"
-version = "1.0.1"
+version = "1.0.2"
 description = "Reference-compatible Liljegren outdoor wet bulb globe temperature (WBGT) kernel with C/FFI, Python, and R APIs"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -72,6 +72,7 @@ sdist.include = [
   "/examples/**",
   "/benchmarks/**",
   "/CHANGELOG.md",
+  "/CONTRIBUTING.md",
   "/CITATION.cff",
   "/docs/**",
   "/LICENSE",

@@ -20,11 +20,12 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Version: v1.0.1.** The 852-case
+**Version: v1.0.2.** The 35,976-case WBGT
 comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
-`Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
-guarantee. When wind is measured at 2 m, the scalar function now writes the
-supplied speed, rounded to `float`, to its wind output; the original left that
+`Tpsy`, WBGT, and `esat` under matched build settings. An additional 1,682
+cases compare water/ice `esat`, and 996 diagnostics check internal branches.
+These sampled comparisons are not an all-input guarantee. When wind is measured
+at 2 m, the scalar function now writes the supplied speed, rounded to `float`, to its wind output; the original left that
 output unwritten. The original 1950–2049 year range is retained. The v1
 calculation remains the default;
 future numerical revisions require explicit versioned APIs. See the
@@ -149,3 +150,5 @@ and retain the acknowledgement in
 
 This project is not affiliated with or endorsed by the original authors,
 UChicago Argonne, or the U.S. Department of Energy.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for validation and Conventional Commits.

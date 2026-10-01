@@ -1,0 +1,143 @@
+{
+  "compilers": {
+    "Clang 18.1.3": {
+      "branches": {
+        "cases": 996,
+        "sha256": "4a2d7286fe26dd7cec8fd6eb276f70ca13004eb7bf1b3162bfbfc9099af64db4",
+        "status": "bit-identical"
+      },
+      "esat": {
+        "cases": 1682,
+        "sha256": "d4409388ea0e46ee157870b37a9ead8f03fff156c5c26e5e120fee1f49a27c26",
+        "status": "bit-identical"
+      },
+      "wbgt": {
+        "candidate_sha256": "0ff8d055116430322ec8291778a23c7ff2ccfe1f3ec3b9c4954cfed7cc39da05",
+        "cases": 35124,
+        "cohorts": {
+          "geometry-extended": {
+            "failure": 0,
+            "success": 9360
+          },
+          "height-sign": {
+            "failure": 0,
+            "success": 128
+          },
+          "horizon-minute": {
+            "failure": 0,
+            "success": 2178
+          },
+          "radiation-threshold": {
+            "failure": 0,
+            "success": 150
+          },
+          "seeded-nominal": {
+            "failure": 5,
+            "success": 4995
+          },
+          "seeded-stress": {
+            "failure": 2035,
+            "success": 2965
+          },
+          "solar-clipping": {
+            "failure": 0,
+            "success": 300
+          },
+          "thermophysical-extreme": {
+            "failure": 1025,
+            "success": 2335
+          },
+          "time-calendar": {
+            "failure": 0,
+            "success": 6912
+          },
+          "wind-threshold": {
+            "failure": 0,
+            "success": 2736
+          }
+        },
+        "corrected_2m_wind_cases": 4320,
+        "reference_sha256": "510f04a335f5661468086c05478d4708fa4dca70b23f46cb1282fcc821634199",
+        "status": "bit-identical except corrected scalar 2 m wind"
+      }
+    },
+    "GCC 13.3.0": {
+      "branches": {
+        "cases": 996,
+        "sha256": "4a2d7286fe26dd7cec8fd6eb276f70ca13004eb7bf1b3162bfbfc9099af64db4",
+        "status": "bit-identical"
+      },
+      "esat": {
+        "cases": 1682,
+        "sha256": "d4409388ea0e46ee157870b37a9ead8f03fff156c5c26e5e120fee1f49a27c26",
+        "status": "bit-identical"
+      },
+      "wbgt": {
+        "candidate_sha256": "0ff8d055116430322ec8291778a23c7ff2ccfe1f3ec3b9c4954cfed7cc39da05",
+        "cases": 35124,
+        "cohorts": {
+          "geometry-extended": {
+            "failure": 0,
+            "success": 9360
+          },
+          "height-sign": {
+            "failure": 0,
+            "success": 128
+          },
+          "horizon-minute": {
+            "failure": 0,
+            "success": 2178
+          },
+          "radiation-threshold": {
+            "failure": 0,
+            "success": 150
+          },
+          "seeded-nominal": {
+            "failure": 5,
+            "success": 4995
+          },
+          "seeded-stress": {
+            "failure": 2035,
+            "success": 2965
+          },
+          "solar-clipping": {
+            "failure": 0,
+            "success": 300
+          },
+          "thermophysical-extreme": {
+            "failure": 1025,
+            "success": 2335
+          },
+          "time-calendar": {
+            "failure": 0,
+            "success": 6912
+          },
+          "wind-threshold": {
+            "failure": 0,
+            "success": 2736
+          }
+        },
+        "corrected_2m_wind_cases": 4320,
+        "reference_sha256": "510f04a335f5661468086c05478d4708fa4dca70b23f46cb1282fcc821634199",
+        "status": "bit-identical except corrected scalar 2 m wind"
+      }
+    }
+  },
+  "date": "2026-10-01",
+  "floating_point_flags": [
+    "-O2",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-fno-strict-aliasing"
+  ],
+  "input_sha256": {
+    "esat-cases.csv": "325237ffaa89a270c4d8281c57b73b73b2015afb48429c4d3c40fe26dc2e6ab0",
+    "extended-cases.csv": "346dacab91c886f499b4890e828fd44319e3b954b2160538efb88f76242e6a9f",
+    "weather-cases.csv": "398ac4144913c6311e00e0b54d57ae8bed7e4d435528a268f4b1d460d8c1e983"
+  },
+  "oracle_blob": "7bc6e6ddd76a538d6454b27e9b252667846e6c9b",
+  "platform": "Linux x86_64",
+  "release": "1.0.2",
+  "seed": 20261001,
+  "seeded_rows": 10000
+}

@@ -1,3 +1,9 @@
+# lwbgt 1.0.2
+
+- Synchronize the project version after expanding retained-original numerical
+  comparisons and documenting contribution guidelines. The R API and native
+  numerical kernel are unchanged.
+
 # lwbgt 1.0.1
 
 - Relax R test-suite golden-value comparisons to native single-precision

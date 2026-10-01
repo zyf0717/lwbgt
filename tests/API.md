@@ -75,3 +75,17 @@ viscosity
 They remain link-visible because the static archive preserves the source-derived
 structure; they are not declared by the installed header and are not supported
 API.
+
+As of v1.0.2, `native_extended_compatibility` and
+`python_runtime_extended_compatibility` add 35,124 oracle comparisons.
+`extended_batch_equivalence` streams those rows in batches of up to 1,024,
+checking every output bit against scalar calls; the installed-wheel suite also
+checks all extended rows. Water/ice `esat` probes exercise both library targets.
+The static-library branch diagnostic checks internal stability thresholds and
+adjacent solar-horizon/clipping inputs; it does not expand the supported API.
+
+A separate 64-row invalid/non-finite weather corpus checks current scalar,
+batch, and installed Python outputs. It is excluded from upstream equivalence:
+unused radiation work can affect the original psychrometric solver on NaN
+solar inputs. Rejected solar-input contract tests now cover 18 year, calendar,
+and coordinate cases through both scalar and batch calls.

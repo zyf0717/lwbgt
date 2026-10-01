@@ -19,6 +19,7 @@ SDIST_BUILD_FILES = {
     "CMakeLists.txt",
     "pyproject.toml",
     "README.md",
+    "CONTRIBUTING.md",
     "docs/ABI.md",
     "docs/COMPATIBILITY.md",
     "docs/COMPARISON.md",
@@ -40,6 +41,9 @@ SDIST_BUILD_FILES = {
     "r/src/lwbgt.h",
     "r/src/lwbgt_r.c",
     "tests/swiftpm/Package.swift",
+    "tests/generate_extended_cases.py",
+    "tests/branch_probe.c",
+    "tests/esat_probe.c",
     "tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",
 }
 
