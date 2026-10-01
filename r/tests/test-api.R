@@ -2,6 +2,14 @@
 
 library(lwbgt)
 
+assert_float_equal <- function(actual, expected) {
+    stopifnot(isTRUE(all.equal(
+        actual,
+        expected,
+        tolerance = 2^-23 # Native C float precision (IEEE binary32 epsilon).
+    )))
+}
+
 assert_error <- function(expr) {
     failed <- tryCatch({
         force(expr)
@@ -74,9 +82,9 @@ stopifnot(
         )
     ),
     singapore_result$status == 0L,
-    singapore_result$status_message == "ok",
-    identical(singapore_result$wbgt_c, 32.50229263305664)
+    singapore_result$status_message == "ok"
 )
+assert_float_equal(singapore_result$wbgt_c, 32.50229263305664)
 
 night <- singapore
 night$hour <- 2
@@ -94,9 +102,9 @@ batch_result <- calculate(batch)
 stopifnot(
     identical(batch_result$status, c(0L, 0L)),
     identical(row.names(batch_result), c("day", "night")),
-    identical(batch_result$wbgt_c[[1L]], singapore_result$wbgt_c[[1L]]),
-    identical(batch_result$wbgt_c[[2L]], 25.700485229492188)
+    identical(batch_result$wbgt_c[[1L]], singapore_result$wbgt_c[[1L]])
 )
+assert_float_equal(batch_result$wbgt_c[[2L]], 25.700485229492188)
 
 recycled_arguments <- as.list(singapore)
 recycled_arguments$year <- c(2023, 2024)
@@ -214,10 +222,10 @@ stopifnot(
     all(is.na(solver_result[3:7]))
 )
 
+assert_float_equal(esat(273.15), 6.136545658111572)
+assert_float_equal(esat(273.15, 1L), 6.1359429359436035)
+assert_float_equal(esat(c(273.15, NA_real_)), c(6.136545658111572, NA_real_))
 stopifnot(
-    identical(esat(273.15), 6.136545658111572),
-    identical(esat(273.15, 1L), 6.1359429359436035),
-    identical(esat(c(273.15, NA_real_)), c(6.136545658111572, NA_real_)),
     identical(esat(numeric(), integer()), numeric()),
     length(esat(c(273.15, 273.15), 0L)) == 2L
 )

@@ -1,6 +1,6 @@
 # lwbgt vs pywbgt vs thermofeel
 
-This page compares the documented public scope of `lwbgt` 1.0.0, `pywbgt`
+This page compares the documented public scope of `lwbgt` 1.0.1, `pywbgt`
 3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22;
 the lwbgt entry was updated on 2026-09-23. It is a package selection guide, not
 a numerical benchmark or a claim that similarly named methods produce

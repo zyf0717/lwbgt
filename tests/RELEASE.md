@@ -1,3 +1,31 @@
+# v1.0.1 release verification
+
+v1.0.1 changes only the R test-suite tolerance for five floating-point golden
+values, plus synchronized release metadata. Native calculations, compiler
+flags, and the exact native oracle tests are unchanged.
+
+Local verification on 2026-10-01 passed:
+
+- version coherence and R-source synchronization;
+- all 12 existing CTest tests on GCC 13.3 and Clang 18.1, including the
+  unchanged 852-case retained-original comparisons;
+- all 17 Python tests against a rebuilt Linux wheel;
+- all 3 release-mode SwiftPM downstream consumer tests using Swift 6.2.4
+  on Linux;
+- `R CMD build r` and `R CMD check --as-cran` on R 4.6.1 with GCC and Clang,
+  and on R 4.6.1 built with `--disable-long-double` (capability confirmed
+  false), including the PDF manual. No errors or warnings; regular R checks
+  report two NOTEs (recent CRAN update and an installed-R compiler flag),
+  while the noLD check reports only the recent-update NOTE.
+
+The original R test suite reproduces the exact `esat(273.15, 1L)` assertion
+failure under noLD; the updated suite passes. The tolerance is IEEE binary32
+epsilon, `2^-23`, because R does not expose `.Machine$single.eps`.
+
+Release acceptance requires green native, SwiftPM, wheel, and R CI on the
+exact candidate commit, plus a successful CRAN-hosted noLD rerun. Create the
+annotated release tag and publish only after the candidate gates pass.
+
 # v1.0.0 release verification
 
 v1.0.0 stabilizes the existing reference-compatible v1 calculation and public

@@ -31,15 +31,15 @@ Argonne terms documented in the installed legal files.
    python tests/check_r_sources.py
    python tests/check_distribution.py dist/*
    python -m twine check dist/*
-   R CMD check lwbgt_1.0.0.tar.gz
+   R CMD check lwbgt_1.0.1.tar.gz
    ```
 
 4. Create and push an annotated or signed tag only after every release gate
    passes:
 
    ```sh
-   git tag -s v1.0.0 -m "lwbgt v1.0.0"
-   git push origin v1.0.0
+   git tag -s v1.0.1 -m "lwbgt v1.0.1"
+   git push origin v1.0.1
    ```
 
 5. The tag workflow reruns the complete R and Python artifact gates, publishes

@@ -20,7 +20,7 @@ and application defaults to callers. For a higher-level Python workflow,
 consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
 [`thermofeel`](https://pypi.org/project/thermofeel/).
 
-**Version: v1.0.0.** The 852-case
+**Version: v1.0.1.** The 852-case
 comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
 `Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
 guarantee. When wind is measured at 2 m, the scalar function now writes the

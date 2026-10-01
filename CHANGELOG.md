@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v1.0.1 — 2026-10-01
+
+- Use native single-precision tolerance for R test-suite golden values on
+  builds without long-double support.
+
 ## v1.0.0 — 2026-09-25
 
 - Stabilized the existing reference-compatible v1 calculation and public C/FFI,
