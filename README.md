@@ -93,6 +93,25 @@ install.packages("remotes", repos = "https://cloud.r-project.org")
 remotes::install_github("zyf0717/lwbgt/r@*release", upgrade = "never")
 ```
 
+```r
+library(lwbgt)
+
+weather <- lwbgt_input(
+    year = 2024, month = 4, day = 15, hour = 14, minute = 30,
+    gmt_offset_hours = 8, averaging_minutes = 60, urban = 1,
+    latitude_deg_north = 1.3521, longitude_deg_east = 103.8198,
+    solar_w_m2 = 742.0, pressure_hpa = 1008.4,
+    air_temperature_c = 32.1, relative_humidity_percent = 68.0,
+    wind_speed_m_s = 2.8, wind_height_m = 10.0,
+    vertical_temperature_difference_c = 1
+)
+
+result <- calculate(weather)
+stopifnot(result$status == 0)
+print(result$wbgt_c)
+print(esat(273.15, phase = 0))
+```
+
 The R API provides `lwbgt_input()`, `calculate()`, and `esat()`. It returns
 ordinary data frames, recycles scalar constructor arguments, and isolates
 invalid or non-convergent rows. See the
@@ -100,15 +119,19 @@ invalid or non-convergent rows. See the
 
 ## SwiftPM
 
-Add the package and its C-library product to a Swift target:
+Add `CLWBGT` as a target dependency in `Package.swift`:
 
 ```swift
+// swift-tools-version: 5.9
+import PackageDescription
+
 let package = Package(
+    name: "WeatherService",
     dependencies: [
         .package(url: "https://github.com/zyf0717/lwbgt.git", from: "1.0.0"),
     ],
     targets: [
-        .target(
+        .executableTarget(
             name: "WeatherService",
             dependencies: [
                 .product(name: "CLWBGT", package: "lwbgt"),
@@ -118,13 +141,31 @@ let package = Package(
 )
 ```
 
+In `Sources/WeatherService/main.swift`:
+
 ```swift
 import CLWBGT
+
+var weather = lwbgt_input_v1(
+    year: 2024, month: 4, day: 15, hour: 14, minute: 30,
+    gmt_offset_hours: 8, averaging_minutes: 60, urban: 1,
+    latitude_deg_north: 1.3521, longitude_deg_east: 103.8198,
+    solar_w_m2: 742.0, pressure_hpa: 1008.4,
+    air_temperature_c: 32.1, relative_humidity_percent: 68.0,
+    wind_speed_m_s: 2.8, wind_height_m: 10.0,
+    vertical_temperature_difference_c: 1
+)
+var result = lwbgt_output_v1()
+let status = lwbgt_calc_batch_v1(&weather, &result, 1)
+precondition(status == Int32(LWBGT_BATCH_OK))
+precondition(result.status == 0)
+print(result.wbgt_c)
+print(esat(273.15, 0))
 ```
 
-`CLWBGT` exposes `lwbgt.h` directly; it is not an idiomatic Swift wrapper.
-SwiftPM builds the canonical C sources without vendoring or generated copies.
-Linux and macOS downstream consumption are tested in release mode.
+`CLWBGT` exposes the C structs and functions directly. Check both the call's
+return code and the result's status. SwiftPM builds the canonical C sources;
+downstream consumption is tested on Linux and macOS in release mode.
 
 ## Native C
 
@@ -153,7 +194,3 @@ numerical target is built in GNU89 mode.
 | Source changes | [Deviations from original Liljegren C](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md) |
 | Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
 | Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
-
-## License
-
-Project license: [Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE).
