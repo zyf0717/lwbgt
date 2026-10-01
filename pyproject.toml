@@ -68,7 +68,6 @@ sdist.include = [
   "/python/**",
   "/r/**",
   "/tests/**",
-  "/examples/**",
   "/benchmarks/**",
   "/CHANGELOG.md",
   "/CONTRIBUTING.md",

@@ -5,9 +5,6 @@ include(CTest)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-option(LWBGT_BUILD_BINDING_TESTS "Build tests for the Python, R, and Julia examples" ON)
-option(LWBGT_REQUIRE_ALL_BINDING_TESTS "Fail if a binding-test runtime is unavailable" OFF)
-
 if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     message(FATAL_ERROR
         "lwbgt requires GCC, Clang, AppleClang, or MinGW GCC; MSVC cannot compile the preserved GNU89 source"
@@ -113,6 +110,10 @@ if(BUILD_TESTING)
         )
         target_include_directories(${target} PRIVATE include)
         target_link_libraries(${target} PRIVATE ${core} m)
+        if(MINGW)
+            # MSVCRT lacks C99 formats such as %zu; use MinGW's stdio wrappers.
+            target_compile_definitions(${target} PRIVATE __USE_MINGW_ANSI_STDIO=1)
+        endif()
     endfunction()
 
     lwbgt_add_harness(lwbgt_probe tests/probe.c lwbgt)
@@ -217,103 +218,6 @@ if(BUILD_TESTING)
                 "${CMAKE_SYSTEM_NAME}" "$<TARGET_FILE:lwbgt_python>"
                 "${CMAKE_NM}" "${CMAKE_OBJDUMP}"
     )
-
-    if(LWBGT_BUILD_BINDING_TESTS)
-        find_program(LWBGT_R_EXECUTABLE NAMES R)
-        find_program(LWBGT_RSCRIPT_EXECUTABLE NAMES Rscript)
-        find_program(LWBGT_JULIA_EXECUTABLE NAMES julia)
-        if(LWBGT_REQUIRE_ALL_BINDING_TESTS AND
-           (NOT LWBGT_R_EXECUTABLE OR NOT LWBGT_RSCRIPT_EXECUTABLE OR NOT LWBGT_JULIA_EXECUTABLE))
-            message(FATAL_ERROR "Python, R, Rscript, and Julia are required for binding tests")
-        endif()
-
-        add_test(
-            NAME python_binding_example
-            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/examples/python/example.py"
-                    "$<TARGET_FILE:lwbgt_shared>"
-        )
-
-        if(LWBGT_JULIA_EXECUTABLE)
-            add_test(
-                NAME julia_binding_example
-                COMMAND "${LWBGT_JULIA_EXECUTABLE}"
-                        "${CMAKE_CURRENT_SOURCE_DIR}/examples/julia/example.jl"
-                        "$<TARGET_FILE:lwbgt_shared>"
-            )
-        else()
-            message(STATUS "Julia not found; skipping the Julia binding example")
-        endif()
-
-        if(LWBGT_R_EXECUTABLE AND LWBGT_RSCRIPT_EXECUTABLE)
-            if(APPLE)
-                get_filename_component(
-                    LWBGT_R_REAL_EXECUTABLE "${LWBGT_R_EXECUTABLE}" REALPATH
-                )
-                get_filename_component(LWBGT_R_BIN_DIR "${LWBGT_R_REAL_EXECUTABLE}" DIRECTORY)
-                find_path(LWBGT_R_INCLUDE_DIR R.h
-                    HINTS
-                        /Library/Frameworks/R.framework/Resources/include
-                        "${LWBGT_R_BIN_DIR}/../include"
-                        /Applications/R.app/Contents/Resources/include
-                    NO_DEFAULT_PATH
-                )
-                find_library(LWBGT_R_LIBRARY R
-                    HINTS
-                        /Library/Frameworks/R.framework/Resources/lib
-                        "${LWBGT_R_BIN_DIR}/../lib"
-                        /Applications/R.app/Contents/Resources/lib
-                    NO_DEFAULT_PATH
-                )
-                if(NOT LWBGT_R_INCLUDE_DIR OR NOT LWBGT_R_LIBRARY)
-                    message(FATAL_ERROR "Cannot locate the macOS R headers and runtime library")
-                endif()
-                set(LWBGT_R_CPPFLAGS_LIST "-I${LWBGT_R_INCLUDE_DIR}")
-                set(LWBGT_R_LIBRARIES "${LWBGT_R_LIBRARY}")
-            else()
-                execute_process(
-                    COMMAND "${LWBGT_R_EXECUTABLE}" CMD config --cppflags
-                    OUTPUT_VARIABLE LWBGT_R_CPPFLAGS
-                    OUTPUT_STRIP_TRAILING_WHITESPACE
-                    RESULT_VARIABLE LWBGT_R_CPPFLAGS_RESULT
-                )
-                execute_process(
-                    COMMAND "${LWBGT_R_EXECUTABLE}" CMD config --ldflags
-                    OUTPUT_VARIABLE LWBGT_R_LDFLAGS
-                    OUTPUT_STRIP_TRAILING_WHITESPACE
-                    RESULT_VARIABLE LWBGT_R_LDFLAGS_RESULT
-                )
-                if(NOT LWBGT_R_CPPFLAGS_RESULT EQUAL 0 OR NOT LWBGT_R_LDFLAGS_RESULT EQUAL 0)
-                    message(FATAL_ERROR "R CMD config failed while preparing the R binding example")
-                endif()
-                separate_arguments(LWBGT_R_CPPFLAGS_LIST NATIVE_COMMAND "${LWBGT_R_CPPFLAGS}")
-                separate_arguments(LWBGT_R_LDFLAGS_LIST NATIVE_COMMAND "${LWBGT_R_LDFLAGS}")
-            endif()
-
-            add_library(lwbgt_r_example MODULE examples/r/lwbgt_r.c)
-            target_compile_features(lwbgt_r_example PRIVATE c_std_11)
-            target_compile_options(lwbgt_r_example PRIVATE ${LWBGT_R_CPPFLAGS_LIST})
-            target_link_options(lwbgt_r_example PRIVATE ${LWBGT_R_LDFLAGS_LIST})
-            target_link_libraries(lwbgt_r_example PRIVATE lwbgt_shared ${LWBGT_R_LIBRARIES})
-            set_target_properties(lwbgt_r_example PROPERTIES
-                PREFIX ""
-                OUTPUT_NAME lwbgt_r_example
-            )
-            if(WIN32)
-                set_target_properties(lwbgt_r_example PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-            endif()
-            add_test(
-                NAME r_binding_example
-                COMMAND "${LWBGT_RSCRIPT_EXECUTABLE}"
-                        "${CMAKE_CURRENT_SOURCE_DIR}/examples/r/example.R"
-                        "$<TARGET_FILE:lwbgt_r_example>"
-            )
-            set_tests_properties(r_binding_example PROPERTIES
-                WORKING_DIRECTORY "$<TARGET_FILE_DIR:lwbgt_shared>"
-            )
-        else()
-            message(STATUS "R not found; skipping the R binding example")
-        endif()
-    endif()
 
     add_test(
         NAME installed_consumer

@@ -37,5 +37,5 @@ comparison and its limits.
 ## Which languages are supported?
 
 C/C++ through the native ABI, Python and R through official bindings, and
-Swift through the `CLWBGT` SwiftPM product. [Examples](../examples/README.md)
-also demonstrate Julia and lower-level bindings.
+Swift through the `CLWBGT` SwiftPM product. See the
+[README](../README.md) for installation and usage.

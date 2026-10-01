@@ -70,31 +70,6 @@ def _library_resource() -> Any:
 
 
 def _configure_library(library: ctypes.CDLL) -> None:
-    library.calc_wbgt.argtypes = (
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_int,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_double,
-        ctypes.c_int,
-        ctypes.POINTER(ctypes.c_float),
-        ctypes.POINTER(ctypes.c_float),
-        ctypes.POINTER(ctypes.c_float),
-        ctypes.POINTER(ctypes.c_float),
-        ctypes.POINTER(ctypes.c_float),
-    )
-    library.calc_wbgt.restype = ctypes.c_int
     library.esat.argtypes = (ctypes.c_double, ctypes.c_int)
     library.esat.restype = ctypes.c_float
     library.lwbgt_calc_batch_v1.argtypes = (
