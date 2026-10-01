@@ -1,3 +1,8 @@
+# lwbgt 1.0.1
+
+- Relax R test-suite golden-value comparisons to native single-precision
+  tolerance for portability to R builds without long-double support.
+
 # lwbgt 1.0.0
 
 - Stabilized the existing R interface and reference-compatible native v1

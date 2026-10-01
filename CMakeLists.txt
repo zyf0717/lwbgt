@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(lwbgt VERSION 1.0.0 LANGUAGES C)
+project(lwbgt VERSION 1.0.1 LANGUAGES C)
 
 include(CTest)
 include(GNUInstallDirs)
