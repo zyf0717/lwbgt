@@ -28,5 +28,5 @@ skipping unused radiation work. Those inputs have separate current-API
 consistency checks and no upstream bit-equivalence claim.
 
 [BASELINE.md](../tests/BASELINE.md) records the finite-input oracle comparisons
-and failure tests. The historical 852 cases also match the v1.0.0 kernel
-exactly. [ABI.md](ABI.md) defines the public interface and failure contract.
+and failure tests. [ABI.md](ABI.md) defines the public interface and failure
+contract.

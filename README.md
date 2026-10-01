@@ -26,16 +26,18 @@ series. Changes to defined valid-input numerical results require explicit
 versioned APIs, with v1 still available. The original solar-position year
 range, 1950–2049, is retained.
 
-Under matched build settings, 35,976 WBGT cases match the retained original C
-bit for bit for `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`. Another 1,682 cases check
-water/ice `esat`, and 996 diagnostics check internal branches. These sampled
-comparisons do not guarantee equivalence for every input or platform.
+Under matched build settings, the 35,976-row WBGT corpus matches the retained
+original C bit for bit for `Tg`, `Tnwb`, `Tpsy`, WBGT, and `esat`. Another
+1,682 cases check water/ice `esat`, and 996 diagnostics check internal branches.
+These sampled comparisons do not guarantee equivalence for every input or
+platform.
 
 The original scalar binary ABI is preserved. The intentional output correction
 is estimated wind at 2 m: the scalar function now writes the supplied speed,
 rounded to `float`; the original left that output unwritten. See
 [compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md)
-for the comparison scope and limitations.
+for the comparison scope and limitations. The same corpus provides the
+[1×/10× throughput benchmark](benchmarks/README.md).
 
 ## Python
 

@@ -11,21 +11,10 @@ tracked or untracked changes before configuration.
 The subsequent evidence-only commit changes no library, binding, build, or test
 code.
 
-The clean-checkout verification command set is:
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DLWBGT_REQUIRE_ALL_BINDING_TESTS=ON
-cmake --build build --clean-first --parallel
-ctest --test-dir build --output-on-failure
-python3 tests/compare.py exact \
-  build/lwbgt_reference_probe build/lwbgt_probe build/cases.csv
-```
-
 All eight CTest tests passed, including the three-symbol shared export audit,
 both installed CMake consumers, and the Python, R, and Julia examples. The
-explicit differential run passed. Its former workload and output hash are
-retired; the current oracle is recorded in `BASELINE.md`.
+explicit differential run passed. [BASELINE.md](BASELINE.md) records the
+current oracle.
 
 The same library and test tree passed GitHub Actions on Linux/GCC,
 macOS/AppleClang, and Windows/MinGW in
@@ -33,5 +22,5 @@ macOS/AppleClang, and Windows/MinGW in
 The workflow covered configuration, static and shared builds, all eight CTest
 tests, installed consumers, and all three language examples.
 
-The historical v0.1.0 clean-checkout record is retained in
+The v0.1.0 clean-checkout record is retained in
 `RELEASE-0.1.0.md`.

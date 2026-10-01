@@ -6,8 +6,10 @@ Use the workflow definitions as the source of truth for supported platforms.
 ## Prepare
 
 Update version metadata, `CHANGELOG.md`, `r/NEWS.md`, and `tests/RELEASE.md`.
-Run the checks in [CONTRIBUTING.md](../CONTRIBUTING.md), then verify the CI
-artifacts:
+Run the checks in [CONTRIBUTING.md](../CONTRIBUTING.md). For kernel or corpus
+changes, refresh the [numerical baseline](../tests/BASELINE.md) and
+[throughput results](../benchmarks/README.md) using matched builds. Verify the
+CI artifacts:
 
 ```sh
 python3 tests/check_versions.py

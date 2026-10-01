@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""Run byte-exact differential tests and interleaved throughput comparisons."""
+"""Run byte-exact differential tests against the retained original."""
 
 from __future__ import annotations
 
 import csv
 import hashlib
 import json
-import statistics
 import struct
 import subprocess
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 SUCCESS_COHORTS = {
-    "year-sweep", "calendar-boundary", "solar-geometry", "wind-stability",
+    "year-sweep", "calendar-boundary", "solar-height2", "wind-stability",
     "thermophysical", "float-conversion",
     "wind-threshold", "radiation-threshold", "height-sign",
-    "geometry-extended", "horizon-minute", "solar-clipping", "time-calendar",
+    "solar-global", "horizon-minute", "solar-clipping", "time-calendar",
 }
 
 
@@ -100,61 +98,6 @@ def compatibility(reference: str, candidate: str, cases: str) -> None:
     }, sort_keys=True))
 
 
-def measured(executable: str, cases: str, iterations: int) -> dict[str, float]:
-    payload = json.loads(run([executable, cases, str(iterations)]))
-    return {key: float(value) for key, value in payload["rows_per_second"].items()}
-
-
-def benchmark(reference: str, candidate: str, cases: str, output: str,
-              repetitions: int, iterations: int) -> None:
-    samples: dict[str, dict[str, list[float]]] = {
-        "reference": defaultdict(list), "candidate": defaultdict(list)
-    }
-    for repetition in range(repetitions):
-        order = (("reference", reference), ("candidate", candidate))
-        if repetition % 2:
-            order = tuple(reversed(order))
-        for name, executable in order:
-            for cohort, rate in measured(executable, cases, iterations).items():
-                samples[name][cohort].append(rate)
-
-    cohorts: dict[str, object] = {}
-    passed = True
-    for cohort in sorted(samples["reference"]):
-        reference_values = samples["reference"][cohort]
-        candidate_values = samples["candidate"][cohort]
-        reference_median = statistics.median(reference_values)
-        candidate_median = statistics.median(candidate_values)
-        speedup = candidate_median / reference_median
-        floor = 1.20 if cohort == "overall" else 0.98
-        cohort_passed = speedup >= floor
-        passed &= cohort_passed
-        cohorts[cohort] = {
-            "candidate_median_rows_s": candidate_median,
-            "candidate_relative_mad": statistics.median(
-                abs(value - candidate_median) for value in candidate_values
-            ) / candidate_median,
-            "gate": floor,
-            "passed": cohort_passed,
-            "reference_median_rows_s": reference_median,
-            "reference_relative_mad": statistics.median(
-                abs(value - reference_median) for value in reference_values
-            ) / reference_median,
-            "speedup": speedup,
-        }
-    report = {
-        "cohorts": cohorts,
-        "iterations_per_case": iterations,
-        "method": "single-thread, pinned CPU, one warm-up, interleaved executions",
-        "passed": passed,
-        "repetitions": repetitions,
-    }
-    Path(output).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(report, sort_keys=True))
-    if not passed:
-        raise SystemExit(1)
-
-
 def main() -> None:
     if len(sys.argv) in (4, 5) and sys.argv[1] == "exact":
         exact(sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) == 5 else None)
@@ -162,14 +105,9 @@ def main() -> None:
     if len(sys.argv) == 5 and sys.argv[1] == "compat":
         compatibility(sys.argv[2], sys.argv[3], sys.argv[4])
         return
-    if len(sys.argv) == 8 and sys.argv[1] == "benchmark":
-        benchmark(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],
-                  int(sys.argv[6]), int(sys.argv[7]))
-        return
     raise SystemExit(
         "usage: compare.py exact REF CANDIDATE [CASES] | "
-        "compare.py compat REF CANDIDATE CASES | "
-        "compare.py benchmark REF CANDIDATE CASES OUT REPS ITERATIONS"
+        "compare.py compat REF CANDIDATE CASES"
     )
 
 

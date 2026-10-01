@@ -20,14 +20,16 @@ seeds, convergence counts, hashes, and reproduction commands.
 These are sampled checks, not an all-input or all-platform guarantee.
 Non-finite weather inputs have separate API consistency tests; their outputs
 can differ from the original. See [DEVIATIONS.md](DEVIATIONS.md). The original
-1950–2049 year guard and historical date arithmetic are retained.
+1950–2049 year guard and original date arithmetic are retained.
 
 ## Performance
 
-The fixed 840-row benchmark measured **1.603×** median throughput against the
-retained original on GCC 13.3.0 with execution pinned to one CPU; all cohort
-gates passed. Its weather-labeled rows are synthetic examples, not a verified
-dataset extract. Results depend on hardware, compiler, and workload.
+Throughput comparisons use the same 35,976-row corpus at 1× and 10×:
+35,976 and 359,760 scalar calls per measured run. All rows are timed,
+including convergence failures. The current kernel measured about
+1.60× throughput at both scales on GCC 13.3.0 with one pinned CPU. Results
+depend on hardware, compiler, and workload; these synthetic inputs are not
+observed weather.
 
 [benchmarks/README.md](../benchmarks/README.md) records the method and results.
 [ABI.md](ABI.md) defines the public layouts, symbols, and API guarantees.

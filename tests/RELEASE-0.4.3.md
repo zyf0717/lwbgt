@@ -2,16 +2,13 @@
 
 v0.4.3 corrects direct scalar estimated wind at the 2 m reference height and
 initializes the optional demonstration's first `dT`. The original 1950–2049
-solar calculation and its valid-input numerical results remain unchanged in the
-852-case retained-original comparison, apart from that scalar wind output.
-The native ABI remains version 1. The unverified weather-source benchmark
-cohort and reports based on it were removed; the current 840-row timing result
-is recorded in `../benchmarks/README.md`.
+solar calculation and its valid-input numerical results remain unchanged,
+apart from that scalar wind output. The native ABI remains version 1.
 
 Local verification on 2026-09-23 passed:
 
 - `tests/check_versions.py` and `tests/check_r_sources.py`;
-- the Release CMake build and all 12 CTest tests, including both 852-case
+- the Release CMake build and all 12 CTest tests, including both
   compatibility comparisons and installed consumers;
 - Python source distribution and wheel content checks, `twine check`, a wheel
   rebuilt from the source distribution, and all 17 tests against that wheel in

@@ -148,10 +148,13 @@ if(BUILD_TESTING)
     target_link_libraries(lwbgt_demo PRIVATE m)
 
     set(LWBGT_CASES "${CMAKE_CURRENT_BINARY_DIR}/cases.csv")
+    set(LWBGT_ESAT_CASES "${CMAKE_CURRENT_BINARY_DIR}/esat-cases.csv")
+    set(LWBGT_WEATHER_CASES "${CMAKE_CURRENT_BINARY_DIR}/weather-cases.csv")
     add_test(
         NAME generate_cases
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/generate_cases.py"
-                "${LWBGT_CASES}"
+                "${LWBGT_CASES}" --esat-output "${LWBGT_ESAT_CASES}"
+                --weather-output "${LWBGT_WEATHER_CASES}"
     )
     add_test(
         NAME r_source_sync
@@ -174,42 +177,28 @@ if(BUILD_TESTING)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)
-    set(LWBGT_EXTENDED_CASES "${CMAKE_CURRENT_BINARY_DIR}/extended-cases.csv")
-    set(LWBGT_ESAT_CASES "${CMAKE_CURRENT_BINARY_DIR}/esat-cases.csv")
-    set(LWBGT_WEATHER_CASES "${CMAKE_CURRENT_BINARY_DIR}/weather-cases.csv")
-    add_test(
-        NAME generate_extended_cases
-        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/generate_extended_cases.py"
-                "${LWBGT_EXTENDED_CASES}" --esat-output "${LWBGT_ESAT_CASES}"
-                --weather-output "${LWBGT_WEATHER_CASES}"
-    )
     foreach(runtime IN ITEMS native python_runtime)
         if(runtime STREQUAL "native")
-            set(probe lwbgt_probe)
             set(esat_probe lwbgt_esat_probe)
         else()
-            set(probe lwbgt_python_probe)
             set(esat_probe lwbgt_python_esat_probe)
         endif()
-        add_test(
-            NAME ${runtime}_extended_compatibility
-            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
-                    compat "$<TARGET_FILE:lwbgt_reference_probe>" "$<TARGET_FILE:${probe}>"
-                    "${LWBGT_EXTENDED_CASES}"
-        )
         add_test(
             NAME ${runtime}_esat_equivalence
             COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
                     exact "$<TARGET_FILE:lwbgt_reference_esat_probe>" "$<TARGET_FILE:${esat_probe}>"
                     "${LWBGT_ESAT_CASES}"
         )
-        set_tests_properties(${runtime}_extended_compatibility ${runtime}_esat_equivalence
-            PROPERTIES DEPENDS generate_extended_cases)
+        set_tests_properties(${runtime}_esat_equivalence
+            PROPERTIES DEPENDS generate_cases)
     endforeach()
-    add_test(NAME extended_batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_EXTENDED_CASES}")
-    set_tests_properties(extended_batch_equivalence PROPERTIES DEPENDS generate_extended_cases)
     add_test(NAME invalid_weather_batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_WEATHER_CASES}")
-    set_tests_properties(invalid_weather_batch_equivalence PROPERTIES DEPENDS generate_extended_cases)
+    set_tests_properties(invalid_weather_batch_equivalence PROPERTIES DEPENDS generate_cases)
+    add_test(
+        NAME benchmark_accounting
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_benchmark.py"
+                "$<TARGET_FILE:lwbgt_reference_benchmark>" "$<TARGET_FILE:lwbgt_benchmark>"
+    )
     add_test(
         NAME demo_smoke
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_demo.py"

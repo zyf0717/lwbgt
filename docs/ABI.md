@@ -90,7 +90,7 @@ int lwbgt_calc_batch_v1(
 at entry to `float`, matching the original K&R argument promotions. Outputs
 are `float *`. Local standard time is converted to GMT; interval centering
 subtracts half of `averaging_minutes`. Its 2 m wind output is now assigned; the original left it
-unwritten. Solar-position support remains 1950–2049 with historical date
+unwritten. Solar-position support remains 1950–2049 with the original date
 arithmetic. Unsupported years return -1 and initialized failure outputs.
 
 `esat` accepts temperature in kelvin and returns saturation pressure in hPa.

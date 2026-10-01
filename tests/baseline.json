@@ -12,12 +12,28 @@
         "status": "bit-identical"
       },
       "wbgt": {
-        "candidate_sha256": "0ff8d055116430322ec8291778a23c7ff2ccfe1f3ec3b9c4954cfed7cc39da05",
-        "cases": 35124,
+        "candidate_sha256": "1de32a0d6ed1a612946e0edb134d52519d7a1c368e6cd15c5af1fbb8610b5345",
+        "cases": 35976,
         "cohorts": {
-          "geometry-extended": {
+          "calendar-boundary": {
             "failure": 0,
-            "success": 9360
+            "success": 52
+          },
+          "domain-edge": {
+            "failure": 2,
+            "success": 2
+          },
+          "finite-invalid": {
+            "failure": 3,
+            "success": 3
+          },
+          "fixed-weather": {
+            "failure": 0,
+            "success": 2
+          },
+          "float-conversion": {
+            "failure": 0,
+            "success": 8
           },
           "height-sign": {
             "failure": 0,
@@ -26,6 +42,18 @@
           "horizon-minute": {
             "failure": 0,
             "success": 2178
+          },
+          "interactions": {
+            "failure": 0,
+            "success": 432
+          },
+          "known-answer": {
+            "failure": 0,
+            "success": 2
+          },
+          "pressure-boundary": {
+            "failure": 6,
+            "success": 0
           },
           "radiation-threshold": {
             "failure": 0,
@@ -43,6 +71,18 @@
             "failure": 0,
             "success": 300
           },
+          "solar-global": {
+            "failure": 0,
+            "success": 9360
+          },
+          "solar-height2": {
+            "failure": 0,
+            "success": 96
+          },
+          "thermophysical": {
+            "failure": 0,
+            "success": 48
+          },
           "thermophysical-extreme": {
             "failure": 1025,
             "success": 2335
@@ -51,13 +91,21 @@
             "failure": 0,
             "success": 6912
           },
+          "wind-stability": {
+            "failure": 0,
+            "success": 96
+          },
           "wind-threshold": {
             "failure": 0,
             "success": 2736
+          },
+          "year-sweep": {
+            "failure": 0,
+            "success": 100
           }
         },
-        "corrected_2m_wind_cases": 4320,
-        "reference_sha256": "510f04a335f5661468086c05478d4708fa4dca70b23f46cb1282fcc821634199",
+        "corrected_2m_wind_cases": 4775,
+        "reference_sha256": "e6ee6fea2653b6f2a50f04a2053a464c73d5f40d5e610e40ad5d5d85e889b869",
         "status": "bit-identical except corrected scalar 2 m wind"
       }
     },
@@ -73,12 +121,28 @@
         "status": "bit-identical"
       },
       "wbgt": {
-        "candidate_sha256": "0ff8d055116430322ec8291778a23c7ff2ccfe1f3ec3b9c4954cfed7cc39da05",
-        "cases": 35124,
+        "candidate_sha256": "1de32a0d6ed1a612946e0edb134d52519d7a1c368e6cd15c5af1fbb8610b5345",
+        "cases": 35976,
         "cohorts": {
-          "geometry-extended": {
+          "calendar-boundary": {
             "failure": 0,
-            "success": 9360
+            "success": 52
+          },
+          "domain-edge": {
+            "failure": 2,
+            "success": 2
+          },
+          "finite-invalid": {
+            "failure": 3,
+            "success": 3
+          },
+          "fixed-weather": {
+            "failure": 0,
+            "success": 2
+          },
+          "float-conversion": {
+            "failure": 0,
+            "success": 8
           },
           "height-sign": {
             "failure": 0,
@@ -87,6 +151,18 @@
           "horizon-minute": {
             "failure": 0,
             "success": 2178
+          },
+          "interactions": {
+            "failure": 0,
+            "success": 432
+          },
+          "known-answer": {
+            "failure": 0,
+            "success": 2
+          },
+          "pressure-boundary": {
+            "failure": 6,
+            "success": 0
           },
           "radiation-threshold": {
             "failure": 0,
@@ -104,6 +180,18 @@
             "failure": 0,
             "success": 300
           },
+          "solar-global": {
+            "failure": 0,
+            "success": 9360
+          },
+          "solar-height2": {
+            "failure": 0,
+            "success": 96
+          },
+          "thermophysical": {
+            "failure": 0,
+            "success": 48
+          },
           "thermophysical-extreme": {
             "failure": 1025,
             "success": 2335
@@ -112,13 +200,21 @@
             "failure": 0,
             "success": 6912
           },
+          "wind-stability": {
+            "failure": 0,
+            "success": 96
+          },
           "wind-threshold": {
             "failure": 0,
             "success": 2736
+          },
+          "year-sweep": {
+            "failure": 0,
+            "success": 100
           }
         },
-        "corrected_2m_wind_cases": 4320,
-        "reference_sha256": "510f04a335f5661468086c05478d4708fa4dca70b23f46cb1282fcc821634199",
+        "corrected_2m_wind_cases": 4775,
+        "reference_sha256": "e6ee6fea2653b6f2a50f04a2053a464c73d5f40d5e610e40ad5d5d85e889b869",
         "status": "bit-identical except corrected scalar 2 m wind"
       }
     }
@@ -131,8 +227,8 @@
     "-fno-strict-aliasing"
   ],
   "input_sha256": {
+    "cases.csv": "9531c1793c1b034337476a2991d22528423c9ed1f9705138cef92aa01cadaf14",
     "esat-cases.csv": "325237ffaa89a270c4d8281c57b73b73b2015afb48429c4d3c40fe26dc2e6ab0",
-    "extended-cases.csv": "346dacab91c886f499b4890e828fd44319e3b954b2160538efb88f76242e6a9f",
     "weather-cases.csv": "398ac4144913c6311e00e0b54d57ae8bed7e4d435528a268f4b1d460d8c1e983"
   },
   "oracle_blob": "7bc6e6ddd76a538d6454b27e9b252667846e6c9b",

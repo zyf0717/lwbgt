@@ -65,15 +65,12 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(function(None, ctypes.byref(output), 1), 1)
 
     def test_deterministic_case_set_matches_direct_native_batch_exactly(self) -> None:
-        self.check_case_set("generate_cases.py", 852)
-
-    def test_extended_case_set_matches_direct_native_batch_exactly(self) -> None:
-        self.check_case_set("generate_extended_cases.py", 35124)
+        self.check_case_set(35976)
 
     def test_invalid_weather_matches_direct_native_batch_exactly(self) -> None:
-        self.check_case_set("generate_extended_cases.py", 64, weather=True)
+        self.check_case_set(64, weather=True)
 
-    def check_case_set(self, generator: str, expected_count: int,
+    def check_case_set(self, expected_count: int,
                        weather: bool = False) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary, "cases.csv")
@@ -82,7 +79,7 @@ class BatchTests(unittest.TestCase):
             subprocess.run(
                 [
                     sys.executable,
-                    str(Path(__file__).parents[1] / generator),
+                    str(Path(__file__).parents[1] / "generate_cases.py"),
                     str(output),
                     *arguments,
                 ],

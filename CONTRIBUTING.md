@@ -27,9 +27,10 @@ oracle, `upstream/wbgt.c.original`.
 
 Add regression cases and compare statuses and output bits in matched builds.
 Rejected solar and non-finite weather inputs need separate API checks; see
-[tests/BASELINE.md](tests/BASELINE.md). Extend `tests/generate_extended_cases.py`
-without changing the historical corpus or timing workload. Keep the R copies
-of `wbgt.c` and `lwbgt.h` byte-identical to their canonical sources.
+[tests/BASELINE.md](tests/BASELINE.md). Extend the shared corpus in
+`tests/generate_cases.py` and refresh `tests/baseline.json`. Rerun throughput
+measurements when the corpus changes. Keep the R copies of `wbgt.c` and
+`lwbgt.h` byte-identical to their canonical sources.
 
 ## Validation
 
