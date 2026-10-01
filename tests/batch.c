@@ -152,12 +152,18 @@ static void check_argument_contract(const lwbgt_input_v1 *input)
 static void check_invalid_solar_failure(void)
 {
     static const struct {
-        int year;
+        int year, month, day;
         double lat, lon;
     } cases[] = {
-        {1949, 0.0, 0.0}, {2050, 0.0, 0.0},
-        {2024, -90.01, 0.0}, {2024, 90.01, 0.0},
-        {2024, 0.0, -180.01}, {2024, 0.0, 180.01},
+        {1949, 1, 1, 0.0, 0.0}, {2050, 1, 1, 0.0, 0.0},
+        {INT32_MIN, 1, 1, 0.0, 0.0}, {INT32_MAX, 1, 1, 0.0, 0.0},
+        {2024, 1, 1, -90.01, 0.0}, {2024, 1, 1, 90.01, 0.0},
+        {2024, 1, 1, 0.0, -180.01}, {2024, 1, 1, 0.0, 180.01},
+        {2024, 1, 1, -90.00001, 0.0}, {2024, 1, 1, 90.00001, 0.0},
+        {2024, 1, 1, 0.0, -180.00002}, {2024, 1, 1, 0.0, 180.00002},
+        {2024, -1, 1, 0.0, 0.0}, {2024, 13, 1, 0.0, 0.0},
+        {2024, 1, -2, 0.0, 0.0}, {2024, 1, 34, 0.0, 0.0},
+        {2024, 0, -2, 0.0, 0.0}, {2024, 0, 369, 0.0, 0.0},
     };
     size_t index;
 
@@ -167,8 +173,10 @@ static void check_invalid_solar_failure(void)
         float natural_wet_bulb = 3.0f;
         float psychrometric_wet_bulb = 4.0f;
         float wbgt = 5.0f;
+        lwbgt_input_v1 input = {0};
+        lwbgt_output_v1 output;
         int status = calc_wbgt(
-            cases[index].year, 1, 1, 12, 0, 0, 60,
+            cases[index].year, cases[index].month, cases[index].day, 12, 0, 0, 60,
             cases[index].lat, cases[index].lon, 500.0, 1013.0,
             25.0, 50.0, 2.0, 2.0, 0.0, 0, &estimated_wind, &globe,
             &natural_wet_bulb, &psychrometric_wet_bulb, &wbgt
@@ -180,6 +188,22 @@ static void check_invalid_solar_failure(void)
             !same_float(psychrometric_wet_bulb, -9999.0f) ||
             !same_float(wbgt, -9999.0f))
             fail("invalid solar input did not initialize failure outputs");
+        input.year = cases[index].year;
+        input.month = cases[index].month;
+        input.day = cases[index].day;
+        input.hour = 12;
+        input.latitude_deg_north = cases[index].lat;
+        input.longitude_deg_east = cases[index].lon;
+        input.wind_height_m = 2.0;
+        memset(&output, 0xa5, sizeof(output));
+        if (lwbgt_calc_batch_v1(&input, &output, 1) != LWBGT_BATCH_OK ||
+            output.status != -1 ||
+            !same_float(output.estimated_wind_speed_m_s, -9999.0f) ||
+            !same_float(output.globe_temperature_c, -9999.0f) ||
+            !same_float(output.natural_wet_bulb_c, -9999.0f) ||
+            !same_float(output.psychrometric_wet_bulb_c, -9999.0f) ||
+            !same_float(output.wbgt_c, -9999.0f))
+            fail("invalid solar batch output is not deterministic");
     }
 }
 
@@ -213,6 +237,29 @@ static void check_supported_year_bounds(void)
     }
 }
 
+static void check_batch(const lwbgt_input_v1 *inputs,
+                        const lwbgt_output_v1 *expected,
+                        lwbgt_output_v1 *actual, char identifiers[][32],
+                        size_t count)
+{
+    size_t index;
+
+    memset(actual, 0xa5, count * sizeof(*actual));
+    if (lwbgt_calc_batch_v1(inputs, actual, count) != LWBGT_BATCH_OK)
+        fail("batch call failed");
+
+    for (index = 0; index < count; ++index) {
+        if (!same_output(&expected[index], &actual[index])) {
+            fprintf(stderr, "batch-test-error: mismatch for %s\n", identifiers[index]);
+            fail("scalar/batch output differs");
+        }
+        if ((float)inputs[index].wind_height_m == 2.0 &&
+            !same_float(actual[index].estimated_wind_speed_m_s,
+                        (float)inputs[index].wind_speed_m_s))
+            fail("2 m wind output is not deterministic");
+    }
+}
+
 int main(int argc, char **argv)
 {
     lwbgt_input_v1 inputs[MAX_CASES];
@@ -221,7 +268,7 @@ int main(int argc, char **argv)
     char identifiers[MAX_CASES][32];
     char line[LINE_CAPACITY];
     size_t count = 0;
-    size_t index;
+    size_t total = 0;
     FILE *stream;
 
     if (argc != 2) fail("expected CASES.csv");
@@ -229,40 +276,33 @@ int main(int argc, char **argv)
     if (stream == NULL) fail("cannot open cases");
     if (fgets(line, sizeof(line), stream) == NULL) fail("cases are empty");
 
+    check_invalid_solar_failure();
+    check_scalar_2m_output();
+    check_supported_year_bounds();
+
     while (fgets(line, sizeof(line), stream) != NULL) {
         char *field[FIELD_COUNT];
 
-        if (count == MAX_CASES) fail("too many cases");
+        if (count == MAX_CASES) {
+            check_batch(inputs, expected, actual, identifiers, count);
+            total += count;
+            count = 0;
+        }
         line[strcspn(line, "\r\n")] = '\0';
         if (split(line, field) != FIELD_COUNT) fail("case width differs");
         if (strlen(field[0]) >= sizeof(identifiers[count])) fail("case id is too long");
         strcpy(identifiers[count], field[0]);
         inputs[count] = parse_input(field);
         expected[count] = scalar(&inputs[count]);
+        if (total == 0 && count == 0) check_argument_contract(&inputs[0]);
         ++count;
     }
     if (ferror(stream) || fclose(stream)) fail("cannot read cases");
-    if (count == 0) fail("no cases generated");
+    if (total == 0 && count == 0) fail("no cases generated");
 
-    check_argument_contract(&inputs[0]);
-    check_invalid_solar_failure();
-    check_scalar_2m_output();
-    check_supported_year_bounds();
-    memset(actual, 0xa5, count * sizeof(*actual));
-    if (lwbgt_calc_batch_v1(inputs, actual, count) != LWBGT_BATCH_OK)
-        fail("batch call failed");
+    if (count != 0) check_batch(inputs, expected, actual, identifiers, count);
+    total += count;
 
-    for (index = 0; index < count; ++index) {
-        if (!same_output(&expected[index], &actual[index])) {
-            fprintf(stderr, "batch-test-error: mismatch for %s\n", identifiers[index]);
-            return 2;
-        }
-        if (inputs[index].wind_height_m == 2.0 &&
-            !same_float(actual[index].estimated_wind_speed_m_s,
-                        (float)inputs[index].wind_speed_m_s))
-            fail("2 m wind output is not deterministic");
-    }
-
-    printf("batch-equivalence: %zu bit-identical cases\n", count);
+    printf("batch-equivalence: %zu bit-identical cases\n", total);
     return 0;
 }

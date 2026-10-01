@@ -1,75 +1,50 @@
-# Release process
+# Releasing
 
-The v1.0 release consists of one checked R source package, five
-Python-ABI-independent platform wheels, and one Python source distribution.
-The R package is distributed from GitHub and R-universe and uses a standard
-Apache License 2.0 declaration for its CRAN-facing package metadata. The
-bundled numerical source remains separately governed by the original UChicago
-Argonne terms documented in the installed legal files.
+Test, benchmark, and documentation changes can merge without a package
+release. Keep the current version and record them under `Unreleased`. Publishing
+new package artifacts requires a new version.
 
-## One-time service configuration
+Release from a commit with passing native, SwiftPM, Python wheel, and R CI.
+Use the workflow definitions as the source of truth for supported platforms.
 
-1. Configure the PyPI and TestPyPI Trusted Publishers for repository
-   `zyf0717/lwbgt`, workflow `release.yml`, and their matching protected GitHub
-   environments. Do not add API tokens.
-2. Install the R-universe GitHub app for the `zyf0717` account and allow it to
-   report commit statuses for this repository.
+## Prepare
 
-## Release sequence
+Update version metadata, `CHANGELOG.md`, `r/NEWS.md`, and `tests/RELEASE.md`.
+Run the checks in [CONTRIBUTING.md](../CONTRIBUTING.md). For kernel or corpus
+changes, refresh the [numerical baseline](../tests/BASELINE.md) and
+[throughput results](../benchmarks/README.md) using matched builds. Verify the
+CI artifacts:
 
-1. Set the same version in CMake, the C header, Python metadata, R
-   `DESCRIPTION`, `CITATION.cff`, and the README. Add the changelog entry.
-2. Require green native, SwiftPM, wheel, and R-package CI on the exact release
-   commit. SwiftPM is tested through a downstream package on Linux and macOS.
-   The R workflow checks Linux/GCC, Linux/Clang with R-devel, Windows/Rtools,
-   and macOS/AppleClang. Its `r-source` artifact has passed a complete `R CMD
-   check`, including the PDF manual.
-3. Download the CI artifacts and independently verify them:
+```sh
+python3 tests/check_versions.py
+python3 tests/check_r_sources.py
+python3 tests/check_distribution.py dist/*
+python3 -m twine check dist/*
+release_version=$(awk -F '"' '/^version = / {print $2; exit}' pyproject.toml)
+R CMD check "lwbgt_${release_version}.tar.gz"
+```
 
-   ```sh
-   python tests/check_versions.py
-   python tests/check_r_sources.py
-   python tests/check_distribution.py dist/*
-   python -m twine check dist/*
-   R CMD check lwbgt_1.0.1.tar.gz
-   ```
+Check the R source artifact from the same commit, including its PDF manual.
 
-4. Create and push an annotated or signed tag only after every release gate
-   passes:
+## Publish
 
-   ```sh
-   git tag -s v1.0.1 -m "lwbgt v1.0.1"
-   git push origin v1.0.1
-   ```
+After all gates pass, create and push an annotated or signed tag:
 
-5. The tag workflow reruns the complete R and Python artifact gates, publishes
-   to TestPyPI, verifies byte identity and installation, publishes to PyPI, and
-   creates a GitHub release containing the Python and R source artifacts.
-6. Verify that `packages.json` in `zyf0717/zyf0717.r-universe.dev` still
-   contains this entry; add it if missing, preserving the existing entries:
+```sh
+git tag -a "v${release_version}" -m "lwbgt v${release_version}"
+git push origin "v${release_version}"
+```
 
-   ```json
-   {
-       "package": "lwbgt",
-       "url": "https://github.com/zyf0717/lwbgt",
-       "subdir": "r",
-       "branch": "*release"
-   }
-   ```
+The [release workflow](../.github/workflows/release.yml) builds the artifacts,
+publishes to TestPyPI, verifies their hashes and installation, then publishes
+to PyPI and creates the GitHub release. Verify the published version and test
+Python and R installation in clean environments using the [README](../README.md).
+Require a successful R-universe build for the tagged commit before announcing
+its R release. Correct a defective release with a new version; never replace
+published artifacts.
 
-   The `subdir` is required because `DESCRIPTION` is under `r/`; `*release`
-   keeps R-universe builds on the latest published GitHub release.
-7. R-universe detects the new GitHub release through the `*release` registry
-   entry and builds the package from `r/`. Require a successful build for the
-   tagged commit at `https://zyf0717.r-universe.dev/lwbgt` before announcing
-   the R release.
-8. Verify PyPI and GitHub metadata, then test both supported R installation
-   paths in clean R libraries:
+## Service setup
 
-   ```r
-   install.packages("lwbgt", repos = "https://zyf0717.r-universe.dev")
-   remotes::install_github("zyf0717/lwbgt/r@*release", upgrade = "never")
-   ```
-
-Never delete and re-upload a defective immutable artifact; issue a patch
-release.
+Configure PyPI and TestPyPI Trusted Publishing for `release.yml` and its
+protected environments. The R-universe registry must point to this repository
+with `subdir: "r"` and `branch: "*release"` so it follows GitHub releases.

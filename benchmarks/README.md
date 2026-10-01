@@ -1,36 +1,57 @@
-# Benchmark
+# Throughput benchmark
 
-The benchmark compares the retained original Liljegren C with the current
-kernel on the same 840 deterministic rows. The full 852-case corpus is used for
-numerical comparison; timing excludes six `invalid` and six `solver-boundary`
-rows. The harness loads cases before timing, pins execution to one CPU, warms
-up each run, and consumes all outputs through a volatile checksum. The two
-variants run in alternating order for seven repetitions of 200 iterations per
-case. Reported rates are medians.
+Compare the retained original and current scalar kernels using the same
+35,976-row corpus as the numerical tests, at 1× and 10×.
 
-On 2026-09-25, the current kernel measured **1.603×** the retained original on
-GCC 13.3.0, Linux 7.0.0-31-generic, and an Intel Core i9-13900HK restricted
-to CPU 12, which has no sibling hardware thread. Both kernels used GNU89,
-`-O2`, `-fno-fast-math`, `-ffp-contract=off`, and `-fno-strict-aliasing`.
+Each scale repeats the complete corpus in order. All rows are timed, including
+3,076 failures per corpus pass. This measures kernel execution; CSV loading,
+one full-corpus warm-up per execution, Python overhead, and result formatting
+are excluded. It does not measure batch or language-wrapper throughput.
 
-| Overall, 840 rows | Original | Current |
-|---|---:|---:|
-| Median rows/s | 60,423 | 96,834 |
-| Relative median absolute deviation | 0.50% | 0.57% |
+The C harness consumes every output bit through a volatile integer checksum,
+uses a monotonic clock, and pins to the first available CPU on Linux. The
+runner records CPU affinity (`-1` if unavailable), alternates kernel order for
+seven repetitions at each scale, and reports median elapsed time, rows/s, and
+relative median absolute deviation. Reports retain raw elapsed times, call and
+failure counts, compiler/platform details, and corpus/executable hashes.
 
-Every cohort met the existing performance gate. Reproduce this comparison from
-the repository root on the same machine with:
+## Results
+
+On 2026-10-01, GCC 13.3.0 on Linux x86_64 (7.0.0-34-generic, glibc 2.39),
+Intel Core i9-13900HK, pinned to CPU 12:
+
+| Scale | Calls/run | Original s | Current s | Original rows/s | Current rows/s | Speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| 1× | 35,976 | 0.526 | 0.328 | 68,425 | 109,810 | 1.605× |
+| 10× | 359,760 | 5.261 | 3.281 | 68,377 | 109,653 | 1.604× |
+
+Values are medians of seven repetitions. Relative MAD was below 0.19% for
+both kernels at both scales. Kernels used GNU89 and
+`-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
+[throughput-gcc-13.3.0.json](throughput-gcc-13.3.0.json) retains the measurements.
+
+## Reproduce
+
+From the repository root:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
-python3 tests/generate_cases.py build/cases.csv
-taskset -c 12 python3 tests/compare.py benchmark \
+ctest --test-dir build --output-on-failure
+python3 benchmarks/compare.py \
   build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
-  build/benchmark.json 7 200
+  build/throughput.json \
+  --compiler-flags='-std=gnu89 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
 ```
 
-The workload contains no downloaded weather dataset. Its two `era5` rows are
-fixed London examples with no recorded source provenance, so that cohort is
-not evidence about ERA5-wide performance. Throughput depends on the CPU,
-compiler, and workload.
+On Linux, prefix the runner with `taskset -c N` to select a CPU available on
+your machine. Both kernels must use matched compiler and floating-point flags.
+Use `--repetitions N` to change the repetition count (minimum three). The
+measured scales remain 1× and 10×. Allow about 80 seconds on this machine
+for seven paired repetitions at both scales, including warm-ups. CI checks
+accounting on a small fixture.
+
+Results depend on hardware, compiler, and workload. These regression fixtures
+and synthetic samples do not establish performance on an observed-weather
+dataset. See [the numerical baseline](../tests/BASELINE.md) for input coverage
+and comparison limits.

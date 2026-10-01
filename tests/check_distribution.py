@@ -10,7 +10,6 @@ from pathlib import Path
 
 LICENSE_FILES = {
     "LICENSE",
-    "LICENSING.md",
     "NOTICE",
     "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 }
@@ -19,6 +18,7 @@ SDIST_BUILD_FILES = {
     "CMakeLists.txt",
     "pyproject.toml",
     "README.md",
+    "CONTRIBUTING.md",
     "docs/ABI.md",
     "docs/COMPATIBILITY.md",
     "docs/COMPARISON.md",
@@ -40,6 +40,13 @@ SDIST_BUILD_FILES = {
     "r/src/lwbgt.h",
     "r/src/lwbgt_r.c",
     "tests/swiftpm/Package.swift",
+    "tests/generate_cases.py",
+    "tests/baseline.json",
+    "tests/check_benchmark.py",
+    "benchmarks/benchmark.c",
+    "benchmarks/compare.py",
+    "tests/branch_probe.c",
+    "tests/esat_probe.c",
     "tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",
 }
 

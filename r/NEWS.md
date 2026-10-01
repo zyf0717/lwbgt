@@ -14,8 +14,7 @@
 - Synchronized the R package with project release 0.4.3. The direct C scalar
   API now writes estimated wind for 2 m input; the R output and WBGT results
   for valid inputs are unchanged.
-- Expanded the retained-original comparison and removed an unverified weather
-  cohort from the timing workload.
+- Expanded the retained-original comparison.
 
 # lwbgt 0.4.2
 
@@ -24,9 +23,7 @@
 
 # lwbgt 0.4.1
 
-- Declared the CRAN-facing package license as Apache License 2.0 while
-  preserving the original UChicago Argonne terms and attribution for the
-  bundled Liljegren-derived `src/wbgt.c`.
+- Declared the CRAN-facing package license as Apache License 2.0.
 
 # lwbgt 0.4.0
 

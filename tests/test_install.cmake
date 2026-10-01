@@ -13,7 +13,7 @@ if(SYSTEM_NAME STREQUAL "Linux" AND
    NOT EXISTS "${INSTALL_DIR}/${INSTALL_LIBDIR}/liblwbgt.so.0")
     message(FATAL_ERROR "installed library is missing the preserved SONAME")
 endif()
-foreach(DOCUMENT LICENSE ABI.md LICENSING.md NOTICE
+foreach(DOCUMENT LICENSE ABI.md INPUTS.md NOTICE
         LicenseRef-UChicago-Argonne-WBGT-1.1.txt)
     if(NOT EXISTS "${INSTALL_DIR}/${INSTALL_DATADIR}/doc/lwbgt/${DOCUMENT}")
         message(FATAL_ERROR "installed documentation is missing ${DOCUMENT}")

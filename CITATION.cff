@@ -11,7 +11,7 @@ version: 1.0.1
 date-released: 2026-10-01
 repository-code: "https://github.com/zyf0717/lwbgt"
 url: "https://github.com/zyf0717/lwbgt"
-license-url: "https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md"
+license: Apache-2.0
 keywords:
   - WBGT
   - Liljegren

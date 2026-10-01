@@ -1,77 +1,25 @@
-# Exported-symbol and API review
+# API verification
 
-`docs/ABI.md` is the authoritative compatibility contract for public symbols,
-layouts, units, ownership, and concurrency semantics.
+[docs/ABI.md](../docs/ABI.md) defines the supported symbols, layouts, units,
+status codes, and ownership rules. Tests verify that contract:
 
-The v0.1.0 static archive was reviewed with:
+| Check | Coverage |
+|---|---|
+| `shared_exports`, `python_runtime_exports` | Only `calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1` are exported by shared runtimes |
+| `installed_consumer` | Installed C/C++ headers, structure sizes/offsets, linkage, SONAME, and accompanying documents |
+| Whole-corpus compatibility probes | Status and output bits against the retained original through static and Python-runtime libraries |
+| Water/ice probes | Both `esat` phases, rounding boundaries, and non-finite temperatures |
+| Internal branch diagnostics | Stability classes and adjacent horizon/clipping inputs; helpers remain unsupported API |
+| Batch tests | Scalar equality in chunks of up to 1,024 rows, null arguments, and deterministic solar rejection |
+| Installed-wheel tests | Resource loading, ABI layouts, public Python API, and full WBGT/invalid-weather batch results |
+| `benchmark_accounting` | Successful and failing rows at 1×/10×, exact call counts, checksum consumption, rejected scales, and comparison reports |
+| `demo_smoke` | Optional demonstration on valid input |
 
-```sh
-nm -g --defined-only build/liblwbgt.a
-```
+At 2 m height, compatibility checks require the supplied wind rounded to
+`float`, including heights that round to 2 m. The original left that output
+unwritten. Rejected solar inputs and non-finite weather have separate current-API
+checks. [BASELINE.md](BASELINE.md) records corpora, hashes, and limitations.
 
-The v0.1.0 static compatibility symbols are:
-
-```text
-calc_wbgt
-esat
-```
-
-Their declarations in `include/lwbgt.h` are the permanent compatibility ABI.
-The scalar `float` parameters in the original K&R definitions are correctly
-declared as `double` at the ABI boundary because of default argument promotion;
-output pointers remain `float *`.
-
-v0.2.0 adds the supported FFI symbol:
-
-```text
-lwbgt_calc_batch_v1
-```
-
-Its `lwbgt_input_v1` and `lwbgt_output_v1` structures have permanent 104-byte
-and 24-byte layouts. The shared library's platform-specific export lists expose
-only `calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1`; `shared_exports` audits that
-surface in CTest.
-
-v0.3.0 adds a wheel-only, unversioned shared runtime built from the same object
-libraries. `python_runtime_exports` audits the same three-symbol surface. The
-current `python_runtime_compatibility_equivalence` test reruns the 852-case
-comparison through an executable linked to that target. For those sampled
-inputs, the compatibility comparison checks the bits of `Tg`, `Tnwb`, `Tpsy`,
-WBGT, and `esat` against the retained original. It also checks estimated wind,
-except at 2 m, where it requires the supplied wind converted to `float`. These
-tests do not prove bit identity for every valid input or build environment. The
-historical byte-exact comparison mode remains available in `tests/compare.py`.
-
-All 400 added rows must succeed in the upstream oracle; they cover every supported year,
-calendar and solar geometry boundaries, wind stability thresholds, varied
-thermophysical inputs, and scalar float conversion.
-
-`demo_smoke` compiles and runs the optional demonstration with a valid row.
-The batch test checks deterministic failure outputs for unsupported years and
-out-of-range solar coordinates, which the original caller did not handle.
-
-As of v0.4.0, the upstream demonstration program is compiled only when
-`LWBGT_BUILD_DEMO` is defined and contributes no `main`, `printf`, or `exit`
-dependency to library builds.
-
-The archive also exposes these inherited implementation symbols:
-
-```text
-Tglobe
-Twb
-calc_solar_parameters
-daynum
-dew_point
-diffusivity
-est_wind_speed
-evap
-h_sphere_in_air
-solarposition
-stab_srdt
-thermal_cond
-viscosity
-```
-
-They remain link-visible because the static archive preserves the source-derived
-structure; they are not declared by the installed header and are not supported
-API.
+The static archive retains internal helpers for solar geometry, wind scaling,
+and thermophysical properties. Their visibility does not make them supported
+entrypoints. Library builds omit the demonstration `main` and its I/O dependencies.

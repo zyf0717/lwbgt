@@ -11,7 +11,6 @@ requires-python = ">=3.10"
 license = "Apache-2.0 AND LicenseRef-UChicago-Argonne-WBGT-1.1"
 license-files = [
   "LICENSE",
-  "LICENSING.md",
   "NOTICE",
   "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 ]
@@ -72,11 +71,11 @@ sdist.include = [
   "/examples/**",
   "/benchmarks/**",
   "/CHANGELOG.md",
+  "/CONTRIBUTING.md",
   "/CITATION.cff",
   "/docs/**",
   "/LICENSE",
   "/LICENSES/**",
-  "/LICENSING.md",
   "/NOTICE",
   "/README.md",
 ]

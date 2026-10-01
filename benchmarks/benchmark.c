@@ -2,8 +2,10 @@
 #include "lwbgt.h"
 
 #include <errno.h>
-#include <math.h>
+#include <inttypes.h>
+#ifdef __linux__
 #include <sched.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,19 +13,18 @@
 
 #define FIELD_COUNT 19
 #define LINE_CAPACITY 1024
-#define MAX_COHORTS 16
 
 typedef struct {
-    char cohort[32];
     int year, month, day, hour, minute, gmt, avg, urban;
     double lat, lon, solar, pressure, air, rh, wind, height, delta;
 } Case;
 
 typedef struct {
-    char name[32];
-} Cohort;
+    size_t successes, failures;
+    uint64_t checksum;
+} Run;
 
-static volatile double consumed_checksum;
+static volatile uint64_t consumed_checksum;
 
 static void fail(const char *message)
 {
@@ -73,7 +74,6 @@ static Case *load_cases(const char *path, size_t *count_out)
         line[strcspn(line, "\r\n")] = '\0';
         char *field[FIELD_COUNT];
         if (split(line, field) != FIELD_COUNT) fail("case width differs");
-        if (!strcmp(field[1], "invalid") || !strcmp(field[1], "solver-boundary")) continue;
         if (count == capacity) {
             capacity *= 2;
             Case *grown = realloc(cases, capacity * sizeof(*grown));
@@ -81,7 +81,6 @@ static Case *load_cases(const char *path, size_t *count_out)
             cases = grown;
         }
         Case *item = &cases[count++];
-        snprintf(item->cohort, sizeof(item->cohort), "%s", field[1]);
         item->year = (int)integer(field[2]); item->month = (int)integer(field[3]);
         item->day = (int)integer(field[4]); item->hour = (int)integer(field[5]);
         item->minute = (int)integer(field[6]); item->gmt = (int)integer(field[7]);
@@ -98,17 +97,17 @@ static Case *load_cases(const char *path, size_t *count_out)
     return cases;
 }
 
-static void pin_cpu(void)
+static int pin_cpu(void)
 {
 #ifdef __linux__
     cpu_set_t available;
-    if (sched_getaffinity(0, sizeof(available), &available) != 0) return;
+    if (sched_getaffinity(0, sizeof(available), &available) != 0) return -1;
     for (int cpu = 0; cpu < CPU_SETSIZE; ++cpu) if (CPU_ISSET(cpu, &available)) {
         cpu_set_t selected; CPU_ZERO(&selected); CPU_SET(cpu, &selected);
-        (void)sched_setaffinity(0, sizeof(selected), &selected);
-        return;
+        return sched_setaffinity(0, sizeof(selected), &selected) == 0 ? cpu : -1;
     }
 #endif
+    return -1;
 }
 
 static double now(void)
@@ -123,14 +122,12 @@ static double now(void)
     return value.tv_sec + value.tv_nsec * 1e-9;
 }
 
-static size_t exercise(const Case *cases, size_t count, const char *cohort,
-                       long iterations)
+static Run exercise(const Case *cases, size_t count, long scale)
 {
-    double checksum = 0.0; size_t calls = 0;
-    for (long repeat = 0; repeat < iterations; ++repeat) {
+    Run result = {0, 0, 0};
+    for (long repeat = 0; repeat < scale; ++repeat) {
         for (size_t index = 0; index < count; ++index) {
             const Case *item = &cases[index];
-            if (cohort && strcmp(cohort, item->cohort)) continue;
             float estimated = 0, globe = 0, natural = 0, psychrometric = 0, wbgt = 0;
             int status = calc_wbgt(
                 item->year, item->month, item->day, item->hour, item->minute,
@@ -139,45 +136,42 @@ static size_t exercise(const Case *cases, size_t count, const char *cohort,
                 item->delta, item->urban, &estimated, &globe, &natural,
                 &psychrometric, &wbgt
             );
-            checksum += estimated + globe + natural + psychrometric + wbgt + status;
-            ++calls;
+            if (status == 0) ++result.successes;
+            else if (status == -1) ++result.failures;
+            else fail("unexpected calculation status");
+            /* Consume every output bit, including infinities and NaNs. */
+            const float outputs[] = {estimated, globe, natural, psychrometric, wbgt};
+            for (size_t field = 0; field < 5; ++field) {
+                uint32_t bits;
+                memcpy(&bits, &outputs[field], sizeof(bits));
+                result.checksum += bits;
+            }
         }
     }
-    consumed_checksum += checksum;
-    return calls;
-}
-
-static double measure(const Case *cases, size_t count, const char *cohort,
-                      long iterations)
-{
-    (void)exercise(cases, count, cohort, 1);
-    double start = now();
-    size_t calls = exercise(cases, count, cohort, iterations);
-    double elapsed = now() - start;
-    return calls / elapsed;
+    consumed_checksum = result.checksum;
+    return result;
 }
 
 int main(int argc, char **argv)
 {
-    if (argc != 3) fail("expected CASES.csv ITERATIONS");
-    long iterations = integer(argv[2]);
-    if (iterations < 1) fail("iterations must be positive");
+    if (argc != 3) fail("expected CASES.csv SCALE");
+    long scale = integer(argv[2]);
+    if (scale < 1) fail("scale must be positive");
     size_t count = 0; Case *cases = load_cases(argv[1], &count);
-    Cohort cohorts[MAX_COHORTS]; size_t cohort_count = 0;
-    for (size_t index = 0; index < count; ++index) {
-        size_t found = 0;
-        while (found < cohort_count && strcmp(cohorts[found].name, cases[index].cohort)) ++found;
-        if (found == cohort_count) {
-            if (cohort_count == MAX_COHORTS) fail("too many cohorts");
-            snprintf(cohorts[cohort_count++].name, sizeof(cohorts[0].name), "%s", cases[index].cohort);
-        }
-    }
-    pin_cpu();
-    printf("{\"rows_per_second\":{\"overall\":%.17g", measure(cases, count, NULL, iterations));
-    for (size_t index = 0; index < cohort_count; ++index)
-        printf(",\"%s\":%.17g", cohorts[index].name,
-               measure(cases, count, cohorts[index].name, iterations));
-    printf("},\"checksum\":%.17g}\n", consumed_checksum);
+    if ((uintmax_t)scale > SIZE_MAX / count) fail("call count overflow");
+    int cpu = pin_cpu();
+    (void)exercise(cases, count, 1);
+    double start = now();
+    Run result = exercise(cases, count, scale);
+    double elapsed = now() - start;
+    if (elapsed <= 0) fail("nonpositive elapsed time");
+    size_t calls = count * (size_t)scale;
+    printf("{\"cases\":%zu,\"scale\":%ld,\"calls\":%zu,"
+           "\"successes\":%zu,\"failures\":%zu,\"cpu\":%d,"
+           "\"compiler\":\"%s\",\"elapsed_seconds\":%.17g,"
+           "\"rows_per_second\":%.17g,\"checksum\":%" PRIu64 "}\n",
+           count, scale, calls, result.successes, result.failures, cpu,
+           __VERSION__, elapsed, calls / elapsed, consumed_checksum);
     free(cases);
     return 0;
 }

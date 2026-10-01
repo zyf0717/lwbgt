@@ -123,6 +123,22 @@ if(BUILD_TESTING)
         )
     endif()
     lwbgt_add_harness(lwbgt_reference_probe tests/probe.c lwbgt_reference)
+    lwbgt_add_harness(lwbgt_esat_probe tests/esat_probe.c lwbgt)
+    lwbgt_add_harness(lwbgt_python_esat_probe tests/esat_probe.c lwbgt_python)
+    lwbgt_add_harness(lwbgt_reference_esat_probe tests/esat_probe.c lwbgt_reference)
+    lwbgt_add_harness(lwbgt_branch_probe tests/branch_probe.c lwbgt)
+    lwbgt_add_harness(lwbgt_reference_branch_probe tests/branch_probe.c lwbgt_reference)
+    target_compile_definitions(lwbgt_reference_branch_probe PRIVATE LWBGT_REFERENCE)
+    add_test(
+        NAME internal_branch_equivalence
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
+                exact "$<TARGET_FILE:lwbgt_reference_branch_probe>" "$<TARGET_FILE:lwbgt_branch_probe>"
+    )
+    if(WIN32)
+        set_target_properties(lwbgt_python_esat_probe PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/python-runtime"
+        )
+    endif()
     lwbgt_add_harness(lwbgt_benchmark benchmarks/benchmark.c lwbgt)
     lwbgt_add_harness(lwbgt_reference_benchmark benchmarks/benchmark.c lwbgt_reference)
     lwbgt_add_harness(lwbgt_batch_test tests/batch.c lwbgt)
@@ -132,10 +148,13 @@ if(BUILD_TESTING)
     target_link_libraries(lwbgt_demo PRIVATE m)
 
     set(LWBGT_CASES "${CMAKE_CURRENT_BINARY_DIR}/cases.csv")
+    set(LWBGT_ESAT_CASES "${CMAKE_CURRENT_BINARY_DIR}/esat-cases.csv")
+    set(LWBGT_WEATHER_CASES "${CMAKE_CURRENT_BINARY_DIR}/weather-cases.csv")
     add_test(
         NAME generate_cases
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/generate_cases.py"
-                "${LWBGT_CASES}"
+                "${LWBGT_CASES}" --esat-output "${LWBGT_ESAT_CASES}"
+                --weather-output "${LWBGT_WEATHER_CASES}"
     )
     add_test(
         NAME r_source_sync
@@ -158,6 +177,28 @@ if(BUILD_TESTING)
 
     add_test(NAME batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_CASES}")
     set_tests_properties(batch_equivalence PROPERTIES DEPENDS generate_cases)
+    foreach(runtime IN ITEMS native python_runtime)
+        if(runtime STREQUAL "native")
+            set(esat_probe lwbgt_esat_probe)
+        else()
+            set(esat_probe lwbgt_python_esat_probe)
+        endif()
+        add_test(
+            NAME ${runtime}_esat_equivalence
+            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/compare.py"
+                    exact "$<TARGET_FILE:lwbgt_reference_esat_probe>" "$<TARGET_FILE:${esat_probe}>"
+                    "${LWBGT_ESAT_CASES}"
+        )
+        set_tests_properties(${runtime}_esat_equivalence
+            PROPERTIES DEPENDS generate_cases)
+    endforeach()
+    add_test(NAME invalid_weather_batch_equivalence COMMAND lwbgt_batch_test "${LWBGT_WEATHER_CASES}")
+    set_tests_properties(invalid_weather_batch_equivalence PROPERTIES DEPENDS generate_cases)
+    add_test(
+        NAME benchmark_accounting
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_benchmark.py"
+                "$<TARGET_FILE:lwbgt_reference_benchmark>" "$<TARGET_FILE:lwbgt_benchmark>"
+    )
     add_test(
         NAME demo_smoke
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_demo.py"
@@ -331,7 +372,6 @@ install(FILES
     LICENSE
     docs/ABI.md
     docs/INPUTS.md
-    LICENSING.md
     NOTICE
     LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/lwbgt"

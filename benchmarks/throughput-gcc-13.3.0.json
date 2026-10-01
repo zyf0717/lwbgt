@@ -1,0 +1,96 @@
+{
+  "compiler_flags": "-std=gnu89 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing",
+  "corpus_cases": 35976,
+  "corpus_sha256": "9531c1793c1b034337476a2991d22528423c9ed1f9705138cef92aa01cadaf14",
+  "cpu_model": "13th Gen Intel(R) Core(TM) i9-13900HK",
+  "date": "2026-10-01",
+  "executable_sha256": {
+    "candidate": "bf60e7c0c142858f61ad3ae718366e363027c4d91657e0dd2a2d627b63bb6922",
+    "reference": "bbb670909e23199cc40680f6de01777a14f9a41531ba19cc7026dc8b0db00ee7"
+  },
+  "method": "single-thread scalar calls; one full-corpus warm-up per execution; input loading and warm-up excluded; alternating kernel order; all rows included; CPU affinity recorded per kernel",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "repetitions": 7,
+  "scales": {
+    "1": {
+      "calls": 35976,
+      "candidate": {
+        "checksum": 245580964663863,
+        "compiler": "13.3.0",
+        "cpu": 12,
+        "elapsed_seconds": [
+          0.32776819900027476,
+          0.32882691999839153,
+          0.32751704700058326,
+          0.3275088899972616,
+          0.3276211729971692,
+          0.3276596500072628,
+          0.32750292800483294
+        ],
+        "median_elapsed_seconds": 0.3276211729971692,
+        "median_rows_per_second": 109809.7527424177,
+        "relative_mad": 0.0003428395482899151
+      },
+      "failures": 3076,
+      "reference": {
+        "checksum": 241490094187860,
+        "compiler": "13.3.0",
+        "cpu": 12,
+        "elapsed_seconds": [
+          0.5315963879984338,
+          0.5202505650086096,
+          0.5276250169990817,
+          0.5257716880005319,
+          0.525553351995768,
+          0.5260769419983262,
+          0.5253262000042014
+        ],
+        "median_elapsed_seconds": 0.5257716880005319,
+        "median_rows_per_second": 68425.1374143288,
+        "relative_mad": 0.0008480216603071992
+      },
+      "speedup": 1.604815962261007,
+      "successes": 32900
+    },
+    "10": {
+      "calls": 359760,
+      "candidate": {
+        "checksum": 2455809646638630,
+        "compiler": "13.3.0",
+        "cpu": 12,
+        "elapsed_seconds": [
+          3.2922099589923164,
+          3.275608748997911,
+          3.275956405996112,
+          3.292374149998068,
+          3.280900070996722,
+          3.2751531839894596,
+          3.282842733009602
+        ],
+        "median_elapsed_seconds": 3.280900070996722,
+        "median_rows_per_second": 109652.8367871645,
+        "relative_mad": 0.0016153705781955705
+      },
+      "failures": 30760,
+      "reference": {
+        "checksum": 2414900941878600,
+        "compiler": "13.3.0",
+        "cpu": 12,
+        "elapsed_seconds": [
+          5.26905570999952,
+          5.251361061993521,
+          5.261387403996196,
+          5.2361957209941465,
+          5.250399837997975,
+          5.27112878501066,
+          5.267289789990173
+        ],
+        "median_elapsed_seconds": 5.261387403996196,
+        "median_rows_per_second": 68377.40169574865,
+        "relative_mad": 0.00184806355749959
+      },
+      "speedup": 1.6036414673238768,
+      "successes": 329000
+    }
+  }
+}

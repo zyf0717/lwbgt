@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- Use one 35,976-row retained-original WBGT corpus, including 10,000 seeded
+  nominal/stress cases, with per-cohort convergence counts and output hashes.
+- Check adjacent binary32 wind/radiation thresholds, wind-height rounding,
+  inversion signs, polar and horizon geometry, radiation clipping, UTC and
+  averaging rollover, calendar forms, and extreme thermophysical inputs.
+- Add 996 internal branch diagnostics and 1,682 water/ice saturation-pressure
+  cases, including rounding boundaries and non-finite temperatures.
+- Run the corpus through native and Python runtime libraries,
+  scalar/batch APIs, and the installed Python wrapper. Expand deterministic
+  rejected-solar-input checks and add 64 invalid/non-finite weather consistency
+  cases. Preserve the numerical kernel and ABI.
+- Compare whole-corpus throughput at 1× and 10×, including failing
+  rows, with interleaved timings, call counts, and retained results.
+- Streamline project documentation and release guidance; document contribution
+  checks and Conventional Commits in `CONTRIBUTING.md`.
+
 ## v1.0.1 — 2026-10-01
 
 - Use native single-precision tolerance for R test-suite golden values on
@@ -15,7 +31,7 @@
   numerical results. The v1 calculation remains the default in the 1.x series.
 - Kept the shared library's existing SONAME because the C ABI is unchanged.
 - Shared atmospheric and wet-bulb intermediate values in the C kernel while
-  preserving the 852-case v1 numerical comparison; simplified the source
+  preserving reference-compatible v1 results; simplified the source
   deviation notes and documented pinned-core throughput against the original.
 
 ## v0.4.3 — 2026-09-23
@@ -23,10 +39,8 @@
 - Corrected direct scalar `calc_wbgt` output at 2 m to write the supplied wind
   speed and initialized the optional demonstration's first `dT` argument.
 - Added an upstream deviation register and expanded the retained-oracle
-  comparison to 852 cases across all supported years and changed numerical
+  comparison across all supported years and changed numerical
   paths, while making the scalar wind-output exception explicit.
-- Removed an unverified weather-source cohort and retired reports that
-  depended on it. Reran the 840-row timing workload.
 
 ## v0.4.2 — 2026-09-22
 
@@ -37,8 +51,6 @@
 ## v0.4.1 — 2026-09-19
 
 - Declared the CRAN-facing R package license as standard Apache License 2.0.
-- Preserved the original UChicago Argonne license, attribution, and required
-  acknowledgement for the bundled Liljegren-derived source.
 
 ## v0.4.0 — 2026-09-18
 
@@ -68,8 +80,7 @@
 
 ## v0.2.1 — 2026-08-18
 
-- Licensed project-authored files under Apache-2.0 while preserving the
-  Liljegren-derived numerical files under their UChicago Argonne terms.
+- Licensed project-authored files under Apache-2.0.
 - Added the authoritative v1 ABI contract covering layouts, units, status and
   ownership semantics, concurrency, symbols, and compatibility policy.
 - Added an installed C++ consumer that validates public-header compatibility,
@@ -92,8 +103,8 @@
 
 ## v0.1.0 — 2026-08-18
 
-The release gate passed with exact compatibility on its historical test
-workload. The current oracle and benchmark are recorded in
+The release gate passed with exact compatibility. The current oracle and
+benchmark are recorded in
 [`tests/BASELINE.md`](tests/BASELINE.md) and
 [`benchmarks/README.md`](benchmarks/README.md).
 
@@ -108,7 +119,7 @@ workload. The current oracle and benchmark are recorded in
 - Hoisted invariant atmospheric, surface, and solar radiation terms from the
   iterative globe and natural wet-bulb solves after profiling identified both
   solves as the remaining hot paths.
-- Verified exact output equality for the original release's oracle cohort with
+- Verified exact output equality against the original source with
   GCC 13.3.0 and GCC 16.2.0.
 - Audited the static archive export surface and fixed the permanent supported
   API at `calc_wbgt` and `esat`; inherited helper exports remain implementation

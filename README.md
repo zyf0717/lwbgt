@@ -1,34 +1,49 @@
 # lwbgt
 
+[![PyPI](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
+[![CRAN](https://img.shields.io/cran/v/lwbgt.svg)](https://cran.r-project.org/web/packages/lwbgt/index.html)
+[![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
+
 [![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
 [![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
 [![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
-[![PyPI](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
-[![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
-[![License](https://img.shields.io/pypi/l/lwbgt.svg)](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
 
-`lwbgt` is a stable, low-level C/FFI implementation of the Liljegren outdoor
-wet bulb globe temperature (WBGT) model. It preserves the original scalar
-binary ABI and legacy WBGT calculations while removing repeated and dead work;
-the current source corrects the scalar 2 m wind output.
-Dependency-free Python and R bindings use the same native kernel. SwiftPM
-exposes the stable C interface as `CLWBGT`.
+`lwbgt` computes outdoor wet bulb globe temperature (WBGT) using the original
+Argonne Liljegren C calculation. One optimized C kernel serves the C/FFI,
+Python, R, and SwiftPM interfaces.
 
-Use `lwbgt` as an auditable numerical backend. It deliberately leaves weather
-data ingestion, unit conversion, missing-data policy, heat-risk classification,
-and application defaults to callers. For a higher-level Python workflow,
-consider [`pywbgt`](https://pypi.org/project/pywbgt/) or
-[`thermofeel`](https://pypi.org/project/thermofeel/).
+## Compatibility and performance
 
-**Version: v1.0.1.** The 852-case
-comparison with the retained original C found bit-identical `Tg`, `Tnwb`,
-`Tpsy`, WBGT, and `esat` under matched build settings; this is not an all-input
-guarantee. When wind is measured at 2 m, the scalar function now writes the
-supplied speed, rounded to `float`, to its wind output; the original left that
-output unwritten. The original 1950–2049 year range is retained. The v1
-calculation remains the default;
-future numerical revisions require explicit versioned APIs. See the
-[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md).
+**Version: v1.0.1.** Reference comparisons reproduce WBGT and its component
+temperatures bit for bit under matched compiler and floating-point settings.
+The v1 calculation remains the default throughout 1.x; future numerical
+revisions will use explicit versioned APIs while preserving v1. See the
+[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md)
+for the scope, documented corrections, and platform limits.
+
+The kernel reuses intermediate results and avoids redundant work, preserving
+the original numerical precision. Our
+[scalar benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
+measures about **1.6× the original throughput** on one CPU. Performance depends
+on the compiler, hardware, and inputs.
+
+## Input assumptions
+
+When some inputs are unavailable, use explicit, recorded assumptions. The
+library does not fill in defaults automatically.
+
+| Field | Suggested assumption |
+|---|---|
+| `pressure_hpa` | Prefer an estimate from site elevation. `1013.25` hPa is a sea-level screening assumption. |
+| `wind_height_m` | Use `10` only when the source specifies wind measured at 10 m; otherwise use instrument metadata. |
+| `vertical_temperature_difference_c` | `1` assumes a nighttime inversion. Only negative versus nonnegative matters. |
+| `urban` | Use `0` for rural or `1` for urban. If unknown, calculate both and retain the higher WBGT for screening. |
+| `averaging_minutes` | Use the source averaging interval; `0` is appropriate only for instantaneous or already centered observations. |
+
+Air temperature, humidity, wind speed, and daytime solar radiation have no
+general fallback. See the
+[input guide](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md) for units,
+timestamp conventions, and when these assumptions affect the calculation.
 
 ## Python
 
@@ -139,13 +154,6 @@ numerical target is built in GNU89 mode.
 | Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
 | Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
 
-## Licence and attribution
+## License
 
-Project-authored files are Apache-2.0 licensed. The retained upstream source
-and modified derivative remain under the UChicago Argonne Liljegren WBGT v1.1
-terms. See [LICENSING.md](https://github.com/zyf0717/lwbgt/blob/main/LICENSING.md)
-and retain the acknowledgement in
-[NOTICE](https://github.com/zyf0717/lwbgt/blob/main/NOTICE) when redistributing.
-
-This project is not affiliated with or endorsed by the original authors,
-UChicago Argonne, or the U.S. Department of Energy.
+Project license: [Apache-2.0](https://github.com/zyf0717/lwbgt/blob/main/LICENSE).

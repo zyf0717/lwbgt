@@ -65,13 +65,23 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(function(None, ctypes.byref(output), 1), 1)
 
     def test_deterministic_case_set_matches_direct_native_batch_exactly(self) -> None:
+        self.check_case_set(35976)
+
+    def test_invalid_weather_matches_direct_native_batch_exactly(self) -> None:
+        self.check_case_set(64, weather=True)
+
+    def check_case_set(self, expected_count: int,
+                       weather: bool = False) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            cases = Path(temporary, "cases.csv")
+            output = Path(temporary, "cases.csv")
+            cases = Path(temporary, "weather-cases.csv") if weather else output
+            arguments = ["--samples", "0", "--weather-output", str(cases)] if weather else []
             subprocess.run(
                 [
                     sys.executable,
                     str(Path(__file__).parents[1] / "generate_cases.py"),
-                    str(cases),
+                    str(output),
+                    *arguments,
                 ],
                 check=True,
             )
@@ -99,7 +109,7 @@ class BatchTests(unittest.TestCase):
                     for row in csv.DictReader(stream)
                 ]
         count = len(records)
-        self.assertEqual(count, 852)
+        self.assertEqual(count, expected_count)
         inputs = (_ffi._InputV1 * count)(*map(_ffi._as_native, records))
         outputs = (_ffi._OutputV1 * count)()
         self.assertEqual(_ffi._library().lwbgt_calc_batch_v1(inputs, outputs, count), 0)
