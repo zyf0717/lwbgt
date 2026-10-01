@@ -11,7 +11,7 @@ from pathlib import Path
 LICENSE_FILES = {
     "LICENSE",
     "NOTICE",
-    "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
+    "src/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 }
 SDIST_BUILD_FILES = {
     "Package.swift",

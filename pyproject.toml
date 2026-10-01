@@ -12,7 +12,7 @@ license = "Apache-2.0 AND LicenseRef-UChicago-Argonne-WBGT-1.1"
 license-files = [
   "LICENSE",
   "NOTICE",
-  "LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
+  "src/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 ]
 authors = [{ name = "Yifei Zheng" }]
 keywords = [
@@ -74,7 +74,6 @@ sdist.include = [
   "/CITATION.cff",
   "/docs/**",
   "/LICENSE",
-  "/LICENSES/**",
   "/NOTICE",
   "/README.md",
 ]

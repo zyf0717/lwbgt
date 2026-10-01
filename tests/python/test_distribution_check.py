@@ -25,7 +25,7 @@ class DistributionCheckTests(unittest.TestCase):
             prefix = "lwbgt-1.0.0.dist-info/licenses/"
             with zipfile.ZipFile(wheel, "w") as archive:
                 archive.writestr(prefix, "")
-                archive.writestr(f"{prefix}LICENSES/", "")
+                archive.writestr(f"{prefix}src/", "")
                 for license_file in checker.LICENSE_FILES:
                     archive.writestr(f"{prefix}{license_file}", "license")
                 archive.writestr("lwbgt/liblwbgt.so", "native")

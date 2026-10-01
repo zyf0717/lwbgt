@@ -277,6 +277,6 @@ install(FILES
     docs/ABI.md
     docs/INPUTS.md
     NOTICE
-    LICENSES/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
+    src/LicenseRef-UChicago-Argonne-WBGT-1.1.txt
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/lwbgt"
 )

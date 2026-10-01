@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Move the canonical Argonne license beside the C kernel in `src/`; keep
+  shipping it in Python and native distributions and retain the R package copy.
 - Use one 35,976-row retained-original WBGT corpus, including 10,000 seeded
   nominal/stress cases, with per-cohort convergence counts and output hashes.
 - Check adjacent binary32 wind/radiation thresholds, wind-height rounding,
