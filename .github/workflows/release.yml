@@ -58,8 +58,9 @@ jobs:
           PREPARED_COMMIT: ${{ steps.prepared.outputs.source_commit }}
         run: |
           endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$PREPARED_RUN"
-          test "$(gh api "$endpoint" --jq '.conclusion == "success" and .event == "workflow_dispatch" and .path == ".github/workflows/julia.yml"')" = true
+          test "$(gh api "$endpoint" --jq '.conclusion == "success" and (.event == "workflow_dispatch" or .event == "pull_request") and .path == ".github/workflows/julia.yml"')" = true
           test "$(gh api "$endpoint" --jq '.head_sha')" = "$PREPARED_COMMIT"
+          test "$(gh api "$endpoint" --jq '.head_repository.full_name')" = "$GITHUB_REPOSITORY"
       - uses: actions/download-artifact@v8
         with:
           name: julia-native

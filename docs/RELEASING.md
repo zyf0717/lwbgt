@@ -32,11 +32,41 @@ Julia shares the C/Python/R version, including releases that only change a bindi
 The first Julia publication must use a new version (currently the next is 1.0.2);
 do not add it retroactively to the published 1.0.1 release.
 
-Before tagging, commit the version bump and all release changes. Run the **Julia**
-workflow manually on that commit's branch and wait for every build and test to pass:
+Put the version bump and all release changes in a same-repository PR. The **Julia**
+workflow builds and tests the PR's source commit. After its full matrix and the
+native, Python-wheel, and R workflows pass, it verifies the archives and appends
+one commit to that same PR containing only:
+
+- `julia/Artifacts.toml`: platform-specific release URLs and hashes.
+- `julia/native-build.toml`: the tested source commit, source-tree digest, and CI run.
+
+The job refuses to push if the PR closes or its source changes. Review the
+metadata commit, wait for the originating Julia workflow to finish successfully,
+and merge the PR manually. Tag the merged commit manually after the release gates
+pass. Squash or rebase merging is supported because source identity is checked by
+tree content, excluding only these two generated files.
+
+The metadata push uses `GITHUB_TOKEN`, so it does not automatically execute another
+test matrix. GitHub may show approval-pending workflows on the bot commit; the
+successful source checks belong to its parent commit. The bot does not copy check
+results onto the new commit. If branch rules later require checks on the final
+commit, approve those runs or revise this policy before merging. No skip-CI marker
+is added, so ordinary main-branch and tag workflows remain enabled.
+
+Each subsequent source push runs the checks again and replaces the metadata.
+Do not combine other source changes after preparation and before tagging. The
+release preflight rejects such changes. CI archives are retained for 90 days;
+rerun preparation if they expire. Generated URLs become usable only when their
+corresponding archives are published; preparing metadata does not publish a release.
+Runtime archives contain the native installation and license notices; the
+matching-toolchain test probes remain only in CI artifacts.
+
+For a fork PR, the bot cannot write to its branch. The manual fallback is to run
+preparation on a branch in this repository and copy the files from that successful
+run (also useful for refreshing expired archives):
 
 ```sh
-gh workflow run julia.yml --ref main
+gh workflow run julia.yml --ref BRANCH
 # Find the completed run's ID with: gh run list --workflow julia.yml
 gh run download RUN_ID --name julia-native --dir build/julia-release
 cp build/julia-release/Artifacts.toml julia/Artifacts.toml
@@ -45,12 +75,6 @@ git add julia/Artifacts.toml julia/native-build.toml
 git commit -m "build(julia): pin prepared native release artifacts"
 julia julia/build/artifacts.jl verify build/julia-release
 ```
-
-Replace `RUN_ID` with the successful manually dispatched run. These two generated
-files must be the only tracked changes since preparation. If anything else changes,
-prepare again before tagging. The archives are retained for 90 days; if they expire,
-prepare again. Runtime archives contain the native installation and license notices;
-the matching-toolchain test probes remain only in CI artifacts.
 
 BinaryBuilder is a pinned build-only dependency. Our CI builds and audits the
 five supported targets without generating a JLL or submitting to Yggdrasil.

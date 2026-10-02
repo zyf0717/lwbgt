@@ -21,6 +21,8 @@ jobs:
       BINARYBUILDER_AUTOMATIC_APPLE: 'true'
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'
@@ -46,6 +48,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'
@@ -56,6 +60,7 @@ jobs:
           merge-multiple: true
       - run: julia julia/build/artifacts.jl prepare products native
       - run: julia julia/test/packaging.jl
+      - run: python3 tests/test_julia_metadata.py
       - name: Verify generated archives
         run: julia -e 'include("julia/build/artifacts.jl"); verify("native", "native/Artifacts.toml", "native/native-build.toml")'
       - uses: actions/upload-artifact@v7
@@ -81,6 +86,8 @@ jobs:
           - {runner: windows-2025, target: x86_64-w64-mingw32}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: '3.10'
@@ -97,3 +104,32 @@ jobs:
           path: products
       - name: Compare native oracle and test isolated Julia package
         run: python tests/check_julia_native.py products native '${{ matrix.platform.target }}'
+
+  commit-metadata:
+    name: Append tested metadata to this PR
+    needs: test
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-native
+          path: ${{ runner.temp }}/julia-native
+      - name: Check other CI results and append only the generated files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          NATIVE_ARCHIVES: ${{ runner.temp }}/julia-native
+        run: python3 julia/build/commit_metadata.py "$NATIVE_ARCHIVES"
