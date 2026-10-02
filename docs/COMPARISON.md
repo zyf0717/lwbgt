@@ -1,13 +1,13 @@
 # lwbgt, pywbgt, and thermofeel
 
-This page compares the documented public scope of `lwbgt` 1.0.1, `pywbgt`
+This page compares the documented public scope of `lwbgt` 1.1.0, `pywbgt`
 3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22.
 
 | Aspect | lwbgt | pywbgt | thermofeel |
 |---|---|---|---|
 | Scope | Native Liljegren kernel for embedding | Python WBGT workflow with selectable methods | Multiple heat/cold comfort indices |
 | WBGT methods | Preserved Liljegren v1.1 calculation | `liljegren`, `bernard`, `dimiceli`, `dimiceli_nws` | `calculate_wbgt_simple`, `calculate_wbgt`, `calculate_wbgt_liljegren` |
-| Interfaces | C ABI, FFI batch, Python, R, SwiftPM, CMake, `pkg-config` | Python; arrays and xarray datasets | Python; NumPy-compatible arrays |
+| Interfaces | C ABI, FFI batch, Python, R, Julia, SwiftPM, CMake, `pkg-config` | Python; arrays and xarray datasets | Python; NumPy-compatible arrays |
 | Units | Explicit required units; caller converts | Pint/MetPy quantities; package converts | Numeric arrays in each function's documented units |
 | Python dependencies | Standard library only | NumPy, Numba, MetPy, xarray, Pint, pandas, pvlib | NumPy |
 | Preprocessing | Caller owns ingestion and missing-data policy | Unit-aware and xarray-oriented handling | Caller supplies inputs; supporting meteorological functions are available |

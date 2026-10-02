@@ -7,6 +7,12 @@ new package artifacts requires a new version.
 Release from a commit with passing native, SwiftPM, Python wheel, R, and Julia CI.
 Use the workflow definitions as the source of truth for supported platforms.
 
+SwiftPM takes its package version from the shared Git tag (for example, `v1.1.0`).
+`Package.swift` has no release-version field; `swift-tools-version: 5.9` specifies
+the minimum tools version. The README's `from: "1.0.0"` dependency permits
+compatible 1.x releases, including 1.1.0. SwiftPM builds the C sources directly
+and needs no separate binary publication.
+
 ## Prepare
 
 Update version metadata, `CHANGELOG.md`, `r/NEWS.md`, and `tests/RELEASE.md`.
@@ -29,8 +35,8 @@ Check the R source artifact from the same commit, including its PDF manual.
 ### Julia native archives
 
 Julia shares the C/Python/R version, including releases that only change a binding.
-The first Julia publication must use a new version (currently the next is 1.0.2);
-do not add it retroactively to the published 1.0.1 release.
+The first Julia publication is planned for 1.1.0; do not add it retroactively to
+the published 1.0.1 release. The minor bump reflects the new Julia interface.
 
 Development PRs run CI automatically on each update and never write commits.
 Merge the shared version bump and release notes into `main`, then start the
