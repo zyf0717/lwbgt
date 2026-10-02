@@ -1,0 +1,71 @@
+name: PR validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  approve:
+    name: Approve this PR revision
+    environment: ci-approval
+    runs-on: ubuntu-24.04
+    outputs:
+      metadata_only: ${{ steps.select.outputs.metadata_only }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Require the current PR revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/pr_validation.py current
+      - name: Test validation guards
+        run: |
+          python3 tests/test_pr_validation.py
+          python3 tests/test_julia_metadata.py
+      - id: select
+        run: python3 julia/build/preparation.py classify
+
+  native:
+    needs: approve
+    if: needs.approve.outputs.metadata_only == 'false'
+    uses: ./.github/workflows/ci.yml
+
+  python:
+    needs: approve
+    if: needs.approve.outputs.metadata_only == 'false'
+    uses: ./.github/workflows/wheels.yml
+
+  r:
+    needs: approve
+    if: needs.approve.outputs.metadata_only == 'false'
+    uses: ./.github/workflows/r.yml
+
+  julia:
+    needs: approve
+    uses: ./.github/workflows/julia-checks.yml
+
+  result:
+    name: PR validation result
+    needs: [approve, native, python, r, julia]
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Require all selected checks to pass
+        env:
+          VALIDATION_NEEDS: ${{ toJSON(needs) }}
+        run: python3 .github/scripts/pr_validation.py results
+      - name: Require the tested PR revision to remain current
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/pr_validation.py current

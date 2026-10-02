@@ -1,14 +1,6 @@
 name: ci
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    paths-ignore:
-      - julia/Artifacts.toml
-      - julia/native-build.toml
-
   workflow_call:
 
 permissions:
