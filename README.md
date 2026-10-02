@@ -116,12 +116,35 @@ invalid or non-convergent rows. See the
 
 ## Julia
 
-`LWBGT` lives in this repository's `julia/` subdirectory and exposes `Input`,
-`Result`, `calculate`, `calculate_batch`, and `esat` through the native v1 ABI.
-Julia ≥1.10 is supported. The first binary-artifact release and General
-registration are pending; see the [Julia guide](julia/README.md) for development
-installation and usage. Published releases will install the native library
-automatically, without a compiler or a separate JLL package.
+```julia
+using Pkg
+Pkg.add("LWBGT")
+```
+
+```julia
+using LWBGT
+
+weather = Input(
+    year=2024, month=4, day=15, hour=14, minute=30,
+    gmt_offset_hours=8, averaging_minutes=60, urban=1,
+    latitude_deg_north=1.3521, longitude_deg_east=103.8198,
+    solar_w_m2=742.0, pressure_hpa=1008.4,
+    air_temperature_c=32.1, relative_humidity_percent=68.0,
+    wind_speed_m_s=2.8, wind_height_m=10.0,
+    vertical_temperature_difference_c=1,
+)
+
+result = calculate(weather)
+@assert result.status == 0
+println(result.wbgt_c)
+
+results = calculate_batch([weather, weather])
+println(esat(273.15; phase=0))
+```
+
+`Input` and `Result` are immutable typed records. Julia ≥1.10 is supported;
+the native library downloads automatically on first use, without a compiler.
+See the [Julia guide](julia/README.md) for API details and development usage.
 
 ## SwiftPM
 

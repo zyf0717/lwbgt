@@ -4,8 +4,7 @@ Julia ≥1.10 binding to the reference-compatible Liljegren C kernel. The packag
 lives in the `julia` subdirectory of [lwbgt](https://github.com/zyf0717/lwbgt).
 It retains the UUID and API of the original standalone `LWBGT.jl` repository.
 
-The first artifact-backed release and General registration are pending. After
-registration, install with `using Pkg; Pkg.add("LWBGT")`. A published tag can also
+Install with `using Pkg; Pkg.add("LWBGT")`. A published tag can also
 be installed with `Pkg.add(url="https://github.com/zyf0717/lwbgt.git",
 subdir="julia", rev="vX.Y.Z")`, replacing the version with a published Julia release.
 
