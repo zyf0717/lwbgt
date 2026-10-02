@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Make validation manual, with full checks or prepared Julia artifact verification.
+  Stop automatic CI on PR updates and branch pushes; keep Julia preparation
+  focused on Julia archives and preserve tag-triggered publication.
+
 ## v1.1.0 — pending
 
 - Integrate the Julia package in `julia/`, with a shared release version,

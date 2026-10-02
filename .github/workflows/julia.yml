@@ -8,12 +8,26 @@ permissions:
   actions: read
 
 jobs:
+  preflight:
+    name: Check release preparation prerequisites
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.preflight.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: python3 tests/test_julia_metadata.py
+      - id: preflight
+        run: python3 julia/build/preparation.py preflight
+
   checks:
+    needs: preflight
     uses: ./.github/workflows/julia-checks.yml
 
   release-pr:
     name: Open release metadata PR
-    needs: checks
+    needs: [preflight, checks]
     runs-on: ubuntu-24.04
     concurrency:
       group: julia-release-pr
@@ -46,16 +60,16 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           base: main
-          branch: codex/julia-release-v${{ needs.checks.outputs.version }}
+          branch: codex/julia-release-v${{ needs.preflight.outputs.version }}
           add-paths: |
             julia/Artifacts.toml
             julia/native-build.toml
-          commit-message: 'build(julia): prepare v${{ needs.checks.outputs.version }} artifacts'
-          title: 'Release v${{ needs.checks.outputs.version }}: pin native artifacts'
+          commit-message: 'build(julia): prepare v${{ needs.preflight.outputs.version }} artifacts'
+          title: 'Release v${{ needs.preflight.outputs.version }}: pin native artifacts'
           body: |
             Pin the exact native archives tested by ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} for source `${{ github.sha }}`.
 
-            Wait for that preparation run to finish successfully, then approve this PR's workflow run if GitHub requests it, then approve the ci-approval environment. Julia CI will verify source and archive hashes and test installation from the prepared archive; it will not rebuild the native binaries or write commits.
+            Wait for that preparation run to finish successfully, then manually run Validate on this PR branch with "Prepared Julia artifacts" selected. It verifies source and archive hashes and tests installation without rebuilding or writing commits.
 
             Review and merge manually, then tag the merged commit. If main changes beyond these two metadata files, prepare again. The archives expire after 90 days. This PR does not publish a release.
       - name: Report the release PR

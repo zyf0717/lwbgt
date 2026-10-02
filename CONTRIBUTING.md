@@ -34,6 +34,18 @@ measurements when the corpus changes. Keep the R copies of `wbgt.c` and
 
 ## Validation
 
+PRs and branch pushes do not start CI. In **Actions → Validate → Run workflow**,
+select the branch and **All checks** to run native/Swift, Python, R, and Julia
+validation. The run tests the selected commit, not a simulated merge; update the
+branch from `main` first when needed. Review its commit and results in Actions
+before merging. Later pushes require another manual run; starting one cancels
+older validation on the same branch.
+
+For prepared release metadata, select **Prepared Julia artifacts** instead; it
+verifies the source and archive hashes and tests installation without rebuilding.
+Neither option writes commits or publishes. See [RELEASING.md](docs/RELEASING.md)
+for manual Julia preparation and tag-triggered publication.
+
 ```sh
 python3 tests/check_versions.py
 python3 tests/check_r_sources.py
