@@ -68,7 +68,7 @@ swift test --package-path tests/swiftpm -c release -Xcc -march=native
 
 For Julia changes, run `julia --project=julia julia/test/runtests.jl` with
 `LWBGT_LIBRARY` pointing to the built shared library, and run
-`julia julia/test/packaging.jl`. The Julia workflow also tests the actual archives
+`julia julia/test/packaging.jl`. The Julia checks also test the actual archives
 on five platforms with Julia 1.10 and current stable, comparing them with probes
 built using the same toolchain and the retained original. No native integration
 tests are silently skipped when a library is unavailable.

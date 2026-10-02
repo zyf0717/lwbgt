@@ -214,13 +214,7 @@ with `-DLWBGT_EXPERIMENTAL_MSVC=ON`.
 
 ## Documentation
 
-| Topic | Document |
-|---|---|
-| Inputs, units, layouts, status codes, and concurrency | [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md) |
-| Numerical compatibility and measured performance | [Compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md) |
-| Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
-| Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
-| Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |
-| Source changes | [Deviations from original Liljegren C](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md) |
-| Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
-| Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
+See the [documentation index](https://github.com/zyf0717/lwbgt/blob/main/docs/README.md)
+for API contracts, input assumptions, numerical evidence, and release history.
+For development and publishing, use [Contributing](https://github.com/zyf0717/lwbgt/blob/main/CONTRIBUTING.md)
+and [Releasing](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md).

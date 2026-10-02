@@ -1,5 +1,8 @@
 # v0.4.2 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 v0.4.2 adds a dependency-safe SwiftPM C-library product backed directly by the
 canonical kernel sources and public header. The C ABI remains version 1.
 

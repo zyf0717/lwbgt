@@ -1,5 +1,8 @@
 # v0.1.0 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 The numerical source was frozen after Optimization 3. No Optimization 4 is
 included or permitted before v0.1.0.
 

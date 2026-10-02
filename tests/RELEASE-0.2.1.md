@@ -1,5 +1,8 @@
 # v0.2.1 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 v0.2.1 is a distribution and ABI-documentation patch. It does not change the
 frozen numerical implementation, scalar ABI, v1 batch runtime behavior, shared
 symbol surface, or floating-point flags. It adds an explicit Apache-2.0 default
