@@ -49,7 +49,11 @@ tree content, excluding only these two generated files.
 The metadata push uses `GITHUB_TOKEN`, so it does not automatically execute another
 test matrix. GitHub may show approval-pending workflows on the bot commit; the
 successful source checks belong to its parent commit. The bot does not copy check
-results onto the new commit. If branch rules later require checks on the final
+results onto the new commit. Approving the pending workflows starts the tests;
+those bot-triggered runs skip the metadata-commit job, even when a human approves
+or reruns them. They cannot append another metadata commit. Approval is not needed
+for the intended single-pass review and manual merge with the current branch rules.
+If branch rules later require checks on the final
 commit, approve those runs or revise this policy before merging. No skip-CI marker
 is added, so ordinary main-branch and tag workflows remain enabled.
 
