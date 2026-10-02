@@ -14,7 +14,7 @@ Python, R, Julia, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
-**Version: v1.0.1.** Reference comparisons reproduce WBGT and its component
+**Version: v1.1.0.** Reference comparisons reproduce WBGT and its component
 temperatures bit for bit under matched compiler and floating-point settings.
 The v1 calculation remains the default throughout 1.x; future numerical
 revisions will use explicit versioned APIs while preserving v1. See the

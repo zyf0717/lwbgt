@@ -1,36 +1,41 @@
-# v1.0.1 release verification
+# v1.1.0 release verification
 
-v1.0.1 relaxes R golden-value tests to native binary32 epsilon (`2^-23`) for
-builds without long-double support. The calculation and public interfaces are
-unchanged. On 2026-10-01, native, installed-wheel Python, and SwiftPM checks
-passed. R 4.6.1 checks passed with GCC, Clang, and disabled long-double support,
-including the PDF manual, with no errors or warnings.
+Release preparation started on 2026-10-02. v1.1.0 adds the Julia interface under
+`julia/` and native artifact distribution through this repository's release
+workflow. All interfaces share version 1.1.0. The reference-compatible numerical
+kernel, v1 FFI ABI, and `liblwbgt.so.0` SONAME are unchanged.
 
-## Unreleased validation
+The CMake package now accepts compatible releases within major version 1. Its
+existing consumer test requests 1.0.0 and must continue to accept 1.1.0.
 
-The shared 35,976-row corpus, expanded edge checks, throughput comparison, and
-documentation updates retain package version 1.0.1. They require no separate
-release. [BASELINE.md](BASELINE.md) records coverage and hashes;
-[benchmarks/README.md](../benchmarks/README.md) records the timing method and
-results.
+## Validation status
 
-Local checks on 2026-10-01 passed:
+This is version and release-note preparation, not a published release. PR CI,
+manual native-artifact preparation, the metadata release PR, tagged publication,
+and published-installation checks remain release gates. Julia General
+registration follows successful publication.
 
-- 17 CTest checks on Linux x86_64 with GCC 13.3.0 and Clang 18.1.3, including
-  whole-corpus compatibility, scalar/batch equality, and benchmark accounting;
-- 18 installed-wheel Python tests, including a wheel built from the sdist;
-- three release-mode SwiftPM tests with Swift 6.2.4;
-- distribution, version, and R-source checks;
-- seven paired throughput measurements at each scale with GCC 13.3.0,
-  measuring 1.605× and 1.604× median speedups at 1× and 10×.
+Local Linux checks passed for the 1.1.0 preparation:
 
-The extracted Clang toolchain needed its `libomp` directory in
-`LD_LIBRARY_PATH` for the R example. Follow
-[RELEASING.md](../docs/RELEASING.md) when preparing a future release.
+- Version coherence and byte-identical R source copies.
+- All 15 native CTest checks, including the installed CMake consumer requesting
+  1.0.0, using GCC 13.3 in release mode.
+- All four SwiftPM consumer tests using the CI image `swift:6.2.4-noble` in
+  release mode with `-march=native`, including bit-for-bit comparison with CMake
+  over all 35,976 WBGT cases. macOS validation remains in CI.
+- Python wheel and source-distribution contents, plus all 18 installed-wheel
+  tests with Python 3.14.7.
+- `R CMD build` and `R CMD check`, including the PDF manual: `Status: OK`.
+- Julia API tests (23 assertions), packaging/source-identity tests (16
+  assertions), and four metadata-preparation guard tests. API tests loaded the
+  locally built library; platform archive validation remains in release preparation.
 
-## Earlier verification
+The numerical corpus and recorded baseline are unchanged; retain their original
+version and provenance in [baseline.json](baseline.json). See
+[BASELINE.md](BASELINE.md) for coverage and
+[benchmarks/README.md](../benchmarks/README.md) for the existing throughput record.
+No new numerical or performance claim is introduced by this version bump.
 
-v1.0.0, checked on 2026-09-25, passed native, distribution, installed-wheel,
-R, and Linux SwiftPM checks. Numerical results matched the pre-refactor kernel,
-the Linux SONAME remained `liblwbgt.so.0`, and R reported `Status: OK`.
-Older records are retained in the `RELEASE-*.md` files.
+Follow [RELEASING.md](../docs/RELEASING.md) for preparation and publication.
+Earlier verification is preserved in [RELEASE-1.0.1.md](RELEASE-1.0.1.md) and the
+other `RELEASE-*.md` files.

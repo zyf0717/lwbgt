@@ -1,3 +1,10 @@
+# lwbgt 1.1.0
+
+- Synchronize with the shared release adding the Julia interface. The R API
+  and reference-compatible native calculation are unchanged.
+- Carry the expanded shared numerical corpus and cross-platform validation
+  improvements documented in the project changelog.
+
 # lwbgt 1.0.1
 
 - Relax R test-suite golden-value comparisons to native single-precision
