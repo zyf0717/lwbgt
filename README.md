@@ -10,7 +10,7 @@
 
 `lwbgt` computes outdoor wet bulb globe temperature (WBGT) using the original
 Argonne Liljegren C calculation. One optimized C kernel serves the C/FFI,
-Python, R, and SwiftPM interfaces.
+Python, R, Julia, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
@@ -115,6 +115,15 @@ The R API provides `lwbgt_input()`, `calculate()`, and `esat()`. It returns
 ordinary data frames, recycles scalar constructor arguments, and isolates
 invalid or non-convergent rows. See the
 [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md).
+
+## Julia
+
+`LWBGT` lives in this repository's `julia/` subdirectory and exposes `Input`,
+`Result`, `calculate`, `calculate_batch`, and `esat` through the native v1 ABI.
+Julia ≥1.10 is supported. The first binary-artifact release and General
+registration are pending; see the [Julia guide](julia/README.md) for development
+installation and usage. Published releases will install the native library
+automatically, without a compiler or a separate JLL package.
 
 ## SwiftPM
 

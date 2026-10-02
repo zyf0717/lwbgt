@@ -66,6 +66,7 @@ sdist.include = [
   "/src/**",
   "/upstream/**",
   "/python/**",
+  "/julia/**",
   "/r/**",
   "/tests/**",
   "/benchmarks/**",

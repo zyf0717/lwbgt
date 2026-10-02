@@ -4,7 +4,7 @@ Test, benchmark, and documentation changes can merge without a package
 release. Keep the current version and record them under `Unreleased`. Publishing
 new package artifacts requires a new version.
 
-Release from a commit with passing native, SwiftPM, Python wheel, and R CI.
+Release from a commit with passing native, SwiftPM, Python wheel, R, and Julia CI.
 Use the workflow definitions as the source of truth for supported platforms.
 
 ## Prepare
@@ -26,6 +26,58 @@ R CMD check "lwbgt_${release_version}.tar.gz"
 
 Check the R source artifact from the same commit, including its PDF manual.
 
+### Julia native archives
+
+Julia shares the C/Python/R version, including releases that only change a binding.
+The first Julia publication must use a new version (currently the next is 1.0.2);
+do not add it retroactively to the published 1.0.1 release.
+
+Development PRs run CI automatically on each update and never write commits.
+Merge the shared version bump and release notes into `main`, then start the
+**Julia** workflow manually on `main`:
+
+```sh
+gh workflow run julia.yml --ref main
+```
+
+Manual preparation rejects an already tagged version. It runs the native/SwiftPM,
+Python-wheel, R, and full Julia platform tests. After all pass, it verifies the
+archives and opens or updates `codex/julia-release-vX.Y.Z`, a separate release PR
+containing only:
+
+- `julia/Artifacts.toml`: platform-specific release URLs and hashes.
+- `julia/native-build.toml`: the tested source commit, source-tree digest, and CI run.
+
+Wait for the preparation run to finish successfully. If GitHub requests approval
+for the bot-created PR's workflows, approve it: that now runs useful verification
+on the final metadata commit. Julia CI authenticates the successful manual run,
+compares the committed metadata with its output, checks all archive hashes and
+the prospective merge tree, and tests installation from the prepared Linux archive. It reuses
+the tested binaries instead of rebuilding the five-platform matrix. Native,
+Python-wheel, and R workflows skip PRs changing only these two generated files.
+Any source change in the PR selects the full test matrix instead. CI on `main`
+and tag-triggered publishing remain automatic.
+
+Review and merge the release PR manually, then tag its merged commit. Squash or
+rebase merging is supported because source identity is checked by tree content,
+excluding only the two generated files. If `main` advances during preparation, the
+workflow refuses to open the PR; start preparation again. If source changes after
+the PR opens, its metadata verification or the tag preflight rejects the stale
+archives. Reprepare after source changes or if the 90-day CI artifacts expire.
+
+Generated URLs become usable only after the corresponding archives are published.
+Preparation neither tags nor publishes a release. Runtime archives contain the
+native installation and license notices; matching-toolchain probes remain only
+in CI artifacts. To inspect a preparation locally:
+
+```sh
+gh run download RUN_ID --name julia-native --dir build/julia-release
+julia -e 'include("julia/build/artifacts.jl"); verify("build/julia-release", "build/julia-release/Artifacts.toml", "build/julia-release/native-build.toml")'
+```
+
+BinaryBuilder is a pinned build-only dependency. Our CI builds and audits the
+five supported targets without generating a JLL or submitting to Yggdrasil.
+
 ## Publish
 
 After all gates pass, create and push an annotated or signed tag:
@@ -35,16 +87,36 @@ git tag -a "v${release_version}" -m "lwbgt v${release_version}"
 git push origin "v${release_version}"
 ```
 
-The [release workflow](../.github/workflows/release.yml) builds the artifacts,
+The [release workflow](../.github/workflows/release.yml) verifies the prepared Julia
+archives and their source before publishing anything. It builds the Python/R artifacts,
 publishes to TestPyPI, verifies their hashes and installation, then publishes
-to PyPI and creates the GitHub release. Verify the published version and test
+to PyPI and creates the GitHub release with the exact prepared native archives.
+It then tests Julia installation from the tagged subdirectory on all five platforms.
+Verify the published version and test
 Python and R installation in clean environments using the [README](../README.md).
 Require a successful R-universe build for the tagged commit before announcing
 its R release. Correct a defective release with a new version; never replace
 published artifacts.
+
+After the published Julia installation checks pass, register the **tagged commit**
+by commenting `@JuliaRegistrator register subdir=julia` on that commit. Use the
+existing annotated `vX.Y.Z` tag for all bindings; no Julia-specific tag or TagBot
+workflow is needed. Registration is separate from building and publishing binaries.
+Preserve the existing Julia UUID. The all-capitals `LWBGT` name may require a manual
+naming exception at initial registration; subdirectory packages need no `.jl`
+repository suffix.
 
 ## Service setup
 
 Configure PyPI and TestPyPI Trusted Publishing for `release.yml` and its
 protected environments. The R-universe registry must point to this repository
 with `subdir: "r"` and `branch: "*release"` so it follows GitHub releases.
+Allow GitHub Actions to create pull requests under **Settings → Actions → General
+→ Workflow permissions**. Keep the default token read-only; only the manual
+release-PR job requests contents/PR write permissions. The built-in token is enough;
+no additional app or personal token is required. Approve the bot PR's verification
+run when GitHub requests it.
+
+Install JuliaRegistrator on this repository before the first Julia registration.
+Retire the standalone Julia repository and superseded Yggdrasil submission only
+after the integrated package has been published and verified.

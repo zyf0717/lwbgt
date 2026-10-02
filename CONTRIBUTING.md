@@ -54,6 +54,13 @@ LWBGT_EXPECTED="$PWD/build/swift-expected.csv" \
 swift test --package-path tests/swiftpm -c release -Xcc -march=native
 ```
 
+For Julia changes, run `julia --project=julia julia/test/runtests.jl` with
+`LWBGT_LIBRARY` pointing to the built shared library, and run
+`julia julia/test/packaging.jl`. The Julia workflow also tests the actual archives
+on five platforms with Julia 1.10 and current stable, comparing them with probes
+built using the same toolchain and the retained original. No native integration
+tests are silently skipped when a library is unavailable.
+
 Performance claims require the [benchmark method](benchmarks/README.md).
 Windows CI also tests an opt-in MSVC build (`LWBGT_EXPERIMENTAL_MSVC=ON`) and
 uploads cross-compiler numerical reports. Finite values must match exactly;

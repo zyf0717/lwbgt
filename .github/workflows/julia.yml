@@ -1,0 +1,197 @@
+name: Julia
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  select:
+    name: Select source tests or prepared artifact verification
+    runs-on: ubuntu-24.04
+    outputs:
+      metadata_only: ${{ steps.select.outputs.metadata_only }}
+      version: ${{ steps.select.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - run: python3 tests/test_julia_metadata.py
+      - id: select
+        run: python3 julia/build/preparation.py classify
+
+  verify-prepared:
+    needs: select
+    if: needs.select.outputs.metadata_only == 'true'
+    uses: ./.github/workflows/julia-verify.yml
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: select
+    if: needs.select.outputs.metadata_only != 'true'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-linux-gnu, aarch64-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin, x86_64-w64-mingw32]
+    env:
+      BINARYBUILDER_AUTOMATIC_APPLE: 'true'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+      - uses: julia-actions/cache@v2
+      - name: Install the pinned build environment
+        run: julia --project=julia/build -e 'using Pkg; Pkg.instantiate()'
+      - name: Build a clean source snapshot
+        shell: bash
+        run: |
+          mkdir -p build/julia-source
+          git archive HEAD | tar -x -C build/julia-source
+          export LWBGT_SOURCE_DIR="$PWD/build/julia-source"
+          julia --project=julia/build julia/build/build_tarballs.jl '${{ matrix.target }}' --verbose
+      - uses: actions/upload-artifact@v7
+        with:
+          name: julia-products-${{ matrix.target }}
+          path: products/lwbgt.v*.tar.gz
+          if-no-files-found: error
+
+  prepare:
+    name: Prepare release archives and metadata
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: julia-products-*
+          path: products
+          merge-multiple: true
+      - run: julia julia/build/artifacts.jl prepare products native
+      - run: julia julia/test/packaging.jl
+      - name: Verify generated archives
+        run: julia -e 'include("julia/build/artifacts.jl"); verify("native", "native/Artifacts.toml", "native/native-build.toml")'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: julia-native
+          path: native/*
+          retention-days: 90
+          if-no-files-found: error
+
+  test:
+    name: Julia ${{ matrix.julia }} / ${{ matrix.platform.target }}
+    needs: prepare
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        julia: ['1.10', '1']
+        platform:
+          - {runner: ubuntu-24.04, target: x86_64-linux-gnu}
+          - {runner: ubuntu-24.04-arm, target: aarch64-linux-gnu}
+          - {runner: macos-15-intel, target: x86_64-apple-darwin}
+          - {runner: macos-15, target: aarch64-apple-darwin}
+          - {runner: windows-2025, target: x86_64-w64-mingw32}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.julia }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-native
+          path: native
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-products-${{ matrix.platform.target }}
+          path: products
+      - name: Compare native oracle and test isolated Julia package
+        run: python tests/check_julia_native.py products native '${{ matrix.platform.target }}'
+
+  release-native:
+    needs: select
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/ci.yml
+
+  release-wheels:
+    needs: select
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/wheels.yml
+
+  release-r:
+    needs: select
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/r.yml
+
+  release-pr:
+    name: Open release metadata PR
+    needs: [select, test, release-native, release-wheels, release-r]
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: julia-release-pr
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-native
+          path: ${{ runner.temp }}/julia-native
+      - name: Verify and copy the prepared metadata
+        env:
+          NATIVE_ARCHIVES: ${{ runner.temp }}/julia-native
+        run: |
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          julia -e 'include("julia/build/artifacts.jl"); d=ARGS[1]; verify(d, joinpath(d,"Artifacts.toml"), joinpath(d,"native-build.toml"))' "$NATIVE_ARCHIVES"
+          cp "$NATIVE_ARCHIVES/Artifacts.toml" julia/Artifacts.toml
+          cp "$NATIVE_ARCHIVES/native-build.toml" julia/native-build.toml
+      - name: Open or update the release PR
+        id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
+        with:
+          base: main
+          branch: codex/julia-release-v${{ needs.select.outputs.version }}
+          add-paths: |
+            julia/Artifacts.toml
+            julia/native-build.toml
+          commit-message: 'build(julia): prepare v${{ needs.select.outputs.version }} artifacts'
+          title: 'Release v${{ needs.select.outputs.version }}: pin native artifacts'
+          body: |
+            Pin the exact native archives tested by ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} for source `${{ github.sha }}`.
+
+            Wait for that preparation run to finish successfully, then approve this PR's workflow run if GitHub requests it. Julia CI will verify source and archive hashes and test installation from the prepared archive; it will not rebuild the native binaries or write commits.
+
+            Review and merge manually, then tag the merged commit. If main changes beyond these two metadata files, prepare again. The archives expire after 90 days. This PR does not publish a release.
+      - name: Report the release PR
+        env:
+          PR_URL: ${{ steps.pr.outputs.pull-request-url }}
+        run: |
+          echo "Release metadata PR: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
