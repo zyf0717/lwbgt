@@ -1,5 +1,8 @@
 # v0.4.3 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 v0.4.3 corrects direct scalar estimated wind at the 2 m reference height and
 initializes the optional demonstration's first `dT`. The original 1950–2049
 solar calculation and its valid-input numerical results remain unchanged,

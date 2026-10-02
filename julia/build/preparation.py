@@ -1,4 +1,4 @@
-"""Select metadata-only validation and authenticate a release preparation run."""
+"""Check release preparation prerequisites and authenticate prepared archives."""
 
 from __future__ import annotations
 
@@ -9,12 +9,6 @@ import re
 import subprocess
 import sys
 import tomllib
-
-GENERATED = {"julia/Artifacts.toml", "julia/native-build.toml"}
-
-
-def metadata_only(paths: list[str]) -> bool:
-    return bool(paths) and set(paths) <= GENERATED
 
 
 def validate_run(run: dict, repository: str, source: str) -> None:
@@ -33,27 +27,18 @@ def output(**values) -> None:
             print(f"{key}={value}", file=stream)
 
 
-def classify() -> None:
+def preflight() -> None:
+    if os.environ["GITHUB_REF"] != "refs/heads/main":
+        raise RuntimeError("start release preparation on main")
     version = tomllib.loads(Path("julia/Project.toml").read_text())["version"]
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         raise RuntimeError("expected a stable shared release version")
-    only_metadata = False
-    if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
-        event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
-        base = event["pull_request"]["base"]["sha"]
-        paths = subprocess.check_output(
-            ["git", "diff", "--name-only", "-z", f"{base}...HEAD"], text=True,
-        ).split("\0")
-        only_metadata = metadata_only([path for path in paths if path])
-    elif os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch":
-        if os.environ["GITHUB_REF"] != "refs/heads/main":
-            raise RuntimeError("start release preparation on main")
-        tag = subprocess.run(["git", "show-ref", "--verify", "--quiet", f"refs/tags/v{version}"])
-        if tag.returncode == 0:
-            raise RuntimeError(f"v{version} already exists; merge a new version before preparing a release")
-        if tag.returncode != 1:
-            raise RuntimeError("could not check existing release tags")
-    output(metadata_only=str(only_metadata).lower(), version=version)
+    tag = subprocess.run(["git", "show-ref", "--verify", "--quiet", f"refs/tags/v{version}"])
+    if tag.returncode == 0:
+        raise RuntimeError(f"v{version} already exists; merge a new version before preparing a release")
+    if tag.returncode != 1:
+        raise RuntimeError("could not check existing release tags")
+    output(version=version)
 
 
 def check_run() -> None:
@@ -70,9 +55,9 @@ def check_run() -> None:
 
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["classify"]:
-        classify()
+    if sys.argv[1:] == ["preflight"]:
+        preflight()
     elif sys.argv[1:] == ["check-run"]:
         check_run()
     else:
-        raise SystemExit("usage: preparation.py classify | check-run")
+        raise SystemExit("usage: preparation.py preflight | check-run")

@@ -1,5 +1,8 @@
 # v0.2.0 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 v0.2.0 leaves the frozen numerical source unchanged and adds a versioned batch
 FFI, static/shared installation metadata, and tested Python, R, and Julia
 interoperability examples.

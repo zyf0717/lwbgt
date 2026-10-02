@@ -2,10 +2,8 @@
 
 Julia ≥1.10 binding to the reference-compatible Liljegren C kernel. The package
 lives in the `julia` subdirectory of [lwbgt](https://github.com/zyf0717/lwbgt).
-It retains the UUID and API of the original standalone `LWBGT.jl` repository.
 
-The first artifact-backed release and General registration are pending. After
-registration, install with `using Pkg; Pkg.add("LWBGT")`. A published tag can also
+Install with `using Pkg; Pkg.add("LWBGT")`. A published tag can also
 be installed with `Pkg.add(url="https://github.com/zyf0717/lwbgt.git",
 subdir="julia", rev="vX.Y.Z")`, replacing the version with a published Julia release.
 
@@ -17,22 +15,8 @@ in input order through one serial native call. `calculate(inputs::AbstractVector
 also accepts a batch. `esat(temperature_k; phase=0)` returns saturation vapour
 pressure in hPa; phase 0 is water and phase 1 is ice.
 
-```julia
-using LWBGT
-
-weather = Input(
-    year=2024, month=4, day=15, hour=14, minute=30,
-    gmt_offset_hours=8, averaging_minutes=60, urban=1,
-    latitude_deg_north=1.3521, longitude_deg_east=103.8198,
-    solar_w_m2=742.0, pressure_hpa=1008.4,
-    air_temperature_c=32.1, relative_humidity_percent=68.0,
-    wind_speed_m_s=2.8, wind_height_m=10.0,
-    vertical_temperature_difference_c=1,
-)
-result = calculate(weather)
-@assert result.status == 0
-println(result.wbgt_c)
-```
+See the [Julia quick start](https://github.com/zyf0717/lwbgt#julia) for a complete
+input record and scalar/batch examples.
 
 Field names encode units. There is no extra validation, clamping, missing-value
 policy, or implicit weather assumption. Status -1 reports solar-position rejection
