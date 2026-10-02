@@ -5,9 +5,9 @@
 - Integrate the Julia package in `julia/`, with a shared release version,
   automatic native artifact loading, and independently operated BinaryBuilder CI.
   Prepare and verify native archives before tagging; publish those same archives
-  with the Python and R release. CI appends verified metadata to the same PR
-  after its tests pass; merging and tagging remain manual. General registration
-  is pending.
+  with the Python and R release. Explicit release preparation opens a separate
+  metadata PR; development CI never writes commits. Merging and tagging remain
+  manual. General registration is pending.
 - Add opt-in MSVC compatibility testing for native libraries, installed C/C++
   consumers, Python loading, and exact finite cross-compiler comparisons.
 - Reuse the Linux native build for SwiftPM, combine Linux/R-release checking

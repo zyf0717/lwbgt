@@ -32,52 +32,47 @@ Julia shares the C/Python/R version, including releases that only change a bindi
 The first Julia publication must use a new version (currently the next is 1.0.2);
 do not add it retroactively to the published 1.0.1 release.
 
-Put the version bump and all release changes in a same-repository PR. The **Julia**
-workflow builds and tests the PR's source commit. After its full matrix and the
-native, Python-wheel, and R workflows pass, it verifies the archives and appends
-one commit to that same PR containing only:
+Development PRs run CI automatically on each update and never write commits.
+Merge the shared version bump and release notes into `main`, then start the
+**Julia** workflow manually on `main`:
+
+```sh
+gh workflow run julia.yml --ref main
+```
+
+Manual preparation rejects an already tagged version. It runs the native/SwiftPM,
+Python-wheel, R, and full Julia platform tests. After all pass, it verifies the
+archives and opens or updates `codex/julia-release-vX.Y.Z`, a separate release PR
+containing only:
 
 - `julia/Artifacts.toml`: platform-specific release URLs and hashes.
 - `julia/native-build.toml`: the tested source commit, source-tree digest, and CI run.
 
-The job refuses to push if the PR closes or its source changes. Review the
-metadata commit, wait for the originating Julia workflow to finish successfully,
-and merge the PR manually. Tag the merged commit manually after the release gates
-pass. Squash or rebase merging is supported because source identity is checked by
-tree content, excluding only these two generated files.
+Wait for the preparation run to finish successfully. If GitHub requests approval
+for the bot-created PR's workflows, approve it: that now runs useful verification
+on the final metadata commit. Julia CI authenticates the successful manual run,
+compares the committed metadata with its output, checks all archive hashes and
+the prospective merge tree, and tests installation from the prepared Linux archive. It reuses
+the tested binaries instead of rebuilding the five-platform matrix. Native,
+Python-wheel, and R workflows skip PRs changing only these two generated files.
+Any source change in the PR selects the full test matrix instead. CI on `main`
+and tag-triggered publishing remain automatic.
 
-The metadata push uses `GITHUB_TOKEN`, so it does not automatically execute another
-test matrix. GitHub may show approval-pending workflows on the bot commit; the
-successful source checks belong to its parent commit. The bot does not copy check
-results onto the new commit. Approving the pending workflows starts the tests;
-those bot-triggered runs skip the metadata-commit job, even when a human approves
-or reruns them. They cannot append another metadata commit. Approval is not needed
-for the intended single-pass review and manual merge with the current branch rules.
-If branch rules later require checks on the final
-commit, approve those runs or revise this policy before merging. No skip-CI marker
-is added, so ordinary main-branch and tag workflows remain enabled.
+Review and merge the release PR manually, then tag its merged commit. Squash or
+rebase merging is supported because source identity is checked by tree content,
+excluding only the two generated files. If `main` advances during preparation, the
+workflow refuses to open the PR; start preparation again. If source changes after
+the PR opens, its metadata verification or the tag preflight rejects the stale
+archives. Reprepare after source changes or if the 90-day CI artifacts expire.
 
-Each subsequent source push runs the checks again and replaces the metadata.
-Do not combine other source changes after preparation and before tagging. The
-release preflight rejects such changes. CI archives are retained for 90 days;
-rerun preparation if they expire. Generated URLs become usable only when their
-corresponding archives are published; preparing metadata does not publish a release.
-Runtime archives contain the native installation and license notices; the
-matching-toolchain test probes remain only in CI artifacts.
-
-For a fork PR, the bot cannot write to its branch. The manual fallback is to run
-preparation on a branch in this repository and copy the files from that successful
-run (also useful for refreshing expired archives):
+Generated URLs become usable only after the corresponding archives are published.
+Preparation neither tags nor publishes a release. Runtime archives contain the
+native installation and license notices; matching-toolchain probes remain only
+in CI artifacts. To inspect a preparation locally:
 
 ```sh
-gh workflow run julia.yml --ref BRANCH
-# Find the completed run's ID with: gh run list --workflow julia.yml
 gh run download RUN_ID --name julia-native --dir build/julia-release
-cp build/julia-release/Artifacts.toml julia/Artifacts.toml
-cp build/julia-release/native-build.toml julia/native-build.toml
-git add julia/Artifacts.toml julia/native-build.toml
-git commit -m "build(julia): pin prepared native release artifacts"
-julia julia/build/artifacts.jl verify build/julia-release
+julia -e 'include("julia/build/artifacts.jl"); verify("build/julia-release", "build/julia-release/Artifacts.toml", "build/julia-release/native-build.toml")'
 ```
 
 BinaryBuilder is a pinned build-only dependency. Our CI builds and audits the
@@ -116,6 +111,12 @@ repository suffix.
 Configure PyPI and TestPyPI Trusted Publishing for `release.yml` and its
 protected environments. The R-universe registry must point to this repository
 with `subdir: "r"` and `branch: "*release"` so it follows GitHub releases.
+Allow GitHub Actions to create pull requests under **Settings → Actions → General
+→ Workflow permissions**. Keep the default token read-only; only the manual
+release-PR job requests contents/PR write permissions. The built-in token is enough;
+no additional app or personal token is required. Approve the bot PR's verification
+run when GitHub requests it.
+
 Install JuliaRegistrator on this repository before the first Julia registration.
 Retire the standalone Julia repository and superseded Yggdrasil submission only
 after the integrated package has been published and verified.

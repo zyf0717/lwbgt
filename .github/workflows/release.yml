@@ -30,53 +30,12 @@ jobs:
   native-artifacts:
     name: Verify prepared Julia binaries
     needs: release-tag
-    runs-on: ubuntu-24.04
     permissions:
       contents: read
       actions: read
-    steps:
-      - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: '1.10'
-      - name: Read the preparation run
-        id: prepared
-        run: |
-          julia -e '
-            using TOML
-            m = TOML.parsefile("julia/native-build.toml")
-            occursin(r"^[0-9]+$", m["run_id"]) || error("invalid run ID")
-            occursin(r"^[0-9a-f]{40}$", m["source_commit"]) || error("invalid source commit")
-            open(ENV["GITHUB_OUTPUT"], "a") do io
-              println(io, "run_id=", m["run_id"])
-              println(io, "source_commit=", m["source_commit"])
-            end'
-      - name: Require a successful preparation run from this repository
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PREPARED_RUN: ${{ steps.prepared.outputs.run_id }}
-          PREPARED_COMMIT: ${{ steps.prepared.outputs.source_commit }}
-        run: |
-          endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$PREPARED_RUN"
-          test "$(gh api "$endpoint" --jq '.conclusion == "success" and (.event == "workflow_dispatch" or .event == "pull_request") and .path == ".github/workflows/julia.yml"')" = true
-          test "$(gh api "$endpoint" --jq '.head_sha')" = "$PREPARED_COMMIT"
-          test "$(gh api "$endpoint" --jq '.head_repository.full_name')" = "$GITHUB_REPOSITORY"
-      - uses: actions/download-artifact@v8
-        with:
-          name: julia-native
-          path: native
-          run-id: ${{ steps.prepared.outputs.run_id }}
-          github-token: ${{ github.token }}
-      - name: Verify source and exact archive identities
-        run: |
-          cmp native/Artifacts.toml julia/Artifacts.toml
-          cmp native/native-build.toml julia/native-build.toml
-          julia julia/build/artifacts.jl verify native
-      - uses: actions/upload-artifact@v7
-        with:
-          name: julia-native-release
-          path: native/*.tar.gz
-          if-no-files-found: error
+    uses: ./.github/workflows/julia-verify.yml
+    with:
+      upload-release: true
 
   testpypi-publish:
     name: Publish verified artifacts to TestPyPI
