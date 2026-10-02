@@ -14,6 +14,15 @@ LICENSE_FILES = {
     "src/LicenseRef-UChicago-Argonne-WBGT-1.1.txt",
 }
 SDIST_BUILD_FILES = {
+    "julia/Project.toml",
+    "julia/Artifacts.toml",
+    "julia/src/LWBGT.jl",
+    "julia/src/ffi.jl",
+    "julia/src/types.jl",
+    "julia/test/runtests.jl",
+    "julia/test/corpus.jl",
+    "julia/LICENSE",
+    "julia/THIRD_PARTY_NOTICE.md",
     "Package.swift",
     "CMakeLists.txt",
     "pyproject.toml",

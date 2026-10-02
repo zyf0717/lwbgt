@@ -27,9 +27,59 @@ jobs:
     needs: release-tag
     uses: ./.github/workflows/r.yml
 
+  native-artifacts:
+    name: Verify prepared Julia binaries
+    needs: release-tag
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+      - name: Read the preparation run
+        id: prepared
+        run: |
+          julia -e '
+            using TOML
+            m = TOML.parsefile("julia/native-build.toml")
+            occursin(r"^[0-9]+$", m["run_id"]) || error("invalid run ID")
+            occursin(r"^[0-9a-f]{40}$", m["source_commit"]) || error("invalid source commit")
+            open(ENV["GITHUB_OUTPUT"], "a") do io
+              println(io, "run_id=", m["run_id"])
+              println(io, "source_commit=", m["source_commit"])
+            end'
+      - name: Require a successful preparation run from this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREPARED_RUN: ${{ steps.prepared.outputs.run_id }}
+          PREPARED_COMMIT: ${{ steps.prepared.outputs.source_commit }}
+        run: |
+          endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$PREPARED_RUN"
+          test "$(gh api "$endpoint" --jq '.conclusion == "success" and .event == "workflow_dispatch" and .path == ".github/workflows/julia.yml"')" = true
+          test "$(gh api "$endpoint" --jq '.head_sha')" = "$PREPARED_COMMIT"
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-native
+          path: native
+          run-id: ${{ steps.prepared.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify source and exact archive identities
+        run: |
+          cmp native/Artifacts.toml julia/Artifacts.toml
+          cmp native/native-build.toml julia/native-build.toml
+          julia julia/build/artifacts.jl verify native
+      - uses: actions/upload-artifact@v7
+        with:
+          name: julia-native-release
+          path: native/*.tar.gz
+          if-no-files-found: error
+
   testpypi-publish:
     name: Publish verified artifacts to TestPyPI
-    needs: [artifacts, r-artifact]
+    needs: [artifacts, r-artifact, native-artifacts]
     runs-on: ubuntu-24.04
     environment:
       name: testpypi
@@ -165,7 +215,7 @@ jobs:
 
   github-release:
     name: Create GitHub release
-    needs: [publish, r-artifact]
+    needs: [publish, r-artifact, native-artifacts]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -179,8 +229,34 @@ jobs:
         with:
           name: r-source
           path: r-dist
+      - uses: actions/download-artifact@v8
+        with:
+          name: julia-native-release
+          path: native
       - name: Create release for the existing annotated tag
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* r-dist/* --verify-tag --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/* r-dist/* native/* --verify-tag --generate-notes
+
+  julia-install:
+    name: Verify published Julia installation
+    needs: github-release
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-15-intel, macos-15, windows-2025]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - name: Install and test the tagged subdirectory in a clean environment
+        shell: bash
+        env:
+          JULIA_DEPOT_PATH: ${{ runner.temp }}/julia-release-depot
+        run: |
+          julia -e 'using Pkg;
+            Pkg.activate(mktempdir());
+            Pkg.add(PackageSpec(url="https://github.com/zyf0717/lwbgt.git", rev=ENV["GITHUB_REF_NAME"], subdir="julia"));
+            Pkg.test("LWBGT")'
