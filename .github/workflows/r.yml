@@ -62,7 +62,7 @@ jobs:
         run: echo "_R_CHECK_BASHISMS_=false" >> "$GITHUB_ENV"
       - name: Select Clang for R package compilation
         if: matrix.compiler == 'clang'
-        run: echo "R_MAKEVARS_USER=$GITHUB_WORKSPACE/.github/R-Makevars-clang" >> "$GITHUB_ENV"
+        run: echo "R_MAKEVARS_USER=$GITHUB_WORKSPACE/.github/r/Makevars.clang" >> "$GITHUB_ENV"
       - name: Verify synchronized sources and versions
         if: matrix.compiler == 'gcc'
         run: |

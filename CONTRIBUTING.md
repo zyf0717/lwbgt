@@ -32,22 +32,33 @@ Rejected solar and non-finite weather inputs need separate API checks; see
 measurements when the corpus changes. Keep the R copies of `wbgt.c` and
 `lwbgt.h` byte-identical to their canonical sources.
 
-## Validation
+## CI
 
-**Validate** runs native/Swift, Python, and R checks when a PR targeting `main`
+| Workflow | Role |
+|---|---|
+| [CI](.github/workflows/ci.yml) | PR, post-merge, and manual entrypoint; runs all 15 checks |
+| [Native checks](.github/workflows/native.yml) | Reusable C/C++ and SwiftPM build, numerical, ABI, and installation checks |
+| [Python package](.github/workflows/python.yml) | Reusable wheel, source-distribution, and installed-package checks |
+| [R package](.github/workflows/r.yml) | Reusable compiler/platform and R-release/R-devel package checks |
+| [Release](.github/workflows/release.yml) | Tag-triggered Python/R builds and publication |
+
+**CI** runs native/Swift, Python, and R checks when a PR targeting `main`
 is opened, updated with new commits, or reopened, and again after it is merged.
 PR checks test GitHub's merge ref; the post-merge run tests the merged commit.
 Closing a PR without merging skips all validation jobs. Direct branch pushes,
 including pushes to `main`, do not trigger validation unless they update an
 open PR targeting `main`.
 
-To validate a selected branch manually, use **Actions → Validate → Run workflow**.
+To validate a selected branch manually, use **Actions → CI → Run workflow**.
 Manual runs test the selected commit. Review the tested commit and results in
 Actions before merging. A new run cancels older validation for the same PR or
 manually selected branch.
 
 Validation does not write commits or publish. See [RELEASING.md](docs/RELEASING.md)
 for release preparation and tag-triggered publication.
+
+The Linux Clang / R-devel job selects its compiler through
+[Makevars.clang](.github/r/Makevars.clang), using `R_MAKEVARS_USER`.
 
 ```sh
 python3 tests/check_versions.py

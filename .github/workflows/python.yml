@@ -1,4 +1,4 @@
-name: wheels
+name: Python package
 
 on:
   workflow_call:
