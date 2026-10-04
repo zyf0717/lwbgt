@@ -9,7 +9,6 @@ Start with the [README](../README.md) for installation and language entrypoints.
 | [Compatibility](COMPATIBILITY.md) | Numerical guarantees and evidence |
 | [FAQ](FAQ.md) | Integration and failure handling |
 | [R guide](../r/README.md) | R installation and row-level failure handling |
-| [Julia guide](../julia/README.md) | Julia API, native artifacts, and development |
 | [Package comparison](COMPARISON.md) | lwbgt, pywbgt, and thermofeel scope |
 | [Upstream](UPSTREAM.md) | Pinned source provenance |
 | [Source changes](DEVIATIONS.md) | Changes from the retained original |

@@ -18,7 +18,7 @@ evidence-only commit changes no library, build, test, licence, or ABI contract
 content.
 
 Acceptance required all eight CTest tests, including installed C, C++, Python,
-R, and Julia consumers; the installed licence, notice, and ABI documents; the
+and R consumers; the installed licence, notice, and ABI documents; the
 three-symbol shared export audit; and a byte-exact oracle comparison.
 
 All eight CTest tests passed in the clean checkout. The explicit differential

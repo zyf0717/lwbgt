@@ -71,7 +71,7 @@ synthetic grids/samples, not a verified observed-weather dataset.
 
 The full corpus runs through static and Python-runtime probes, scalar/batch
 checks in chunks of up to 1,024 rows, and installed-wheel tests. Numerical
-comparison runs in **Validate → All checks**; full throughput measurement is a
+comparison runs in **Validate**; full throughput measurement is a
 separate local run.
 
 ## Reproduce

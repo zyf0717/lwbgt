@@ -2,21 +2,16 @@
 
 [v1.1.0](https://github.com/zyf0717/lwbgt/releases/tag/v1.1.0) was published on
 2026-10-02 from commit `b6c49eff1d34738ae40f1d6b51a62cc3a5d0e83d`.
-It adds the Julia interface under
-`julia/` and native artifact distribution through this repository's release
-workflow. All interfaces share version 1.1.0. The reference-compatible numerical
-kernel, v1 FFI ABI, and `liblwbgt.so.0` SONAME are unchanged.
+The reference-compatible numerical kernel, v1 FFI ABI, and `liblwbgt.so.0`
+SONAME are unchanged.
 
 The CMake package now accepts compatible releases within major version 1. Its
 existing consumer test requests 1.0.0 and must continue to accept 1.1.0.
 
 ## Validation status
 
-The [artifact preparation](https://github.com/zyf0717/lwbgt/actions/runs/36968661265)
-and [release workflow](https://github.com/zyf0717/lwbgt/actions/runs/36971287469)
-passed, including Python/R package checks, publication, and Julia installation
-from the published archives on all five platforms. Julia's registry submission
-is tracked separately in [General #170273](https://github.com/JuliaRegistries/General/pull/170273).
+The [release workflow](https://github.com/zyf0717/lwbgt/actions/runs/36971287469)
+passed, including Python/R package checks and publication.
 
 Local Linux checks passed for the 1.1.0 preparation:
 
@@ -25,14 +20,10 @@ Local Linux checks passed for the 1.1.0 preparation:
   1.0.0, using GCC 13.3 in release mode.
 - All four SwiftPM consumer tests using the CI image `swift:6.2.4-noble` in
   release mode with `-march=native`, including bit-for-bit comparison with CMake
-  over all 35,976 WBGT cases. The preparation run also checked macOS.
+  over all 35,976 WBGT cases.
 - Python wheel and source-distribution contents, plus all 18 installed-wheel
   tests with Python 3.14.7.
 - `R CMD build` and `R CMD check`, including the PDF manual: `Status: OK`.
-- Julia API tests (23 assertions), packaging/source-identity tests (16
-  assertions), and four metadata-preparation guard tests. API tests loaded the
-  locally built library; the linked workflows checked platform archives and
-  published installation.
 
 The numerical corpus and recorded baseline are unchanged; retain their original
 version and provenance in [baseline.json](baseline.json). See

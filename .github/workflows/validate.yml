@@ -1,43 +1,28 @@
 name: Validate
-run-name: Validate ${{ github.ref_name }} / ${{ inputs.checks }}
+run-name: Validate ${{ github.ref_name }}
 
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, closed]
   workflow_dispatch:
-    inputs:
-      checks:
-        description: Checks to run
-        type: choice
-        required: true
-        default: All checks
-        options:
-          - All checks
-          - Prepared Julia artifacts
 
 permissions:
   contents: read
-  actions: read
 
 concurrency:
-  group: validate-${{ github.ref }}
+  group: validate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   native:
-    if: inputs.checks == 'All checks'
+    if: github.event.action != 'closed' || github.event.pull_request.merged == true
     uses: ./.github/workflows/ci.yml
 
   python:
-    if: inputs.checks == 'All checks'
+    if: github.event.action != 'closed' || github.event.pull_request.merged == true
     uses: ./.github/workflows/wheels.yml
 
   r:
-    if: inputs.checks == 'All checks'
+    if: github.event.action != 'closed' || github.event.pull_request.merged == true
     uses: ./.github/workflows/r.yml
-
-  julia:
-    if: inputs.checks == 'All checks'
-    uses: ./.github/workflows/julia-checks.yml
-
-  prepared:
-    if: inputs.checks == 'Prepared Julia artifacts'
-    uses: ./.github/workflows/julia-verify.yml

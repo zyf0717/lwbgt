@@ -27,19 +27,9 @@ jobs:
     needs: release-tag
     uses: ./.github/workflows/r.yml
 
-  native-artifacts:
-    name: Verify prepared Julia binaries
-    needs: release-tag
-    permissions:
-      contents: read
-      actions: read
-    uses: ./.github/workflows/julia-verify.yml
-    with:
-      upload-release: true
-
   testpypi-publish:
     name: Publish verified artifacts to TestPyPI
-    needs: [artifacts, r-artifact, native-artifacts]
+    needs: [artifacts, r-artifact]
     runs-on: ubuntu-24.04
     environment:
       name: testpypi
@@ -175,7 +165,7 @@ jobs:
 
   github-release:
     name: Create GitHub release
-    needs: [publish, r-artifact, native-artifacts]
+    needs: [publish, r-artifact]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -189,34 +179,8 @@ jobs:
         with:
           name: r-source
           path: r-dist
-      - uses: actions/download-artifact@v8
-        with:
-          name: julia-native-release
-          path: native
       - name: Create release for the existing annotated tag
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* r-dist/* native/* --verify-tag --generate-notes
-
-  julia-install:
-    name: Verify published Julia installation
-    needs: github-release
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-15-intel, macos-15, windows-2025]
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: '1'
-      - name: Install and test the tagged subdirectory in a clean environment
-        shell: bash
-        env:
-          JULIA_DEPOT_PATH: ${{ runner.temp }}/julia-release-depot
-        run: |
-          julia -e 'using Pkg;
-            Pkg.activate(mktempdir());
-            Pkg.add(PackageSpec(url="https://github.com/zyf0717/lwbgt.git", rev=ENV["GITHUB_REF_NAME"], subdir="julia"));
-            Pkg.test("LWBGT")'
+        run: gh release create "$GITHUB_REF_NAME" dist/* r-dist/* --verify-tag --generate-notes
