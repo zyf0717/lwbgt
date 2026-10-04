@@ -21,7 +21,7 @@ jobs:
 
   artifacts:
     needs: release-tag
-    uses: ./.github/workflows/wheels.yml
+    uses: ./.github/workflows/python.yml
 
   r-artifact:
     needs: release-tag

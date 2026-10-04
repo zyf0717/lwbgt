@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Name the CI entrypoint `ci.yml` and the reusable native and Python workflows
+  `native.yml` and `python.yml`. Group the R compiler configuration under
+  `.github/r/` and document workflow roles and entrypoints.
 - Run validation automatically on PR updates and merges into `main`, with
   manual dispatch available. Direct pushes to `main` do not trigger validation;
   preserve tag-triggered publication.

@@ -6,11 +6,11 @@ a new version. SwiftPM uses the tag directly and builds the C sources.
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| Validate | PR updates and merges into `main`; manual dispatch | Native/Swift, Python, and R checks |
-| Release | Annotated `v*` tag push | Build/test packages, verify TestPyPI installation, and publish |
+| [CI](../.github/workflows/ci.yml) | PR updates and merges into `main`; manual dispatch | Native/Swift, Python, and R checks |
+| [Release](../.github/workflows/release.yml) | Annotated `v*` tag push | Build/test packages, verify TestPyPI installation, and publish |
 
 Direct pushes to `main` do not trigger validation. See
-[Contributing](../CONTRIBUTING.md#validation) for PR events and manual branch selection.
+[Contributing](../CONTRIBUTING.md#ci) for PR events and manual branch selection.
 
 ## Prepare
 
@@ -18,7 +18,7 @@ Direct pushes to `main` do not trigger validation. See
    `tests/RELEASE.md`. For numerical changes, refresh the
    [baseline](../tests/BASELINE.md) and [benchmarks](../benchmarks/README.md).
 2. Open a PR with the version bump and release notes. Review the automatic
-   **Validate** results, then merge into `main` and wait for post-merge validation
+   **CI** results, then merge into `main` and wait for post-merge validation
    to pass before tagging.
 
 ## Publish
