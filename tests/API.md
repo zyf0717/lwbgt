@@ -12,6 +12,8 @@ status codes, and ownership rules. Tests verify that contract:
 | Internal branch diagnostics | Stability classes and adjacent horizon/clipping inputs; helpers remain unsupported API |
 | Batch tests | Scalar equality in chunks of up to 1,024 rows, null arguments, and deterministic solar rejection |
 | Installed-wheel tests | Resource loading, ABI layouts, public Python API, and full WBGT/invalid-weather batch results |
+| R package checks | Vectorized inputs, row statuses, `NA` handling, and installed native symbols |
+| SwiftPM consumer tests | ABI layout, batch contract, and bit-for-bit comparison with the native WBGT corpus |
 | `benchmark_accounting` | Successful and failing rows at 1×/10×, exact call counts, checksum consumption, rejected scales, and comparison reports |
 | `demo_smoke` | Optional demonstration on valid input |
 

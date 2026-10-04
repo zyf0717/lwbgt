@@ -41,8 +41,12 @@ ctest --test-dir build --output-on-failure
 python3 benchmarks/compare.py \
   build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
   build/throughput.json \
-  --compiler-flags='-std=gnu89 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
+  --compiler-flags='current: -std=c11; original: -std=gnu89; common: -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
 ```
+
+Current CMake builds use C11 for the production kernel and GNU89 for the oracle.
+The recorded results above predate that build change; retain their original
+compiler metadata when comparing new measurements.
 
 On Linux, prefix the runner with `taskset -c N` to select a CPU available on
 your machine. Both kernels must use matched compiler and floating-point flags.

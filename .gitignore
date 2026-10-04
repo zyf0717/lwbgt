@@ -6,7 +6,6 @@ __pycache__/
 *.py[cod]
 /dist/
 /wheelhouse/
-/products/
 /sdist-wheel/
 /sdist-test/
 /lwbgt_*.tar.gz

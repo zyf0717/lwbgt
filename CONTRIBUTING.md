@@ -34,6 +34,21 @@ measurements when the corpus changes. Keep the R copies of `wbgt.c` and
 
 ## Validation
 
+**Validate** runs native/Swift, Python, and R checks when a PR targeting `main`
+is opened, updated with new commits, or reopened, and again after it is merged.
+PR checks test GitHub's merge ref; the post-merge run tests the merged commit.
+Closing a PR without merging skips all validation jobs. Direct branch pushes,
+including pushes to `main`, do not trigger validation unless they update an
+open PR targeting `main`.
+
+To validate a selected branch manually, use **Actions → Validate → Run workflow**.
+Manual runs test the selected commit. Review the tested commit and results in
+Actions before merging. A new run cancels older validation for the same PR or
+manually selected branch.
+
+Validation does not write commits or publish. See [RELEASING.md](docs/RELEASING.md)
+for release preparation and tag-triggered publication.
+
 ```sh
 python3 tests/check_versions.py
 python3 tests/check_r_sources.py
@@ -53,13 +68,6 @@ LWBGT_CASES="$PWD/build/cases.csv" \
 LWBGT_EXPECTED="$PWD/build/swift-expected.csv" \
 swift test --package-path tests/swiftpm -c release -Xcc -march=native
 ```
-
-For Julia changes, run `julia --project=julia julia/test/runtests.jl` with
-`LWBGT_LIBRARY` pointing to the built shared library, and run
-`julia julia/test/packaging.jl`. The Julia workflow also tests the actual archives
-on five platforms with Julia 1.10 and current stable, comparing them with probes
-built using the same toolchain and the retained original. No native integration
-tests are silently skipped when a library is unavailable.
 
 Performance claims require the [benchmark method](benchmarks/README.md).
 Windows CI also tests an opt-in MSVC build (`LWBGT_EXPERIMENTAL_MSVC=ON`) and

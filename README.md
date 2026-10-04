@@ -4,13 +4,11 @@
 [![CRAN](https://img.shields.io/cran/v/lwbgt.svg)](https://cran.r-project.org/web/packages/lwbgt/index.html)
 [![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
 
-[![Native CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
-[![Wheel CI](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/wheels.yml)
-[![R package CI](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/zyf0717/lwbgt/actions/workflows/r.yml)
+[![Validate](https://github.com/zyf0717/lwbgt/actions/workflows/validate.yml/badge.svg)](https://github.com/zyf0717/lwbgt/actions/workflows/validate.yml)
 
 `lwbgt` computes outdoor wet bulb globe temperature (WBGT) using the original
 Argonne Liljegren C calculation. One optimized C kernel serves the C/FFI,
-Python, R, Julia, and SwiftPM interfaces.
+Python, R, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
@@ -116,15 +114,6 @@ ordinary data frames, recycles scalar constructor arguments, and isolates
 invalid or non-convergent rows. See the
 [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md).
 
-## Julia
-
-`LWBGT` lives in this repository's `julia/` subdirectory and exposes `Input`,
-`Result`, `calculate`, `calculate_batch`, and `esat` through the native v1 ABI.
-Julia ≥1.10 is supported. The first binary-artifact release and General
-registration are pending; see the [Julia guide](julia/README.md) for development
-installation and usage. Published releases will install the native library
-automatically, without a compiler or a separate JLL package.
-
 ## SwiftPM
 
 Add `CLWBGT` as a target dependency in `Package.swift`:
@@ -193,13 +182,7 @@ with `-DLWBGT_EXPERIMENTAL_MSVC=ON`.
 
 ## Documentation
 
-| Topic | Document |
-|---|---|
-| Inputs, units, layouts, status codes, and concurrency | [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md) |
-| Numerical compatibility and measured performance | [Compatibility and performance](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md) |
-| Scope and common integration questions | [FAQ](https://github.com/zyf0717/lwbgt/blob/main/docs/FAQ.md) |
-| Package selection | [lwbgt vs pywbgt vs thermofeel](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPARISON.md) |
-| Source lineage | [Upstream provenance](https://github.com/zyf0717/lwbgt/blob/main/docs/UPSTREAM.md) |
-| Source changes | [Deviations from original Liljegren C](https://github.com/zyf0717/lwbgt/blob/main/docs/DEVIATIONS.md) |
-| Release history | [Changelog](https://github.com/zyf0717/lwbgt/blob/main/CHANGELOG.md) |
-| Release procedure | [Maintainer guide](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md) |
+See the [documentation index](https://github.com/zyf0717/lwbgt/blob/main/docs/README.md)
+for API contracts, input assumptions, numerical evidence, and release history.
+For development and publishing, use [Contributing](https://github.com/zyf0717/lwbgt/blob/main/CONTRIBUTING.md)
+and [Releasing](https://github.com/zyf0717/lwbgt/blob/main/docs/RELEASING.md).

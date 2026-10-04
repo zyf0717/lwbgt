@@ -2,14 +2,14 @@
 
 ## Unreleased
 
-## v1.1.0 — pending
+- Run validation automatically on PR updates and merges into `main`, with
+  manual dispatch available. Direct pushes to `main` do not trigger validation;
+  preserve tag-triggered publication.
+- Limit in-repository interfaces to C/FFI, Python, R, and SwiftPM. Simplify
+  validation and release packaging around those interfaces.
 
-- Integrate the Julia package in `julia/`, with a shared release version,
-  automatic native artifact loading, and independently operated BinaryBuilder CI.
-  Prepare and verify native archives before tagging; publish those same archives
-  with the Python and R release. Explicit release preparation opens a separate
-  metadata PR; development CI never writes commits. Merging and tagging remain
-  manual. General registration is pending.
+## v1.1.0 — 2026-10-02
+
 - Accept compatible 1.x releases in the installed CMake package configuration;
   preserve the C ABI and shared-library SONAME.
 - Add opt-in MSVC compatibility testing for native libraries, installed C/C++
@@ -117,12 +117,12 @@
   serial `lwbgt_calc_batch_v1` FFI entry point without changing the scalar ABI.
 - Added versioned shared-library builds with a three-symbol dynamic export
   surface while retaining the existing static archive.
-- Added dependency-light Python, R, and Julia examples and made them release
+- Added dependency-light Python and R examples and made them release
   gates on Linux/GCC, macOS/Clang, and Windows/MinGW CI.
 - Added relocatable CMake and `pkg-config` installation metadata.
 - Verified the final static and shared artifacts on Linux/GCC,
   macOS/AppleClang, and Windows/MinGW, including installed consumers and all
-  three language examples.
+  language examples.
 - Revalidated the position-independent static build with exact compatibility
   and all release gates passing.
 

@@ -1,5 +1,8 @@
 # v1.0.1 release verification
 
+Historical verification for this version. For current release instructions, see
+[Releasing](../docs/RELEASING.md).
+
 v1.0.1 relaxes R golden-value tests to native binary32 epsilon (`2^-23`) for
 builds without long-double support. The calculation and public interfaces are
 unchanged. On 2026-10-01, native, installed-wheel Python, and SwiftPM checks

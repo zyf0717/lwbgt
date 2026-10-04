@@ -21,7 +21,6 @@ def main() -> None:
     versions = {
         "CMakeLists.txt": match("CMakeLists.txt", r"project\(lwbgt VERSION ([0-9.]+)"),
         "pyproject.toml": match("pyproject.toml", r'^version = "([0-9.]+)"$'),
-        "julia/Project.toml": match("julia/Project.toml", r'^version = "([0-9.]+)"$'),
         "python/lwbgt/__init__.py": match(
             "python/lwbgt/__init__.py", r'^__version__ = "([0-9.]+)"$'
         ),

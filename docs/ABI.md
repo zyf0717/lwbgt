@@ -129,6 +129,5 @@ and original oracle are not compiled by MSVC.
 | Binding | Behavior |
 |---|---|
 | Python | `Input` and `Result` map to the v1 structures. Both calculation functions use the batch ABI; `esat` calls the scalar symbol. The bundled runtime loads through `ctypes` and `importlib.resources`. No extra input or failure policy. |
-| Julia | `Input` and `Result` map to the v1 structures with checked sizes and offsets. Scalar and batch calculation use the batch ABI; `esat` calls the scalar symbol. Native binaries load through Julia artifacts, with an explicit `LWBGT_LIBRARY` development override. No extra input or failure policy. |
 | R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
 | SwiftPM | `CLWBGT` builds the canonical C sources and exposes the header directly. It is a C-library product, not a Swift wrapper. |
