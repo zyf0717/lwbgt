@@ -4,6 +4,9 @@ C, Python, R, and SwiftPM share one version and Git tag. Test and
 documentation changes can stay under `Unreleased`; publishing packages requires
 a new version. SwiftPM uses the tag directly and builds the C sources.
 
+The Julia binding [LWBGT.jl](https://github.com/zyf0717/LWBGT.jl) and its
+`lwbgt_jll` dependency have separate versions and release procedures.
+
 | Workflow | Trigger | Purpose |
 |---|---|---|
 | [CI](../.github/workflows/ci.yml) | PR updates and merges into `main`; manual dispatch | Native/Swift, Python, and R checks |

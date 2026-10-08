@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Document the separately released LWBGT.jl binding, General installation,
+  and Julia usage of the shared native kernel.
 - Name the CI entrypoint `ci.yml` and the reusable native and Python workflows
   `native.yml` and `python.yml`. Group the R compiler configuration under
   `.github/r/` and document workflow roles and entrypoints.

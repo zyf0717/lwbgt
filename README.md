@@ -4,11 +4,9 @@
 [![CRAN](https://img.shields.io/cran/v/lwbgt.svg)](https://cran.r-project.org/web/packages/lwbgt/index.html)
 [![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
 
-[![CI](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml/badge.svg)](https://github.com/zyf0717/lwbgt/actions/workflows/ci.yml)
-
 `lwbgt` computes outdoor wet bulb globe temperature (WBGT) using the original
 Argonne Liljegren C calculation. One optimized C kernel serves the C/FFI,
-Python, R, and SwiftPM interfaces.
+Python, R, Julia, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
@@ -22,7 +20,7 @@ for the scope, documented corrections, and platform limits.
 The kernel reuses intermediate results and avoids redundant work, preserving
 the original numerical precision. Our
 [scalar benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
-measures about **1.6× the original throughput** on one CPU. Performance depends
+measures about 1.6× the original throughput on one CPU. Performance depends
 on the compiler, hardware, and inputs.
 
 ## Input assumptions
@@ -113,6 +111,40 @@ The R API provides `lwbgt_input()`, `calculate()`, and `esat()`. It returns
 ordinary data frames, recycles scalar constructor arguments, and isolates
 invalid or non-convergent rows. See the
 [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md).
+
+## Julia
+
+Use [LWBGT.jl](https://github.com/zyf0717/LWBGT.jl) with Julia 1.10 or later.
+Install from General:
+
+```julia
+using Pkg
+Pkg.add("LWBGT")
+```
+
+```julia
+using LWBGT
+
+weather = Input(
+    year=2024, month=4, day=15, hour=14, minute=30,
+    gmt_offset_hours=8, averaging_minutes=60, urban=1,
+    latitude_deg_north=1.3521, longitude_deg_east=103.8198,
+    solar_w_m2=742.0, pressure_hpa=1008.4,
+    air_temperature_c=32.1, relative_humidity_percent=68.0,
+    wind_speed_m_s=2.8, wind_height_m=10.0,
+    vertical_temperature_difference_c=1,
+)
+
+result = calculate(weather)
+@assert result.status == 0
+println(result.wbgt_c)
+
+results = calculate_batch([weather, weather])
+println(esat(273.15; phase=0))
+```
+
+`Input` and `Result` are immutable typed records following the
+[ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md).
 
 ## SwiftPM
 
