@@ -10,7 +10,7 @@ are excluded. It does not measure batch or language-wrapper throughput.
 
 The C harness consumes every output bit through a volatile integer checksum,
 uses a monotonic clock, and pins to the first available CPU on Linux. The
-runner records CPU affinity (`-1` if unavailable), alternates kernel order for
+runner records CPU affinity (`-1` if unavailable), rotates kernel order for
 seven repetitions at each scale, and reports median elapsed time, rows/s, and
 relative median absolute deviation. Reports retain raw elapsed times, call and
 failure counts, compiler/platform details, and corpus/executable hashes.
@@ -31,43 +31,11 @@ used GNU89; both used
 `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
 [throughput-gcc-13.3.0.json](throughput-gcc-13.3.0.json) retains the measurements.
 
-## Reproduce
-
-From the repository root on Linux, using CPU 0:
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel
-ctest --test-dir build --output-on-failure
-taskset -c 0 python3 benchmarks/compare.py \
-  build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
-  build/throughput.json \
-  --compiler-flags='current: -std=c11; original: -std=gnu89; common: -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
-```
-
-On Linux, prefix the runner with `taskset -c N` to select a CPU available on
-your machine. Both kernels must use matched compiler and floating-point flags.
-Use `--repetitions N` to change the repetition count (minimum three). The
-measured scales remain 1× and 10×. Allow about 45 seconds on this machine
-for seven paired repetitions at both scales, including warm-ups. CI checks
-accounting on a small fixture.
-
-Results depend on hardware, compiler, and workload. These regression fixtures
-and synthetic samples do not establish performance on an observed-weather
-dataset. See [the numerical baseline](../tests/BASELINE.md) for input coverage
-and comparison limits.
-
 ## Psychrometric opt-out
 
-The unreleased opt-out and private-helper changes use the same synthetic
-corpus and 1×/10× scales. Compare the candidate's default and opt-out modes
-against the pre-change `main` (`027d41b`), with matched compiler settings.
-Loading and warm-ups are excluded; checksumming all outputs remains inside
-the timed C loop. Numerical regression tests verify that default outputs and
-retained opt-out outputs are unchanged.
-
-Measured on 2026-10-09, Linux x86_64, Intel Core i9-13900HK, CPU 0,
-with seven repetitions per mode and scale:
+The unreleased opt-out and private-helper changes compare against pre-change
+`main` (`027d41b`), using the same corpus, date, CPU, and repetitions as above.
+Numerical tests verify default and retained opt-out outputs are unchanged.
 
 | Compiler | Scale | Default/main | Opt-out/main |
 |---|---:|---:|---:|
@@ -78,20 +46,37 @@ with seven repetitions per mode and scale:
 
 Relative median absolute deviations were below 0.1% for every mode and scale.
 
-After building and testing the candidate as above, build the baseline and run:
+## Reproduce
+
+From the repository root on Linux, build all three kernels with the same
+compiler, then run both comparisons on CPU 0:
 
 ```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
+
 mkdir -p build/baseline-src
 git archive 027d41b | tar -x -C build/baseline-src
 cmake -S build/baseline-src -B build/baseline -DCMAKE_BUILD_TYPE=Release
 cmake --build build/baseline --target lwbgt_benchmark --parallel
+
+# Original versus current
+taskset -c 0 python3 benchmarks/compare.py \
+  build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
+  build/throughput.json
+
+# Pre-change main versus current, including opt-out
 taskset -c 0 python3 benchmarks/compare.py \
   build/baseline/lwbgt_benchmark build/lwbgt_benchmark build/cases.csv \
-  build/optional-psychrometric.json --skip-psychrometric \
-  --compiler-flags='-std=c11 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
+  build/optional-psychrometric.json --skip-psychrometric
 ```
 
-`--skip-psychrometric` adds a third mode using the candidate's scalar API
-with a null psychrometric output pointer. The reference is always measured
-with all outputs. The runner rotates mode order across seven repetitions and
-writes raw timings and hashes to the requested file under `build/`.
+Both commands use seven repetitions at 1× and 10× and save raw timings and
+hashes under `build/`. Change `taskset -c 0` to select another available CPU.
+Use `--repetitions N` (minimum three) or `--compiler-flags='...'` to adjust
+repetitions or record build flags.
+
+Results depend on hardware, compiler, and workload. See
+[the numerical baseline](../tests/BASELINE.md) for synthetic input coverage
+and comparison limits.
