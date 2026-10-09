@@ -2,7 +2,8 @@
 
 The public interface is `include/lwbgt.h`. The shared library exports
 `calc_wbgt`, `esat`, `lwbgt_calc_batch_v1`, and `lwbgt_calc_batch_ex_v1`.
-Numerical helpers have internal linkage. The header supports C and C++.
+Only declarations in this header are supported; numerical helpers have internal
+linkage. The header supports C and C++.
 
 ## Versioning
 
@@ -84,7 +85,7 @@ int lwbgt_calc_batch_v1(
   clamping, or missing-data policy beyond the scalar model.
 - At 2 m wind height, estimated wind is the supplied speed rounded to `float`.
 
-### Optional psychrometric wet-bulb (unreleased)
+### Optional psychrometric wet-bulb (since 1.2.0)
 
 The default entrypoint continues to calculate every output. The extended
 entrypoint uses the same v1 structures and adds flags:

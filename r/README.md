@@ -31,7 +31,7 @@ calculate(input)
 esat(273.15)
 ```
 
-In development builds, `calculate(input, psychrometric = FALSE)` skips the independent psychrometric
+`calculate(input, psychrometric = FALSE)` skips the independent psychrometric
 wet-bulb solve and returns `NA` for that column. It is calculated by default;
 the other outputs retain their existing behavior.
 

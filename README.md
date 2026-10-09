@@ -10,7 +10,7 @@ Python, R, Julia, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
-**Version: v1.1.0.** Reference comparisons reproduce WBGT and its component
+**Version: v1.2.0.** Reference comparisons reproduce WBGT and its component
 temperatures bit for bit under matched compiler and floating-point settings.
 The v1 calculation remains the default throughout 1.x; future numerical
 revisions will use explicit versioned APIs while preserving v1. See the
@@ -74,7 +74,7 @@ codes, and failure behaviour are defined by the
 [input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
 before substituting unavailable observations.
 
-Development builds calculate psychrometric wet-bulb by default. When only WBGT and its
+Psychrometric wet-bulb is calculated by default. When only WBGT and its
 components are needed, use `calculate(weather, psychrometric=False)` or
 `calculate_batch(records, psychrometric=False)` to skip the independent solve.
 That result field is `-9999`; the remaining fields and status are unchanged.

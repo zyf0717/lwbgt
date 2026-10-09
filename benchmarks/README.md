@@ -37,7 +37,7 @@ CPU 0, but the original gains more, so the relative speedup is lower.
 
 ## Psychrometric opt-out
 
-The unreleased opt-out and private-helper changes compare against pre-change
+The 1.2.0 opt-out and private-helper changes compare against pre-change
 `main` (`027d41b`), using CPU 0 and the same corpus, date, and repetitions as above.
 Numerical tests verify default and retained opt-out outputs are unchanged.
 

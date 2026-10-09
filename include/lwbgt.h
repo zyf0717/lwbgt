@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 #define LWBGT_VERSION_MAJOR 1
-#define LWBGT_VERSION_MINOR 1
+#define LWBGT_VERSION_MINOR 2
 #define LWBGT_VERSION_PATCH 0
 #define LWBGT_FFI_ABI_VERSION 1
 

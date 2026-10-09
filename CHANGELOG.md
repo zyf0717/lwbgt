@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+## v1.2.0 — 2026-10-09
+
 - Allow explicitly skipping psychrometric wet-bulb: a null scalar output,
   `LWBGT_SKIP_PSYCHROMETRIC_WET_BULB` in the new `lwbgt_calc_batch_ex_v1`, or
   `psychrometric=False` / `FALSE` in Python / R. Existing defaults, v1 layouts,
   and retained numerical results are preserved.
 - Give numerical helpers internal linkage and use a private saturation-pressure
-  helper so the compiler can inline and specialize internal calls.
+  helper so the compiler can inline and specialize internal calls. Undocumented
+  helper symbols are no longer linkable from static-library consumers.
+- Change the internal R native calculation routine to take two arguments;
+  existing calls to the exported R functions remain compatible.
 - Extend the synthetic throughput benchmark with psychrometric opt-out.
 - Document the separately released LWBGT.jl binding, General installation,
   and Julia usage of the shared native kernel.
@@ -18,7 +23,8 @@
   manual dispatch available. Direct pushes to `main` do not trigger validation;
   preserve tag-triggered publication.
 - Limit in-repository interfaces to C/FFI, Python, R, and SwiftPM. Simplify
-  validation and release packaging around those interfaces.
+  validation and release packaging around those interfaces. Julia development
+  installs using the removed `julia/` directory must migrate to LWBGT.jl.
 
 ## v1.1.0 — 2026-10-02
 
