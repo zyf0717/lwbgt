@@ -17,41 +17,38 @@ failure counts, compiler/platform details, and corpus/executable hashes.
 
 ## Results
 
-On 2026-10-01, GCC 13.3.0 on Linux x86_64 (7.0.0-34-generic, glibc 2.39),
-Intel Core i9-13900HK, pinned to CPU 12:
+On 2026-10-09, GCC 13.3.0 on Linux x86_64 (7.0.0-34-generic, glibc 2.39),
+Intel Core i9-13900HK, pinned to CPU 0:
 
 | Scale | Calls/run | Original s | Current s | Original rows/s | Current rows/s | Speedup |
 |---|---:|---:|---:|---:|---:|---:|
-| 1× | 35,976 | 0.526 | 0.328 | 68,425 | 109,810 | 1.605× |
-| 10× | 359,760 | 5.261 | 3.281 | 68,377 | 109,653 | 1.604× |
+| 1× | 35,976 | 0.306 | 0.210 | 117,611 | 171,000 | 1.454× |
+| 10× | 359,760 | 3.055 | 2.101 | 117,750 | 171,258 | 1.454× |
 
-Values are medians of seven repetitions. Relative MAD was below 0.19% for
-both kernels at both scales. Kernels used GNU89 and
+Values are medians of seven repetitions. Relative MAD was below 0.12% for
+both kernels at both scales. The current kernel used C11 and the original
+used GNU89; both used
 `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
 [throughput-gcc-13.3.0.json](throughput-gcc-13.3.0.json) retains the measurements.
 
 ## Reproduce
 
-From the repository root:
+From the repository root on Linux, using CPU 0:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
-python3 benchmarks/compare.py \
+taskset -c 0 python3 benchmarks/compare.py \
   build/lwbgt_reference_benchmark build/lwbgt_benchmark build/cases.csv \
   build/throughput.json \
   --compiler-flags='current: -std=c11; original: -std=gnu89; common: -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
 ```
 
-Current CMake builds use C11 for the production kernel and GNU89 for the oracle.
-The recorded results above predate that build change; retain their original
-compiler metadata when comparing new measurements.
-
 On Linux, prefix the runner with `taskset -c N` to select a CPU available on
 your machine. Both kernels must use matched compiler and floating-point flags.
 Use `--repetitions N` to change the repetition count (minimum three). The
-measured scales remain 1× and 10×. Allow about 80 seconds on this machine
+measured scales remain 1× and 10×. Allow about 45 seconds on this machine
 for seven paired repetitions at both scales, including warm-ups. CI checks
 accounting on a small fixture.
 
@@ -88,7 +85,7 @@ mkdir -p build/baseline-src
 git archive 027d41b | tar -x -C build/baseline-src
 cmake -S build/baseline-src -B build/baseline -DCMAKE_BUILD_TYPE=Release
 cmake --build build/baseline --target lwbgt_benchmark --parallel
-python3 benchmarks/compare.py \
+taskset -c 0 python3 benchmarks/compare.py \
   build/baseline/lwbgt_benchmark build/lwbgt_benchmark build/cases.csv \
   build/optional-psychrometric.json --skip-psychrometric \
   --compiler-flags='-std=c11 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'

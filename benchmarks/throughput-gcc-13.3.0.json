@@ -1,14 +1,14 @@
 {
-  "compiler_flags": "-std=gnu89 -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing",
+  "compiler_flags": "current: -std=c11; original: -std=gnu89; common: -O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing",
   "corpus_cases": 35976,
   "corpus_sha256": "9531c1793c1b034337476a2991d22528423c9ed1f9705138cef92aa01cadaf14",
   "cpu_model": "13th Gen Intel(R) Core(TM) i9-13900HK",
-  "date": "2026-10-01",
+  "date": "2026-10-09",
   "executable_sha256": {
-    "candidate": "bf60e7c0c142858f61ad3ae718366e363027c4d91657e0dd2a2d627b63bb6922",
-    "reference": "bbb670909e23199cc40680f6de01777a14f9a41531ba19cc7026dc8b0db00ee7"
+    "candidate": "5dfee22811ad9169ac02925f8a33af33762dba3c0ef385945a3201aceaa1069a",
+    "reference": "2a74e68ba11e29a9e1b01f09367be0b549778ee84770b66263997e79745164e4"
   },
-  "method": "single-thread scalar calls; one full-corpus warm-up per execution; input loading and warm-up excluded; alternating kernel order; all rows included; CPU affinity recorded per kernel",
+  "method": "single-thread scalar calls; one full-corpus warm-up per execution; input loading and warm-up excluded; rotating mode order; all rows included; CPU affinity recorded per kernel",
   "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
   "repetitions": 7,
   "scales": {
@@ -17,39 +17,39 @@
       "candidate": {
         "checksum": 245580964663863,
         "compiler": "13.3.0",
-        "cpu": 12,
+        "cpu": 0,
         "elapsed_seconds": [
-          0.32776819900027476,
-          0.32882691999839153,
-          0.32751704700058326,
-          0.3275088899972616,
-          0.3276211729971692,
-          0.3276596500072628,
-          0.32750292800483294
+          0.21036114892922342,
+          0.21026778896339238,
+          0.2103856949834153,
+          0.21054320700932294,
+          0.21021190006285906,
+          0.2108006189810112,
+          0.21048904000781476
         ],
-        "median_elapsed_seconds": 0.3276211729971692,
-        "median_rows_per_second": 109809.7527424177,
-        "relative_mad": 0.0003428395482899151
+        "median_elapsed_seconds": 0.2103856949834153,
+        "median_rows_per_second": 171000.2193962664,
+        "relative_mad": 0.0005607421878748841
       },
       "failures": 3076,
       "reference": {
         "checksum": 241490094187860,
         "compiler": "13.3.0",
-        "cpu": 12,
+        "cpu": 0,
         "elapsed_seconds": [
-          0.5315963879984338,
-          0.5202505650086096,
-          0.5276250169990817,
-          0.5257716880005319,
-          0.525553351995768,
-          0.5260769419983262,
-          0.5253262000042014
+          0.30572261300403625,
+          0.3063153229886666,
+          0.3056535719661042,
+          0.3059547160519287,
+          0.3058886770159006,
+          0.30567197396885604,
+          0.30641467694658786
         ],
-        "median_elapsed_seconds": 0.5257716880005319,
-        "median_rows_per_second": 68425.1374143288,
-        "relative_mad": 0.0008480216603071992
+        "median_elapsed_seconds": 0.3058886770159006,
+        "median_rows_per_second": 117611.41455435405,
+        "relative_mad": 0.0007089398620059983
       },
-      "speedup": 1.604815962261007,
+      "speedup": 1.4539423749319733,
       "successes": 32900
     },
     "10": {
@@ -57,39 +57,39 @@
       "candidate": {
         "checksum": 2455809646638630,
         "compiler": "13.3.0",
-        "cpu": 12,
+        "cpu": 0,
         "elapsed_seconds": [
-          3.2922099589923164,
-          3.275608748997911,
-          3.275956405996112,
-          3.292374149998068,
-          3.280900070996722,
-          3.2751531839894596,
-          3.282842733009602
+          2.103388141025789,
+          2.104187428019941,
+          2.1010578320128843,
+          2.099709775997326,
+          2.100685363053344,
+          2.1003795139258727,
+          2.1002942220075056
         ],
-        "median_elapsed_seconds": 3.280900070996722,
-        "median_rows_per_second": 109652.8367871645,
-        "relative_mad": 0.0016153705781955705
+        "median_elapsed_seconds": 2.100685363053344,
+        "median_rows_per_second": 171258.39324985308,
+        "relative_mad": 0.00018623154877063755
       },
       "failures": 30760,
       "reference": {
         "checksum": 2414900941878600,
         "compiler": "13.3.0",
-        "cpu": 12,
+        "cpu": 0,
         "elapsed_seconds": [
-          5.26905570999952,
-          5.251361061993521,
-          5.261387403996196,
-          5.2361957209941465,
-          5.250399837997975,
-          5.27112878501066,
-          5.267289789990173
+          3.0572046090383083,
+          3.0553136490052566,
+          3.0586589120794088,
+          3.0552859229501337,
+          3.0489285580115393,
+          3.0480988470371813,
+          3.047626192914322
         ],
-        "median_elapsed_seconds": 5.261387403996196,
-        "median_rows_per_second": 68377.40169574865,
-        "relative_mad": 0.00184806355749959
+        "median_elapsed_seconds": 3.0552859229501337,
+        "median_rows_per_second": 117750.027026152,
+        "relative_mad": 0.001102767332426125
       },
-      "speedup": 1.6036414673238768,
+      "speedup": 1.454423388045737,
       "successes": 329000
     }
   }
