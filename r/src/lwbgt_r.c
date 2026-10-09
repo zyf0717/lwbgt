@@ -225,7 +225,7 @@ static int validate_row(double *columns[INPUT_FIELD_COUNT], R_xlen_t index,
     return STATUS_OK;
 }
 
-static SEXP lwbgt_r_calculate(SEXP input)
+static SEXP lwbgt_r_calculate(SEXP input, SEXP psychrometric)
 {
     static const char *output_names[OUTPUT_FIELD_COUNT] = {
         "status",
@@ -249,7 +249,12 @@ static SEXP lwbgt_r_calculate(SEXP input)
     R_xlen_t count;
     R_xlen_t index;
     int field;
+    int include_psychrometric;
 
+    if (TYPEOF(psychrometric) != LGLSXP || XLENGTH(psychrometric) != 1 ||
+        LOGICAL(psychrometric)[0] == NA_LOGICAL)
+        error("psychrometric must be TRUE or FALSE");
+    include_psychrometric = LOGICAL(psychrometric)[0];
     if (TYPEOF(input) != VECSXP || XLENGTH(input) != INPUT_FIELD_COUNT)
         error("native calculation requires exactly 17 input columns");
     count = XLENGTH(VECTOR_ELT(input, 0));
@@ -330,7 +335,7 @@ static SEXP lwbgt_r_calculate(SEXP input)
             &estimated_wind,
             &globe,
             &natural_wet_bulb,
-            &psychrometric_wet_bulb,
+            include_psychrometric ? &psychrometric_wet_bulb : NULL,
             &wbgt
         );
 
@@ -343,7 +348,7 @@ static SEXP lwbgt_r_calculate(SEXP input)
             !R_FINITE((double)estimated_wind) ||
             !R_FINITE((double)globe) ||
             !R_FINITE((double)natural_wet_bulb) ||
-            !R_FINITE((double)psychrometric_wet_bulb) ||
+            (include_psychrometric && !R_FINITE((double)psychrometric_wet_bulb)) ||
             !R_FINITE((double)wbgt)) {
             INTEGER(status_column)[index] = STATUS_INVALID_OUTPUT;
             SET_STRING_ELT(message_column, index, mkChar("native calculation returned an invalid result"));
@@ -355,7 +360,8 @@ static SEXP lwbgt_r_calculate(SEXP input)
         REAL(estimated_wind_column)[index] = estimated_wind;
         REAL(globe_column)[index] = globe;
         REAL(natural_wet_bulb_column)[index] = natural_wet_bulb;
-        REAL(psychrometric_wet_bulb_column)[index] = psychrometric_wet_bulb;
+        if (include_psychrometric)
+            REAL(psychrometric_wet_bulb_column)[index] = psychrometric_wet_bulb;
         REAL(wbgt_column)[index] = wbgt;
     }
 
@@ -392,7 +398,7 @@ static SEXP lwbgt_r_esat(SEXP temperature_k, SEXP phase)
 }
 
 static const R_CallMethodDef call_methods[] = {
-    {"lwbgt_calculate", (DL_FUNC)&lwbgt_r_calculate, 1},
+    {"lwbgt_calculate", (DL_FUNC)&lwbgt_r_calculate, 2},
     {"lwbgt_esat", (DL_FUNC)&lwbgt_r_esat, 2},
     {NULL, NULL, 0}
 };

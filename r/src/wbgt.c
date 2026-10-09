@@ -72,6 +72,7 @@ PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE WOULD NOT INFRINGE PRIVATELY OWNED
 #endif
 
 #include	<math.h>
+#include	<stddef.h>
 
 /* Use prototypes accepted by current C compilers. */
 int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
@@ -222,33 +223,34 @@ int	main(void)
 #define	CONVERGENCE	0.02
 #define	MAX_ITER	50
 
+/* Helpers have internal linkage so source-built consumers can inline them. */
 struct wbgt_atmosphere {
 	float eair;
 	float tdew;
 	double fatm_base;
 };
 
-int calc_solar_parameters(int year, int month, double day, float lat,
+static int calc_solar_parameters(int year, int month, double day, float lat,
 		float lon, float *solar, float *cza, float *fdir);
-float Twb(float Tair, float Pair, float speed, float solar,
+static float esat_internal(float tk, int phase);
+static float Twb(float Tair, float Pair, float speed, float solar,
 		float fdir, float cza, int rad, const struct wbgt_atmosphere *atmosphere);
 static float h_cylinder_from_properties(float diameter, float speed,
 		float density, float mu);
-float Tglobe(float Tair, float Pair, float speed, float solar,
+static float Tglobe(float Tair, float Pair, float speed, float solar,
 		float fdir, float cza, const struct wbgt_atmosphere *atmosphere);
-float h_sphere_in_air(float diameter, float Tair, float Pair, float speed);
-float dew_point(float e, int phase);
-float viscosity(float Tair);
-float thermal_cond(float Tair);
-float diffusivity(float Tair, float Pair);
-float evap(float Tair);
-int solarposition(int year, int month, double day, double days_1900,
+static float h_sphere_in_air(float diameter, float Tair, float Pair, float speed);
+static float dew_point(float e, int phase);
+static inline float viscosity(float Tair);
+static float diffusivity(float Tair, float Pair);
+static inline float evap(float Tair);
+static int solarposition(int year, int month, double day, double days_1900,
 		double latitude, double longitude, double *ap_ra, double *ap_dec,
 		double *altitude, double *refraction, double *azimuth,
 		double *distance);
-int daynum(int year, int month, int day);
-float est_wind_speed(float speed, float zspeed, int stability_class, int urban);
-int stab_srdt(int daytime, float speed, float solar, float dT);
+static int daynum(int year, int month, int day);
+static float est_wind_speed(float speed, float zspeed, int stability_class, int urban);
+static int stab_srdt(int daytime, float speed, float solar, float dT);
 
 int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 		int avg, double lat_arg, double lon_arg, double solar_arg,
@@ -289,7 +291,8 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
  */
 	/* Propagate invalid solar-position inputs. */
 	if ( calc_solar_parameters(year, month, dday, lat, lon, &solar, &cza, &fdir) != 0 ) {
-		*est_speed = *Tg = *Tnwb = *Tpsy = *Twbg = -9999.;
+		*est_speed = *Tg = *Tnwb = *Twbg = -9999.;
+		if ( Tpsy != NULL ) *Tpsy = -9999.;
 		return -1;
 	}
 	*est_speed = speed;
@@ -311,7 +314,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
 	tk = Tair + 273.15; /* degC to kelvin */
 	rh = 0.01 * relhum; /* % to fraction  */
 	/* Prepare the shared atmospheric terms with the original rounding steps. */
-	esat_air = esat(tk,0);
+	esat_air = esat_internal(tk,0);
 	atmosphere.eair = rh * esat_air;
 	atmosphere.tdew = dew_point(atmosphere.eair,0);
 	/* Atmospheric emissivity: Oke, 2nd edition, page 373. */
@@ -324,7 +327,8 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
  */
 	*Tg   = Tglobe(tk, pres, speed, solar, fdir, cza, &atmosphere);
 	*Tnwb = Twb(tk, pres, speed, solar, fdir, cza, 1, &atmosphere);
-	*Tpsy = Twb(tk, pres, speed, solar, fdir, cza, 0, &atmosphere);
+	if ( Tpsy != NULL )
+		*Tpsy = Twb(tk, pres, speed, solar, fdir, cza, 0, &atmosphere);
 	*Twbg = 0.1 * Tair + 0.2 * (*Tg) + 0.7 * (*Tnwb); 
 		
 	if ( *Tg == -9999 || *Tnwb == -9999 ) {
@@ -344,7 +348,7 @@ int calc_wbgt(int year, int month, int day, int hour, int minute, int gmt,
  *		 Argonne National Laboratory
  */
  
-int calc_solar_parameters(int year, int month, double day, float lat,
+static int calc_solar_parameters(int year, int month, double day, float lat,
 		float lon, float *solar, float *cza, float *fdir)
 	
 {
@@ -394,7 +398,7 @@ int calc_solar_parameters(int year, int month, double day, float lat,
  *		 Argonne National Laboratory
  */
  
-float Twb(float Tair, float Pair, float speed, float solar,
+static float Twb(float Tair, float Pair, float speed, float solar,
 		float fdir, float cza, int rad, const struct wbgt_atmosphere *atmosphere)
 		
 {
@@ -435,7 +439,7 @@ float Twb(float Tair, float Pair, float speed, float solar,
 			     + solar_base;
 		else
 			Fatm = 0.0f;
-		ewick = esat(Twb_prev,0);
+		ewick = esat_internal(Twb_prev,0);
 		Sc = mu/(density*diffusivity(Tref,Pair));
 		Twb_new = Tair - evap(Tref)/RATIO * (ewick-atmosphere->eair)/(Pair-ewick) * pow(Pr/Sc,a) + (Fatm/h * rad);
 		if ( fabs(Twb_new-Twb_prev) < CONVERGENCE ) converged = TRUE;
@@ -481,7 +485,7 @@ static float h_cylinder_from_properties(float diameter, float speed,
  *		 Argonne National Laboratory
  */
  
-float Tglobe(float Tair, float Pair, float speed, float solar,
+static float Tglobe(float Tair, float Pair, float speed, float solar,
 		float fdir, float cza, const struct wbgt_atmosphere *atmosphere)
 	
 {
@@ -522,7 +526,7 @@ float Tglobe(float Tair, float Pair, float speed, float solar,
  *
  */
  
-float h_sphere_in_air(float diameter, float Tair, float Pair, float speed)
+static float h_sphere_in_air(float diameter, float Tair, float Pair, float speed)
 	
 {
 	float	density,
@@ -549,10 +553,14 @@ float h_sphere_in_air(float diameter, float Tair, float Pair, float speed)
  */
  
 float esat(double tk_arg, int phase)
-
 {
 	/* Preserve the scalar ABI's historical float conversion at function entry. */
-	float tk = (float)tk_arg, y, es;
+	return esat_internal((float)tk_arg, phase);
+}
+
+static float esat_internal(float tk, int phase)
+{
+	float y, es;
 	
 	if ( phase == 0 ) {	/* over liquid water */
 		y = (tk - 273.15)/(tk - 32.18);
@@ -576,7 +584,7 @@ float esat(double tk_arg, int phase)
  *           temperature, K.
  */
  
-float dew_point(float e, int phase)
+static float dew_point(float e, int phase)
 
 {
 	float z, tdk;
@@ -599,7 +607,7 @@ float dew_point(float e, int phase)
  *  Reference: BSL, page 23.
  */
  
-float viscosity(float Tair)
+static inline float viscosity(float Tair)
 
 {
 	static float sigma = 3.617,
@@ -613,24 +621,12 @@ float viscosity(float Tair)
 }
 
 /* ============================================================================
- *  Purpose: calculate the thermal conductivity of air, W/(m K)
- *
- *  Reference: BSL, page 257.
- */
- 
-float thermal_cond(float Tair)
-
-{			 
-	return( ( Cp + 1.25 * R_AIR ) * viscosity(Tair) );
-}
-
-/* ============================================================================
  *  Purpose: calculate the diffusivity of water vapor in air, m2/s
  *
  *  Reference: BSL, page 505.
  */
  
-float diffusivity(float Tair, float Pair)
+static float diffusivity(float Tair, float Pair)
 
 {
 	static float Pcrit_air = 36.4, 
@@ -658,7 +654,7 @@ float diffusivity(float Tair, float Pair)
  *  Reference: Van Wylen and Sonntag, Table A.1.1
  */
  
-float evap(float Tair)
+static inline float evap(float Tair)
 
 {			 
 	return( (313.15 - Tair)/30. * (-71100.) + 2.4073E6 );
@@ -728,7 +724,7 @@ float evap(float Tair)
 #define	DEG_RAD	0.017453292519943295
 #define	RAD_DEG	57.295779513082323
 
-int solarposition(int year, int month, double day, double days_1900,
+static int solarposition(int year, int month, double day, double days_1900,
 		double latitude, double longitude, double *ap_ra, double *ap_dec,
 		double *altitude, double *refraction, double *azimuth,
 		double *distance)
@@ -978,7 +974,7 @@ int solarposition(int year, int month, double day, double days_1900,
  *         U.S.A.
  */
 
-int daynum(int year, int month, int day)
+static int daynum(int year, int month, int day)
 {
   static int begmonth[13] = {0,0,31,59,90,120,151,181,212,243,273,304,334};
   int dnum,
@@ -1009,7 +1005,7 @@ int daynum(int year, int month, int day)
  *  Reference: EPA-454/5-99-005, 2000, section 6.2.5
  */
 
-float est_wind_speed(float speed, float zspeed, int stability_class, int urban)
+static float est_wind_speed(float speed, float zspeed, int stability_class, int urban)
 	
 {
 	float urban_exp[6] = { 0.15, 0.15, 0.20, 0.25, 0.30, 0.30 },
@@ -1032,7 +1028,7 @@ float est_wind_speed(float speed, float zspeed, int stability_class, int urban)
  *
  *  Reference: EPA-454/5-99-005, 2000, section 6.2.5
  */
-int stab_srdt(int daytime, float speed, float solar, float dT)
+static int stab_srdt(int daytime, float speed, float solar, float dT)
 	
 {
 	static int	lsrdt[6][8] = {

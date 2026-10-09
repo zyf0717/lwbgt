@@ -10,7 +10,7 @@ Python, R, Julia, and SwiftPM interfaces.
 
 ## Compatibility and performance
 
-**Version: v1.1.0.** Reference comparisons reproduce WBGT and its component
+**Version: v1.2.0.** Reference comparisons reproduce WBGT and its component
 temperatures bit for bit under matched compiler and floating-point settings.
 The v1 calculation remains the default throughout 1.x; future numerical
 revisions will use explicit versioned APIs while preserving v1. See the
@@ -20,8 +20,8 @@ for the scope, documented corrections, and platform limits.
 The kernel reuses intermediate results and avoids redundant work, preserving
 the original numerical precision. Our
 [scalar benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
-measures about 1.6× the original throughput on one CPU. Performance depends
-on the compiler, hardware, and inputs.
+measured 1.45–1.67× the original throughput across two CPU cores with GCC 13.3.0.
+Performance depends on the compiler, hardware, and inputs.
 
 ## Input assumptions
 
@@ -73,6 +73,13 @@ codes, and failure behaviour are defined by the
 [ABI contract](https://github.com/zyf0717/lwbgt/blob/main/docs/ABI.md). See the
 [input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
 before substituting unavailable observations.
+
+Psychrometric wet-bulb is calculated by default. When only WBGT and its
+components are needed, use `calculate(weather, psychrometric=False)` or
+`calculate_batch(records, psychrometric=False)` to skip the independent solve.
+That result field is `-9999`; the remaining fields and status are unchanged.
+The C equivalent is `lwbgt_calc_batch_ex_v1` with
+`LWBGT_SKIP_PSYCHROMETRIC_WET_BULB`; see the ABI contract above.
 
 ## R
 

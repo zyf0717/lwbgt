@@ -1,6 +1,6 @@
 # lwbgt, pywbgt, and thermofeel
 
-This page compares the documented public scope of `lwbgt` 1.1.0, `pywbgt`
+This page compares the documented public scope of `lwbgt` 1.2.0, `pywbgt`
 3.0.7, and `thermofeel` 2.3.0. Third-party details were checked on 2026-09-22.
 
 | Aspect | lwbgt | pywbgt | thermofeel |

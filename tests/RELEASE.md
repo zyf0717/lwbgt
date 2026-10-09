@@ -1,36 +1,43 @@
-# v1.1.0 release verification
+# v1.2.0 release verification
 
-[v1.1.0](https://github.com/zyf0717/lwbgt/releases/tag/v1.1.0) was published on
-2026-10-02 from commit `b6c49eff1d34738ae40f1d6b51a62cc3a5d0e83d`.
-The reference-compatible numerical kernel, v1 FFI ABI, and `liblwbgt.so.0`
-SONAME are unchanged.
+Prepared on 2026-10-09; publication is pending. This release adds psychrometric
+wet-bulb opt-out and private numerical helpers while preserving the public v1
+ABI, default calculation, and `liblwbgt.so.0` SONAME.
 
-The CMake package now accepts compatible releases within major version 1. Its
-existing consumer test requests 1.0.0 and must continue to accept 1.1.0.
+## Compatibility
+
+- Existing calls through the public C, Python, R, and SwiftPM APIs remain compatible.
+  Psychrometric wet-bulb remains enabled unless explicitly disabled.
+- The new `lwbgt_calc_batch_ex_v1` accepts flags using the existing 104-byte
+  input and 24-byte output structures. Zero flags preserve all outputs.
+- Undocumented C helpers are now private. R's internal native calculation
+  routine takes two arguments. Consumers of these internals must update.
+- Julia development installs tracking this repository's removed `julia/`
+  directory must migrate to the separately maintained LWBGT.jl package.
 
 ## Validation status
 
-The [release workflow](https://github.com/zyf0717/lwbgt/actions/runs/36971287469)
-passed, including Python/R package checks and publication.
-
-Local Linux checks passed for the 1.1.0 preparation:
+Local Linux checks passed on 2026-10-09:
 
 - Version coherence and byte-identical R source copies.
-- All 15 native CTest checks, including the installed CMake consumer requesting
-  1.0.0, using GCC 13.3 in release mode.
-- All four SwiftPM consumer tests using the CI image `swift:6.2.4-noble` in
-  release mode with `-march=native`, including bit-for-bit comparison with CMake
-  over all 35,976 WBGT cases.
-- Python wheel and source-distribution contents, plus all 18 installed-wheel
-  tests with Python 3.14.7.
-- `R CMD build` and `R CMD check`, including the PDF manual: `Status: OK`.
+- All 15 native CTest checks with GCC 13.3.0 and Clang 18.1.3, including
+  numerical regression, opt-out equivalence, exports, and installed consumers.
+- A C consumer compiled against 1.1.0 headers and library runs successfully
+  with the 1.2.0 shared library, retaining SONAME `liblwbgt.so.0`.
+- Python 3.12 wheel built from the source distribution, archive content checks,
+  and all 20 installed-wheel tests in a clean environment.
+- All four SwiftPM consumer tests with `swift:6.2.4-noble`, release mode and
+  `-march=native`, including bitwise comparison over all 35,976 corpus rows.
+- R 4.6.1 source-package build and full check, including the PDF manual:
+  `Status: OK`.
 
-The numerical corpus and recorded baseline are unchanged; retain their original
-version and provenance in [baseline.json](baseline.json). See
-[BASELINE.md](BASELINE.md) for coverage and
-[benchmarks/README.md](../benchmarks/README.md) for the existing throughput record.
-No new numerical or performance claim is introduced by this version bump.
+Cross-platform CI and post-merge validation are required before tagging.
+Publication is pending.
 
-Follow [RELEASING.md](../docs/RELEASING.md) for preparation and publication.
-Earlier verification is preserved in [RELEASE-1.0.1.md](RELEASE-1.0.1.md) and the
-other `RELEASE-*.md` files.
+The synthetic corpus and [baseline.json](baseline.json) are unchanged;
+retain their original provenance. [BASELINE.md](BASELINE.md) defines coverage
+and limits. [benchmarks/README.md](../benchmarks/README.md) records refreshed
+throughput results using the same corpus, including psychrometric opt-out.
+
+Follow [RELEASING.md](../docs/RELEASING.md) for validation and publication.
+Previous verification is preserved in [RELEASE-1.1.0.md](RELEASE-1.1.0.md).

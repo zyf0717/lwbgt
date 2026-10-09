@@ -15,7 +15,7 @@ Other compiler, architecture, and math-library combinations may differ.
 
 | Cohort | Rows | Failures | Coverage |
 |---|---:|---:|---|
-| Known answers | 2 | 0 | HeatStressBench generator endpoints |
+| Known answers | 2 | 0 | Fixed regression endpoints |
 | Fixed weather | 2 | 0 | London examples with unrecorded source provenance |
 | Interactions | 432 | 0 | Day/night, radiation, RH, wind, height, urban/rural, averaging |
 | Pressure boundaries | 6 | 6 | Vapor-pressure/ambient-pressure poles and low wind |

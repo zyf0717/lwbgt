@@ -106,6 +106,18 @@ stopifnot(
 )
 assert_float_equal(batch_result$wbgt_c[[2L]], 25.700485229492188)
 
+skipped <- calculate(batch, psychrometric = FALSE)
+stopifnot(
+    identical(batch_result, calculate(batch, psychrometric = TRUE)),
+    all(is.na(skipped$psychrometric_wet_bulb_c)),
+    identical(skipped[-6L], batch_result[-6L]),
+    identical(calculate(batch)$status, c(0L, 0L))
+)
+for (value in list(NA, NULL, logical(), c(TRUE, FALSE), 1, "FALSE")) {
+    assert_error(calculate(batch, psychrometric = value))
+}
+stopifnot(nrow(calculate(batch[FALSE, ], psychrometric = FALSE)) == 0L)
+
 recycled_arguments <- as.list(singapore)
 recycled_arguments$year <- c(2023, 2024)
 recycled <- do.call(lwbgt_input, recycled_arguments)

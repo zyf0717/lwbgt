@@ -2,11 +2,14 @@
 \alias{calculate}
 \title{Calculate Outdoor Wet Bulb Globe Temperature}
 \usage{
-calculate(input)
+calculate(input, psychrometric = TRUE)
 }
 \arguments{
 \item{input}{A data frame containing the columns produced by
 \code{lwbgt_input()}. Additional columns are ignored.}
+\item{psychrometric}{Calculate psychrometric wet-bulb temperature, default
+\code{TRUE}. With \code{FALSE}, that column is \code{NA} and other results
+are unchanged.}
 }
 \value{
 A plain data frame containing integer \code{status}, character

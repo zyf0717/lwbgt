@@ -122,19 +122,19 @@ static double now(void)
     return value.tv_sec + value.tv_nsec * 1e-9;
 }
 
-static Run exercise(const Case *cases, size_t count, long scale)
+static Run exercise(const Case *cases, size_t count, long scale, int skip_psychrometric)
 {
     Run result = {0, 0, 0};
     for (long repeat = 0; repeat < scale; ++repeat) {
         for (size_t index = 0; index < count; ++index) {
             const Case *item = &cases[index];
-            float estimated = 0, globe = 0, natural = 0, psychrometric = 0, wbgt = 0;
+            float estimated = 0, globe = 0, natural = 0, psychrometric = -9999, wbgt = 0;
             int status = calc_wbgt(
                 item->year, item->month, item->day, item->hour, item->minute,
                 item->gmt, item->avg, item->lat, item->lon, item->solar,
                 item->pressure, item->air, item->rh, item->wind, item->height,
                 item->delta, item->urban, &estimated, &globe, &natural,
-                &psychrometric, &wbgt
+                skip_psychrometric ? NULL : &psychrometric, &wbgt
             );
             if (status == 0) ++result.successes;
             else if (status == -1) ++result.failures;
@@ -154,15 +154,21 @@ static Run exercise(const Case *cases, size_t count, long scale)
 
 int main(int argc, char **argv)
 {
-    if (argc != 3) fail("expected CASES.csv SCALE");
+    if (argc != 3 && argc != 4) fail("expected CASES.csv SCALE [--skip-psychrometric]");
+    int skip_psychrometric = argc == 4;
+    if (skip_psychrometric && strcmp(argv[3], "--skip-psychrometric") != 0)
+        fail("unknown option");
+#ifdef LWBGT_REFERENCE
+    if (skip_psychrometric) fail("the original kernel requires every output pointer");
+#endif
     long scale = integer(argv[2]);
     if (scale < 1) fail("scale must be positive");
     size_t count = 0; Case *cases = load_cases(argv[1], &count);
     if ((uintmax_t)scale > SIZE_MAX / count) fail("call count overflow");
     int cpu = pin_cpu();
-    (void)exercise(cases, count, 1);
+    (void)exercise(cases, count, 1, skip_psychrometric);
     double start = now();
-    Run result = exercise(cases, count, scale);
+    Run result = exercise(cases, count, scale, skip_psychrometric);
     double elapsed = now() - start;
     if (elapsed <= 0) fail("nonpositive elapsed time");
     size_t calls = count * (size_t)scale;

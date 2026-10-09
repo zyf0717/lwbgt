@@ -9,8 +9,8 @@
 int calc_solar_parameters(int, int, double, double, double, float *, float *, float *);
 int stab_srdt(int, double, double, double);
 #else
-int calc_solar_parameters(int, int, double, float, float, float *, float *, float *);
-int stab_srdt(int, float, float, float);
+/* Compile the kernel here to probe helpers with internal linkage. */
+#include "../src/wbgt.c"
 #endif
 
 static unsigned int bits(float value)

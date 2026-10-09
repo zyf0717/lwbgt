@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-EXPECTED = {"calc_wbgt", "esat", "lwbgt_calc_batch_v1"}
+EXPECTED = {"calc_wbgt", "esat", "lwbgt_calc_batch_v1", "lwbgt_calc_batch_ex_v1"}
 
 
 def run(*command: str) -> str:

@@ -79,11 +79,12 @@ static lwbgt_input_v1 parse_input(char **field)
     return input;
 }
 
-static lwbgt_output_v1 scalar(const lwbgt_input_v1 *input)
+static lwbgt_output_v1 scalar(const lwbgt_input_v1 *input, int psychrometric)
 {
     lwbgt_output_v1 output;
 
     output.estimated_wind_speed_m_s = (float)input->wind_speed_m_s;
+    output.psychrometric_wet_bulb_c = -9999.0f;
     output.status = calc_wbgt(
         input->year,
         input->month,
@@ -105,7 +106,7 @@ static lwbgt_output_v1 scalar(const lwbgt_input_v1 *input)
         &output.estimated_wind_speed_m_s,
         &output.globe_temperature_c,
         &output.natural_wet_bulb_c,
-        &output.psychrometric_wet_bulb_c,
+        psychrometric ? &output.psychrometric_wet_bulb_c : NULL,
         &output.wbgt_c
     );
     return output;
@@ -147,6 +148,18 @@ static void check_argument_contract(const lwbgt_input_v1 *input)
         fail("invalid call modified output");
     if (lwbgt_calc_batch_v1(input, NULL, 1) != LWBGT_BATCH_INVALID_ARGUMENT)
         fail("null output was accepted");
+    if (lwbgt_calc_batch_ex_v1(NULL, NULL, 0, 0) != LWBGT_BATCH_OK ||
+        lwbgt_calc_batch_ex_v1(NULL, NULL, 0,
+            LWBGT_SKIP_PSYCHROMETRIC_WET_BULB) != LWBGT_BATCH_OK)
+        fail("extended zero-count call failed");
+    if (lwbgt_calc_batch_ex_v1(NULL, &output, 1, 0) != LWBGT_BATCH_INVALID_ARGUMENT ||
+        lwbgt_calc_batch_ex_v1(input, NULL, 1, 0) != LWBGT_BATCH_INVALID_ARGUMENT)
+        fail("extended null argument was accepted");
+    if (lwbgt_calc_batch_ex_v1(input, &output, 1, 2u) != LWBGT_BATCH_INVALID_ARGUMENT ||
+        lwbgt_calc_batch_ex_v1(NULL, NULL, 0, UINT32_MAX) != LWBGT_BATCH_INVALID_ARGUMENT)
+        fail("unknown option was accepted");
+    if (memcmp(&output, &unchanged, sizeof(output)) != 0)
+        fail("invalid extended call modified output");
 }
 
 static void check_invalid_solar_failure(void)
@@ -258,6 +271,26 @@ static void check_batch(const lwbgt_input_v1 *inputs,
                         (float)inputs[index].wind_speed_m_s))
             fail("2 m wind output is not deterministic");
     }
+    if (lwbgt_calc_batch_ex_v1(inputs, actual, count, 0) != LWBGT_BATCH_OK)
+        fail("extended full-output call failed");
+    for (index = 0; index < count; ++index)
+        if (!same_output(&expected[index], &actual[index]))
+            fail("extended full-output call differs from scalar");
+
+    memset(actual, 0xa5, count * sizeof(*actual));
+    if (lwbgt_calc_batch_ex_v1(inputs, actual, count,
+            LWBGT_SKIP_PSYCHROMETRIC_WET_BULB) != LWBGT_BATCH_OK)
+        fail("psychrometric opt-out failed");
+    for (index = 0; index < count; ++index) {
+        lwbgt_output_v1 wanted = expected[index];
+        lwbgt_output_v1 skipped_scalar = scalar(&inputs[index], 0);
+        wanted.psychrometric_wet_bulb_c = -9999.0f;
+        if (!same_output(&wanted, &actual[index]) ||
+            !same_output(&wanted, &skipped_scalar)) {
+            fprintf(stderr, "batch-test-error: opt-out mismatch for %s\n", identifiers[index]);
+            fail("psychrometric opt-out changed another output");
+        }
+    }
 }
 
 int main(int argc, char **argv)
@@ -293,7 +326,7 @@ int main(int argc, char **argv)
         if (strlen(field[0]) >= sizeof(identifiers[count])) fail("case id is too long");
         strcpy(identifiers[count], field[0]);
         inputs[count] = parse_input(field);
-        expected[count] = scalar(&inputs[count]);
+        expected[count] = scalar(&inputs[count], 1);
         if (total == 0 && count == 0) check_argument_contract(&inputs[0]);
         ++count;
     }
