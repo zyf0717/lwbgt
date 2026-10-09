@@ -59,3 +59,69 @@ Results depend on hardware, compiler, and workload. These regression fixtures
 and synthetic samples do not establish performance on an observed-weather
 dataset. See [the numerical baseline](../tests/BASELINE.md) for input coverage
 and comparison limits.
+
+## Optional psychrometric wet-bulb and private helpers
+
+The unreleased C changes retain every default output and permit explicitly
+skipping the independent psychrometric solve. `batch.py` compares the public
+batch ABI against `main` at `027d41b`, using matching compiler settings. It
+checks every default output bit and every retained opt-out output bit before
+timing. Zero flags also match the existing entrypoint exactly.
+
+On 2026-10-09, Linux x86_64, Intel Core i9-13900HK, CPU 0, with seven rotating
+repetitions per mode and scale:
+
+| Compiler | Main rows/s | Default rows/s | Opt-out rows/s | Default/main | Opt-out/main |
+|---|---:|---:|---:|---:|---:|
+| GCC 13.3.0 | 134,953 | 140,279 | 240,503 | 1.039× | 1.782× |
+| Clang 18.1.3 | 140,598 | 140,491 | 240,332 | 0.999× | 1.709× |
+
+These figures use 1,590,715 accepted ERA5 records, repeated four times per
+timed run (6,362,860 evaluations). The sample selects every fourth latitude
+and longitude from the acquired 0.25° global grid, retaining land fractions
+above 0.5 and all 24 hours on January 1, July 1, and October 1, 2025. Rows are
+cell-major. Solar energy is divided by 3600 to obtain W/m², pressure by 100
+to obtain hPa, and temperatures are converted from kelvin to Celsius.
+Timestamps are interval midpoints, with zero further averaging offset; wind
+is measured at 10 m, terrain follows the saved urban mask, and the supplied
+upper-minus-lower temperature difference is +1 °C, matching HeatStressBench's
+missing-profile assumption. Relative humidity uses native water-phase `esat`.
+
+All accepted records are timed, including 121,535 model failures per sample
+pass. Loading, conversion, output hashing, validation, and warm-ups are
+excluded. This measures kernel throughput rather than wrapper or end-to-end
+data processing, and does not establish model accuracy on these records.
+
+The matrix also covers the 35,976-row numerical corpus, 64 invalid-weather
+cases, and 301,705 regional ERA5 records, at 1× and 4×. Both compilers together
+process 404,976,600 timed records. Default and retained opt-out outputs match
+`main` bit-for-bit in every dataset under each compiler. Relative median
+absolute deviations were below 0.12% on the ERA5 datasets; the 64-row
+fixture is too short for useful performance claims. Clang's default speed
+remains essentially unchanged, so private helpers do not promise a gain on
+every compiler.
+
+[GCC raw results](optional-psychrometric-gcc.json) and
+[Clang raw results](optional-psychrometric-clang.json) retain input and library
+hashes, source hashes, controls, counts, and all timings. The native-endian
+104-byte ERA5 input records are local study artifacts, excluded from Git.
+
+To reproduce the runner after building a baseline and candidate library:
+
+```sh
+python3 benchmarks/batch.py \
+  build/optional-psychrometric/baseline-gcc/liblwbgt.so \
+  build/optional-psychrometric/gcc/liblwbgt.so \
+  build/optional-psychrometric/gcc-performance.json \
+  --input corpus=build/optional-psychrometric/gcc/cases.csv \
+  --input weather=build/optional-psychrometric/gcc/weather-cases.csv \
+  --input era5-global=build/optional-psychrometric/era5-global-3days.bin \
+  --scales 1 4 --repetitions 7 \
+  --compiler='GCC 13.3.0' \
+  --compiler-flags='-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing'
+```
+
+The runner uses only the Python standard library. CSV input follows the shared
+test-corpus schema; binary input uses the host's `lwbgt_input_v1` layout and
+byte order. Use the saved ERA5 generator and metadata in
+`build/optional-psychrometric` for the local acquisition.

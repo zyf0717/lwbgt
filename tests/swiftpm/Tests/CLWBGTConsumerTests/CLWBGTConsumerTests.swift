@@ -97,6 +97,18 @@ final class CLWBGTConsumerTests: XCTestCase {
         XCTAssertEqual(output.status, 0)
         XCTAssertEqual(output.wbgt_c.bitPattern, 0x42020259)
         XCTAssertEqual(esat(273.15, 0).bitPattern, 0x40c45e95)
+        let full = output
+        XCTAssertEqual(
+            lwbgt_calc_batch_ex_v1(&input, &output, 1,
+                UInt32(LWBGT_SKIP_PSYCHROMETRIC_WET_BULB)),
+            Int32(LWBGT_BATCH_OK)
+        )
+        XCTAssertEqual(output.psychrometric_wet_bulb_c, -9999)
+        XCTAssertEqual(output.status, full.status)
+        XCTAssertEqual(output.estimated_wind_speed_m_s.bitPattern, full.estimated_wind_speed_m_s.bitPattern)
+        XCTAssertEqual(output.globe_temperature_c.bitPattern, full.globe_temperature_c.bitPattern)
+        XCTAssertEqual(output.natural_wet_bulb_c.bitPattern, full.natural_wet_bulb_c.bitPattern)
+        XCTAssertEqual(output.wbgt_c.bitPattern, full.wbgt_c.bitPattern)
     }
 
     func testBatchArgumentContract() {

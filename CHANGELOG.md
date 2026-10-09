@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Allow explicitly skipping psychrometric wet-bulb: a null scalar output,
+  `LWBGT_SKIP_PSYCHROMETRIC_WET_BULB` in the new `lwbgt_calc_batch_ex_v1`, or
+  `psychrometric=False` / `FALSE` in Python / R. Existing defaults, v1 layouts,
+  and retained numerical results are preserved.
+- Give numerical helpers internal linkage and use a private saturation-pressure
+  helper so the compiler can inline and specialize internal calls.
+- Add reproducible C batch benchmarks against a baseline library, including
+  bitwise checks of default and retained opt-out outputs.
 - Document the separately released LWBGT.jl binding, General installation,
   and Julia usage of the shared native kernel.
 - Name the CI entrypoint `ci.yml` and the reusable native and Python workflows

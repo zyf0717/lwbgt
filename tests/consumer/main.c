@@ -9,6 +9,9 @@ int main(void)
     };
     lwbgt_output_v1 output;
 
-    return lwbgt_calc_batch_v1(&input, &output, 1) != LWBGT_BATCH_OK ||
-        output.status != 0;
+    if (lwbgt_calc_batch_v1(&input, &output, 1) != LWBGT_BATCH_OK || output.status != 0)
+        return 1;
+    return lwbgt_calc_batch_ex_v1(&input, &output, 1,
+            LWBGT_SKIP_PSYCHROMETRIC_WET_BULB) != LWBGT_BATCH_OK ||
+        output.status != 0 || output.psychrometric_wet_bulb_c != -9999.0f;
 }

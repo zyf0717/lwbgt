@@ -49,6 +49,10 @@ enum {
     LWBGT_BATCH_INVALID_ARGUMENT = 1
 };
 
+enum {
+    LWBGT_SKIP_PSYCHROMETRIC_WET_BULB = 1u
+};
+
 int calc_wbgt(
     int year,
     int month,
@@ -72,6 +76,7 @@ int calc_wbgt(
     float *estimated_wind_speed_m_s,
     float *globe_temperature_c,
     float *natural_wet_bulb_c,
+    /* NULL skips the psychrometric wet-bulb calculation. */
     float *psychrometric_wet_bulb_c,
     float *wbgt_c
 );
@@ -83,6 +88,15 @@ int lwbgt_calc_batch_v1(
     const lwbgt_input_v1 *inputs,
     lwbgt_output_v1 *outputs,
     size_t count
+);
+
+/* flags == 0 calculates every output. Skipped psychrometric outputs are -9999.
+ * Unknown flags return LWBGT_BATCH_INVALID_ARGUMENT without modifying outputs. */
+int lwbgt_calc_batch_ex_v1(
+    const lwbgt_input_v1 *inputs,
+    lwbgt_output_v1 *outputs,
+    size_t count,
+    uint32_t flags
 );
 
 #ifdef __cplusplus

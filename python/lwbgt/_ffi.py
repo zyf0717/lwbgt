@@ -78,6 +78,11 @@ def _configure_library(library: ctypes.CDLL) -> None:
         ctypes.c_size_t,
     )
     library.lwbgt_calc_batch_v1.restype = ctypes.c_int
+    library.lwbgt_calc_batch_ex_v1.argtypes = (
+        *library.lwbgt_calc_batch_v1.argtypes,
+        ctypes.c_uint32,
+    )
+    library.lwbgt_calc_batch_ex_v1.restype = ctypes.c_int
 
 
 def _library() -> ctypes.CDLL:
@@ -111,34 +116,45 @@ def _as_result(output: _OutputV1) -> Result:
     return Result(*(getattr(output, name) for name, _ in _OutputV1._fields_))
 
 
-def calculate(record: Input) -> Result:
-    """Calculate one record through the versioned native FFI."""
+def calculate(record: Input, *, psychrometric: bool = True) -> Result:
+    """Calculate one record; disabling psychrometric wet-bulb returns -9999 for it."""
 
+    if not isinstance(psychrometric, bool):
+        raise TypeError("psychrometric must be bool")
     native_input = _as_native(record)
     native_output = _OutputV1()
-    status = _library().lwbgt_calc_batch_v1(
-        ctypes.byref(native_input), ctypes.byref(native_output), 1
+    status = _library().lwbgt_calc_batch_ex_v1(
+        ctypes.byref(native_input),
+        ctypes.byref(native_output),
+        1,
+        0 if psychrometric else 1,
     )
     if status != 0:
         raise RuntimeError(
-            f"lwbgt_calc_batch_v1 rejected a valid wrapper call: {status}"
+            f"lwbgt_calc_batch_ex_v1 rejected a valid wrapper call: {status}"
         )
     return _as_result(native_output)
 
 
-def calculate_batch(records: Iterable[Input]) -> list[Result]:
-    """Calculate records in one native batch call, preserving input order."""
+def calculate_batch(
+    records: Iterable[Input], *, psychrometric: bool = True
+) -> list[Result]:
+    """Calculate records in input order; skipped psychrometric wet-bulb is -9999."""
 
+    if not isinstance(psychrometric, bool):
+        raise TypeError("psychrometric must be bool")
     native_records = tuple(_as_native(record) for record in records)
     if not native_records:
         return []
     count = len(native_records)
     inputs = (_InputV1 * count)(*native_records)
     outputs = (_OutputV1 * count)()
-    status = _library().lwbgt_calc_batch_v1(inputs, outputs, count)
+    status = _library().lwbgt_calc_batch_ex_v1(
+        inputs, outputs, count, 0 if psychrometric else 1
+    )
     if status != 0:
         raise RuntimeError(
-            f"lwbgt_calc_batch_v1 rejected a valid wrapper call: {status}"
+            f"lwbgt_calc_batch_ex_v1 rejected a valid wrapper call: {status}"
         )
     return [_as_result(output) for output in outputs]
 

@@ -47,6 +47,7 @@ SDIST_BUILD_FILES = {
     "tests/test_compiler_checks.py",
     "benchmarks/benchmark.c",
     "benchmarks/compare.py",
+    "benchmarks/batch.py",
     "tests/branch_probe.c",
     "tests/esat_probe.c",
     "tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",

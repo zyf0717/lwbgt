@@ -1,3 +1,9 @@
+# Development version
+
+- Add `calculate(input, psychrometric = FALSE)` to skip the independent
+  psychrometric wet-bulb solve; its column is `NA`. The default remains `TRUE`.
+- Synchronize private numerical helpers with the canonical C kernel.
+
 # lwbgt 1.1.0
 
 - Synchronize with the shared release. The R API and reference-compatible

@@ -74,6 +74,13 @@ codes, and failure behaviour are defined by the
 [input assumptions](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
 before substituting unavailable observations.
 
+Development builds calculate psychrometric wet-bulb by default. When only WBGT and its
+components are needed, use `calculate(weather, psychrometric=False)` or
+`calculate_batch(records, psychrometric=False)` to skip the independent solve.
+That result field is `-9999`; the remaining fields and status are unchanged.
+The C equivalent is `lwbgt_calc_batch_ex_v1` with
+`LWBGT_SKIP_PSYCHROMETRIC_WET_BULB`; see the ABI contract above.
+
 ## R
 
 Install from CRAN:

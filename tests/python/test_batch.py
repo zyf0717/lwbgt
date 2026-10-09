@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 import lwbgt
@@ -29,6 +30,24 @@ def packed(result: lwbgt.Result) -> bytes:
 class BatchTests(unittest.TestCase):
     def test_empty_batch(self) -> None:
         self.assertEqual(lwbgt.calculate_batch([]), [])
+        self.assertEqual(lwbgt.calculate_batch([], psychrometric=False), [])
+
+    def test_psychrometric_opt_out_preserves_other_outputs(self) -> None:
+        records = [NIGHT, SINGAPORE, SOLVER_FAILURE, replace(SINGAPORE, year=2050)]
+        default = lwbgt.calculate_batch(records)
+        self.assertEqual(default, lwbgt.calculate_batch(records, psychrometric=True))
+        skipped = lwbgt.calculate_batch(iter(records), psychrometric=False)
+        expected = [replace(result, psychrometric_wet_bulb_c=-9999.0) for result in default]
+        self.assertEqual([packed(result) for result in skipped], [packed(result) for result in expected])
+        self.assertEqual(skipped, [lwbgt.calculate(record, psychrometric=False) for record in records])
+
+    def test_psychrometric_option_requires_bool(self) -> None:
+        for value in [None, 0, 1, "false"]:
+            with self.subTest(value=value):
+                with self.assertRaises(TypeError):
+                    lwbgt.calculate(SINGAPORE, psychrometric=value)
+                with self.assertRaises(TypeError):
+                    lwbgt.calculate_batch([], psychrometric=value)
 
     def test_one_record_batch_matches_scalar(self) -> None:
         self.assertEqual(
@@ -63,6 +82,11 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(function(None, None, 0), 0)
         output = _ffi._OutputV1()
         self.assertEqual(function(None, ctypes.byref(output), 1), 1)
+        extended = _ffi._library().lwbgt_calc_batch_ex_v1
+        self.assertEqual(extended.restype, ctypes.c_int)
+        self.assertEqual(extended(None, None, 0, 0), 0)
+        self.assertEqual(extended(None, None, 0, 1), 0)
+        self.assertEqual(extended(None, None, 0, 2), 1)
 
     def test_deterministic_case_set_matches_direct_native_batch_exactly(self) -> None:
         self.check_case_set(35976)
@@ -118,6 +142,14 @@ class BatchTests(unittest.TestCase):
         self.assertEqual(
             [packed(result) for result in wrapped],
             [packed(result) for result in direct],
+        )
+        self.assertEqual(_ffi._library().lwbgt_calc_batch_ex_v1(inputs, outputs, count, 1), 0)
+        skipped = lwbgt.calculate_batch(records, psychrometric=False)
+        expected = [replace(result, psychrometric_wet_bulb_c=-9999.0) for result in direct]
+        self.assertEqual([packed(result) for result in skipped], [packed(result) for result in expected])
+        self.assertEqual(
+            [packed(result) for result in skipped],
+            [packed(_ffi._as_result(output)) for output in outputs],
         )
 
 

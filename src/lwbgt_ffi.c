@@ -29,14 +29,17 @@ LWBGT_ASSERT_OFFSET(lwbgt_output_v1, natural_wet_bulb_c, 12);
 LWBGT_ASSERT_OFFSET(lwbgt_output_v1, psychrometric_wet_bulb_c, 16);
 LWBGT_ASSERT_OFFSET(lwbgt_output_v1, wbgt_c, 20);
 
-int lwbgt_calc_batch_v1(
+int lwbgt_calc_batch_ex_v1(
     const lwbgt_input_v1 *inputs,
     lwbgt_output_v1 *outputs,
-    size_t count
+    size_t count,
+    uint32_t flags
 )
 {
     size_t index;
 
+    if (flags & ~(uint32_t)LWBGT_SKIP_PSYCHROMETRIC_WET_BULB)
+        return LWBGT_BATCH_INVALID_ARGUMENT;
     if (count == 0) return LWBGT_BATCH_OK;
     if (inputs == NULL || outputs == NULL) return LWBGT_BATCH_INVALID_ARGUMENT;
 
@@ -45,6 +48,7 @@ int lwbgt_calc_batch_v1(
         lwbgt_output_v1 *output = &outputs[index];
 
         output->estimated_wind_speed_m_s = (float)input->wind_speed_m_s;
+        output->psychrometric_wet_bulb_c = -9999.0f;
         output->status = calc_wbgt(
             input->year,
             input->month,
@@ -66,10 +70,20 @@ int lwbgt_calc_batch_v1(
             &output->estimated_wind_speed_m_s,
             &output->globe_temperature_c,
             &output->natural_wet_bulb_c,
-            &output->psychrometric_wet_bulb_c,
+            flags & LWBGT_SKIP_PSYCHROMETRIC_WET_BULB ?
+                NULL : &output->psychrometric_wet_bulb_c,
             &output->wbgt_c
         );
     }
 
     return LWBGT_BATCH_OK;
+}
+
+int lwbgt_calc_batch_v1(
+    const lwbgt_input_v1 *inputs,
+    lwbgt_output_v1 *outputs,
+    size_t count
+)
+{
+    return lwbgt_calc_batch_ex_v1(inputs, outputs, count, 0);
 }

@@ -48,6 +48,7 @@ class CompilerChecks(unittest.TestCase):
                   1    0 00001000 calc_wbgt
                   2    1 00002000 esat
                   3    2 00003000 lwbgt_calc_batch_v1
+                  4    3 00004000 lwbgt_calc_batch_ex_v1
         Summary
                  1000 .data
         """

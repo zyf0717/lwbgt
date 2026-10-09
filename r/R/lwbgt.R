@@ -119,12 +119,17 @@ lwbgt_input <- function(
 #'
 #' @param input A data frame containing the columns produced by
 #'   [lwbgt_input()]. Additional columns are ignored.
+#' @param psychrometric Calculate psychrometric wet-bulb temperature, default
+#'   `TRUE`. With `FALSE`, that column is `NA` and other results are unchanged.
 #'
 #' @return A plain data frame containing `status`, `status_message`,
 #'   `estimated_wind_speed_m_s`, `globe_temperature_c`,
 #'   `natural_wet_bulb_c`, `psychrometric_wet_bulb_c`, and `wbgt_c`.
 #' @export
-calculate <- function(input) {
+calculate <- function(input, psychrometric = TRUE) {
+    if (!is.logical(psychrometric) || length(psychrometric) != 1L || is.na(psychrometric)) {
+        stop("psychrometric must be TRUE or FALSE", call. = FALSE)
+    }
     if (!is.data.frame(input)) {
         stop("input must be a data frame", call. = FALSE)
     }
@@ -143,7 +148,7 @@ calculate <- function(input) {
         }
         columns[[name]] <- as.double(value)
     }
-    result <- .Call(C_lwbgt_calculate, columns)
+    result <- .Call(C_lwbgt_calculate, columns, psychrometric)
     class(result) <- "data.frame"
     attr(result, "row.names") <- attr(input, "row.names")
     result

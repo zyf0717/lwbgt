@@ -31,5 +31,9 @@ calculate(input)
 esat(273.15)
 ```
 
+In development builds, `calculate(input, psychrometric = FALSE)` skips the independent psychrometric
+wet-bulb solve and returns `NA` for that column. It is calculated by default;
+the other outputs retain their existing behavior.
+
 Rows with missing, invalid, or non-convergent inputs return a nonzero status
 and `NA` numerical outputs without preventing other rows from being calculated.

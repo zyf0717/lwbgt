@@ -1,8 +1,8 @@
 # ABI contract
 
 The public interface is `include/lwbgt.h`. The shared library exports
-`calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1`; other static-library symbols are
-implementation details. The header supports C and C++.
+`calc_wbgt`, `esat`, `lwbgt_calc_batch_v1`, and `lwbgt_calc_batch_ex_v1`.
+Numerical helpers have internal linkage. The header supports C and C++.
 
 ## Versioning
 
@@ -84,6 +84,29 @@ int lwbgt_calc_batch_v1(
   clamping, or missing-data policy beyond the scalar model.
 - At 2 m wind height, estimated wind is the supplied speed rounded to `float`.
 
+### Optional psychrometric wet-bulb (unreleased)
+
+The default entrypoint continues to calculate every output. The extended
+entrypoint uses the same v1 structures and adds flags:
+
+```c
+int lwbgt_calc_batch_ex_v1(
+    const lwbgt_input_v1 *inputs,
+    lwbgt_output_v1 *outputs,
+    size_t count,
+    uint32_t flags
+);
+```
+
+With `flags == 0`, results are identical to `lwbgt_calc_batch_v1`. Set
+`LWBGT_SKIP_PSYCHROMETRIC_WET_BULB` to omit that independent solve. Its output
+field is always `-9999`; row status and all other output fields are unchanged.
+WBGT depends on the natural wet-bulb and globe temperatures, not the
+psychrometric wet-bulb temperature. Unknown flag bits return
+`LWBGT_BATCH_INVALID_ARGUMENT` without modifying outputs, including when
+`count == 0`. With valid flags, the existing pointer, ordering, ownership,
+and failure contracts apply.
+
 ## Scalar calls
 
 `calc_wbgt` accepts scalar floating-point inputs as `double` and rounds them
@@ -92,6 +115,9 @@ are `float *`. Local standard time is converted to GMT; interval centering
 subtracts half of `averaging_minutes`. Its 2 m wind output is now assigned; the original left it
 unwritten. Solar-position support remains 1950–2049 with the original date
 arithmetic. Unsupported years return -1 and initialized failure outputs.
+Passing `NULL` for the psychrometric wet-bulb output skips that solve; the other
+four scalar output pointers must be non-null. Supplying all five pointers
+preserves the default calculation.
 
 `esat` accepts temperature in kelvin and returns saturation pressure in hPa.
 Phase 0 selects liquid water; phase 1 selects ice. Other phases are unsupported.
@@ -128,7 +154,7 @@ and original oracle are not compiled by MSVC.
 
 | Binding | Behavior |
 |---|---|
-| Python | `Input` and `Result` map to the v1 structures. Both calculation functions use the batch ABI; `esat` calls the scalar symbol. The bundled runtime loads through `ctypes` and `importlib.resources`. No extra input or failure policy. |
-| R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
+| Python | `Input` and `Result` map to the v1 structures. Both calculation functions use the extended batch ABI with keyword-only `psychrometric=True` by default; `False` returns `-9999` for that field. `esat` calls the scalar symbol. The bundled runtime loads through `ctypes` and `importlib.resources`. No extra input or failure policy. |
+| R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. `calculate(input, psychrometric=TRUE)` includes the independent solve by default; `FALSE` returns `NA` for that column. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
 | Julia | [LWBGT.jl](https://github.com/zyf0717/LWBGT.jl) maps immutable `Input` and `Result` records to the v1 structures and loads the native library through `lwbgt_jll`. Both calculation functions use the serial batch ABI; `esat` calls the scalar symbol. No extra input or failure policy. |
 | SwiftPM | `CLWBGT` builds the canonical C sources and exposes the header directly. It is a C-library product, not a Swift wrapper. |
