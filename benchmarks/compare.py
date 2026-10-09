@@ -17,8 +17,12 @@ from pathlib import Path
 SCALES = (1, 10)
 
 
-def measured(executable: str, cases: Path, scale: int, count: int) -> dict:
-    result = subprocess.run([executable, str(cases), str(scale)], check=True,
+def measured(executable: str, cases: Path, scale: int, count: int,
+             skip_psychrometric: bool = False) -> dict:
+    command = [executable, str(cases), str(scale)]
+    if skip_psychrometric:
+        command.append("--skip-psychrometric")
+    result = subprocess.run(command, check=True,
                             stdout=subprocess.PIPE, text=True)
     sample = json.loads(result.stdout)
     calls = count * scale
@@ -62,7 +66,8 @@ def cpu_model() -> str:
 
 
 def benchmark(reference: str, candidate: str, cases: Path, output: Path,
-              repetitions: int, compiler_flags: str | None = None) -> dict:
+              repetitions: int, compiler_flags: str | None = None,
+              skip_psychrometric: bool = False) -> dict:
     if repetitions < 3:
         raise ValueError("at least three repetitions are required")
     with cases.open(encoding="ascii", newline="") as stream:
@@ -70,6 +75,8 @@ def benchmark(reference: str, candidate: str, cases: Path, output: Path,
     if not count:
         raise ValueError("corpus is empty")
     executables = {"reference": reference, "candidate": candidate}
+    if skip_psychrometric:
+        executables["skip"] = candidate
     report = {
         "date": datetime.now(timezone.utc).date().isoformat(),
         "platform": platform.platform(),
@@ -81,7 +88,7 @@ def benchmark(reference: str, candidate: str, cases: Path, output: Path,
                               for name, exe in executables.items()},
         "repetitions": repetitions,
         "method": "single-thread scalar calls; one full-corpus warm-up per execution; "
-                  "input loading and warm-up excluded; alternating kernel order; "
+                  "input loading and warm-up excluded; rotating mode order; "
                   "all rows included; CPU affinity recorded per kernel",
         "scales": {},
     }
@@ -90,11 +97,11 @@ def benchmark(reference: str, candidate: str, cases: Path, output: Path,
     for scale in SCALES:
         samples: dict[str, list[dict]] = {name: [] for name in executables}
         for repetition in range(repetitions):
-            order = tuple(executables)
-            if repetition % 2:
-                order = tuple(reversed(order))
+            order = list(executables)
+            rotation = repetition % len(order)
+            order = order[rotation:] + order[:rotation]
             for name in order:
-                sample = measured(executables[name], cases, scale, count)
+                sample = measured(executables[name], cases, scale, count, name == "skip")
                 samples[name].append(sample)
                 print(f"{scale}x {name} {repetition + 1}/{repetitions}: "
                       f"{sample['elapsed_seconds']:.3f} s, "
@@ -120,6 +127,11 @@ def benchmark(reference: str, candidate: str, cases: Path, output: Path,
             "speedup": summaries["candidate"]["median_rows_per_second"] /
                        summaries["reference"]["median_rows_per_second"],
         }
+        if skip_psychrometric:
+            report["scales"][str(scale)]["skip_speedup"] = (
+                summaries["skip"]["median_rows_per_second"] /
+                summaries["reference"]["median_rows_per_second"]
+            )
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return report
@@ -133,11 +145,13 @@ def main() -> None:
     parser.add_argument("output", type=Path)
     parser.add_argument("--repetitions", type=int, default=7)
     parser.add_argument("--compiler-flags", help="record the kernel build flags")
+    parser.add_argument("--skip-psychrometric", action="store_true",
+                        help="also measure the candidate with psychrometric wet-bulb omitted")
     args = parser.parse_args()
     if args.repetitions < 3:
         parser.error("--repetitions must be at least three")
     benchmark(args.reference, args.candidate, args.cases, args.output,
-              args.repetitions, args.compiler_flags)
+              args.repetitions, args.compiler_flags, args.skip_psychrometric)
 
 
 if __name__ == "__main__":

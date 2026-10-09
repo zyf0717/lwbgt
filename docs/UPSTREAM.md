@@ -11,7 +11,6 @@ The oracle is Liljegren WBGT v1.1, retained verbatim as
 | Original path | `src/wbgt.c.original` |
 | Imported | 2026-08-18 |
 
-This is also HeatStressBench's frozen canonical `liljegren-c` source.
 `src/wbgt.c` is the modified kernel; `r/src/wbgt.c` is its byte-identical copy.
 [DEVIATIONS.md](DEVIATIONS.md) records the changes, and Git history records
 the individual edits.

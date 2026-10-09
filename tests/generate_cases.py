@@ -56,7 +56,7 @@ def wbgt_cases(samples: int, seed: int) -> list[tuple]:
         rows.append((f"case-{len(rows) + 1:06d}", cohort,
                      *(values[key] for key in HEADER[2:])))
 
-    # HeatStressBench generator-n known-answer endpoints.
+    # Fixed known-answer endpoints.
     add("known-answer", 2024, 3, 21, 7, 0, 0, 0, 14.515380, -91.977540,
         0.0, 1010.0, 42.543334, 31.5, 0.821752, 2.0, 0.0, 0)
     add("known-answer", 2024, 9, 22, 13, 0, 0, 0, 11.359619, 11.997070,

@@ -76,4 +76,5 @@ sdist.include = [
   "/LICENSE",
   "/NOTICE",
   "/README.md",
+  "!**/__pycache__/**",
 ]

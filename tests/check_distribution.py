@@ -47,7 +47,6 @@ SDIST_BUILD_FILES = {
     "tests/test_compiler_checks.py",
     "benchmarks/benchmark.c",
     "benchmarks/compare.py",
-    "benchmarks/batch.py",
     "tests/branch_probe.c",
     "tests/esat_probe.c",
     "tests/swiftpm/Tests/CLWBGTConsumerTests/CLWBGTConsumerTests.swift",
@@ -87,6 +86,8 @@ def inspect_sdist(path: Path) -> None:
         raise RuntimeError(f"{path}: expected one sdist root, got {sorted(roots)}")
     root = roots.pop()
     names = {name.removeprefix(f"{root}/") for name in members}
+    if any("__pycache__" in Path(name).parts for name in names):
+        raise RuntimeError(f"{path}: sdist contains Python bytecode caches")
     required = LICENSE_FILES | SDIST_BUILD_FILES
     missing = sorted(required - names)
     if missing:

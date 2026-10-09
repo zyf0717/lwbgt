@@ -8,8 +8,7 @@
   and retained numerical results are preserved.
 - Give numerical helpers internal linkage and use a private saturation-pressure
   helper so the compiler can inline and specialize internal calls.
-- Add reproducible C batch benchmarks against a baseline library, including
-  bitwise checks of default and retained opt-out outputs.
+- Extend the synthetic throughput benchmark with psychrometric opt-out.
 - Document the separately released LWBGT.jl binding, General installation,
   and Julia usage of the shared native kernel.
 - Name the CI entrypoint `ci.yml` and the reusable native and Python workflows
