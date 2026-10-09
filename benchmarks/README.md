@@ -31,13 +31,14 @@ used GNU89; both used
 `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
 [throughput-gcc-13.3.0.json](throughput-gcc-13.3.0.json) retains the measurements.
 
-The same binaries measured 1.66–1.67× on CPU 12. Both kernels run faster on
+Across CPUs 0 and 12, the same binaries measured 1.45–1.67× speedup.
+CPU 12 yielded 1.664× at 1× and 1.670× at 10×. Both kernels run faster on
 CPU 0, but the original gains more, so the relative speedup is lower.
 
 ## Psychrometric opt-out
 
 The unreleased opt-out and private-helper changes compare against pre-change
-`main` (`027d41b`), using the same corpus, date, CPU, and repetitions as above.
+`main` (`027d41b`), using CPU 0 and the same corpus, date, and repetitions as above.
 Numerical tests verify default and retained opt-out outputs are unchanged.
 
 | Compiler | Scale | Default/main | Opt-out/main |

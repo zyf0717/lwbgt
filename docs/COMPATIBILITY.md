@@ -27,7 +27,7 @@ can differ from the original. See [DEVIATIONS.md](DEVIATIONS.md). The original
 Throughput comparisons use the same 35,976-row corpus at 1× and 10×:
 35,976 and 359,760 scalar calls per measured run. All rows are timed,
 including convergence failures. The current kernel measured about
-1.45× throughput at both scales on GCC 13.3.0, pinned to CPU 0. Results
+1.45–1.67× throughput on GCC 13.3.0 across CPUs 0 and 12. Results
 depend on hardware, compiler, and workload; these synthetic inputs are not
 observed weather.
 

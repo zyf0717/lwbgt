@@ -20,7 +20,7 @@ for the scope, documented corrections, and platform limits.
 The kernel reuses intermediate results and avoids redundant work, preserving
 the original numerical precision. Our
 [scalar benchmark](https://github.com/zyf0717/lwbgt/blob/main/benchmarks/README.md)
-measures about 1.45× the original throughput on CPU 0 with GCC 13.3.0.
+measured 1.45–1.67× the original throughput across two CPU cores with GCC 13.3.0.
 Performance depends on the compiler, hardware, and inputs.
 
 ## Input assumptions
