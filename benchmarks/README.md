@@ -31,6 +31,9 @@ used GNU89; both used
 `-O2 -fno-fast-math -ffp-contract=off -fno-strict-aliasing`.
 [throughput-gcc-13.3.0.json](throughput-gcc-13.3.0.json) retains the measurements.
 
+The same binaries measured 1.66–1.67× on CPU 12. Both kernels run faster on
+CPU 0, but the original gains more, so the relative speedup is lower.
+
 ## Psychrometric opt-out
 
 The unreleased opt-out and private-helper changes compare against pre-change
