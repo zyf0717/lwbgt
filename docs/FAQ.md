@@ -32,6 +32,8 @@ The native library is installed automatically through `lwbgt_jll`. See the
 Native, Python, and Julia calls return a per-row status and the native failure
 values.
 R validates inputs and replaces failed-row numerical outputs with `NA`.
+With `psychrometric=TRUE`, failure of that independent solve also makes the
+R row unsuccessful; skipping it can still yield successful WBGT results.
 See [the failure contract](ABI.md#batch-call-contract) and [R quick start](../r/README.md).
 
 ## Can I substitute another WBGT package?

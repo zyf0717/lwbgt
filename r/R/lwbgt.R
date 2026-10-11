@@ -120,7 +120,8 @@ lwbgt_input <- function(
 #' @param input A data frame containing the columns produced by
 #'   [lwbgt_input()]. Additional columns are ignored.
 #' @param psychrometric Calculate psychrometric wet-bulb temperature, default
-#'   `TRUE`. With `FALSE`, that column is `NA` and other results are unchanged.
+#'   `TRUE`. With `FALSE`, that column is `NA`; the other calculations are
+#'   unchanged. Skipping a failed psychrometric solve can allow a row to succeed.
 #'
 #' @return A plain data frame containing `status`, `status_message`,
 #'   `estimated_wind_speed_m_s`, `globe_temperature_c`,

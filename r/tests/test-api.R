@@ -234,6 +234,26 @@ stopifnot(
     all(is.na(solver_result[3:7]))
 )
 
+# The independent psychrometric solve can fail while WBGT still converges.
+psychrometric_failure <- solver_failure
+psychrometric_failure$solar_w_m2 <- 1100
+psychrometric_failure$pressure_hpa <- 200
+psychrometric_failure$air_temperature_c <- -60
+psychrometric_failure$relative_humidity_percent <- 0.001
+psychrometric_failure$wind_speed_m_s <- 0
+failure_batch <- rbind(singapore, psychrometric_failure, night)
+failure_result <- calculate(failure_batch)
+skipped_failure <- calculate(failure_batch, psychrometric = FALSE)
+stopifnot(
+    identical(failure_result$status, c(0L, -1L, 0L)),
+    failure_result$status_message[[2L]] == "solver did not converge",
+    all(is.na(failure_result[2L, 3:7])),
+    identical(skipped_failure$status, c(0L, 0L, 0L)),
+    all(is.na(skipped_failure$psychrometric_wet_bulb_c)),
+    all(is.finite(as.numeric(skipped_failure[2L, c(3:5, 7)]))),
+    identical(failure_result[c(1L, 3L), -6L], skipped_failure[c(1L, 3L), -6L])
+)
+
 assert_float_equal(esat(273.15), 6.136545658111572)
 assert_float_equal(esat(273.15, 1L), 6.1359429359436035)
 assert_float_equal(esat(c(273.15, NA_real_)), c(6.136545658111572, NA_real_))

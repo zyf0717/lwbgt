@@ -38,7 +38,8 @@ esat(273.15)
 
 `calculate(input, psychrometric = FALSE)` skips the independent psychrometric
 wet-bulb solve and returns `NA` for that column. It is calculated by default;
-the other outputs retain their existing behavior.
+the other calculations are unchanged. Skipping a failed psychrometric solve
+can allow a row to return successful WBGT results.
 
 Rows with missing, invalid, or non-convergent inputs return a nonzero status
 and `NA` numerical outputs without preventing other rows from being calculated.
