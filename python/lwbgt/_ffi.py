@@ -7,7 +7,6 @@ import sys
 from collections.abc import Iterable
 from contextlib import ExitStack
 from importlib import resources
-from operator import index
 from threading import Lock
 from typing import Any
 
@@ -107,21 +106,10 @@ def _library() -> ctypes.CDLL:
         return library
 
 
-def _as_int32(value: int, name: str) -> int:
-    value = index(value)
-    if not -(2**31) <= value < 2**31:
-        raise OverflowError(f"{name} must fit a signed 32-bit integer")
-    return value
-
-
 def _as_native(record: Input) -> _InputV1:
     if not isinstance(record, Input):
         raise TypeError(f"record must be lwbgt.Input, not {type(record).__name__}")
-    return _InputV1(*(
-        _as_int32(getattr(record, name), name) if native_type is ctypes.c_int32
-        else getattr(record, name)
-        for name, native_type in _InputV1._fields_
-    ))
+    return _InputV1(*(getattr(record, name) for name, _ in _InputV1._fields_))
 
 
 def _as_result(output: _OutputV1) -> Result:
@@ -174,4 +162,4 @@ def calculate_batch(
 def esat(temperature_k: float, phase: int = 0) -> float:
     """Return native saturation vapour pressure for temperature in kelvin."""
 
-    return float(_library().esat(temperature_k, _as_int32(phase, "phase")))
+    return float(_library().esat(temperature_k, phase))

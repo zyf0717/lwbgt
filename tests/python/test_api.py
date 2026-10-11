@@ -3,7 +3,6 @@ from __future__ import annotations
 import ctypes
 import struct
 import unittest
-from dataclasses import replace
 from importlib.metadata import version
 
 import lwbgt
@@ -16,31 +15,11 @@ def float_bits(value: float) -> bytes:
 
 
 class ApiTests(unittest.TestCase):
-    def test_integer_fields_reject_overflow_without_wrapping(self) -> None:
-        fields = ("year", "month", "day", "hour", "minute",
-                  "gmt_offset_hours", "averaging_minutes", "urban")
-        for field in fields:
-            for value in (-(2**31) - 1, 2**31, getattr(SINGAPORE, field) + 2**32):
-                record = replace(SINGAPORE, **{field: value})
-                with self.subTest(field=field, value=value):
-                    with self.assertRaisesRegex(OverflowError, field):
-                        lwbgt.calculate(record)
-                    with self.assertRaisesRegex(OverflowError, field):
-                        lwbgt.calculate_batch([SINGAPORE, record])
-        for value in (-(2**31), 2**31 - 1):
-            self.assertEqual(lwbgt.calculate(replace(SINGAPORE, year=value)).status, -1)
-
     def test_public_surface_and_version(self) -> None:
         self.assertEqual(lwbgt.__version__, version("lwbgt"))
         self.assertEqual(
             lwbgt.__all__, ["Input", "Result", "calculate", "calculate_batch", "esat"]
         )
-
-    def test_esat_phase_rejects_overflow_without_wrapping(self) -> None:
-        for phase in (-(2**31) - 1, 2**31, 2**32):
-            with self.subTest(phase=phase):
-                with self.assertRaisesRegex(OverflowError, "phase"):
-                    lwbgt.esat(273.15, phase)
 
     def test_singapore_scalar_matches_native_scalar_exactly(self) -> None:
         result = lwbgt.calculate(SINGAPORE)

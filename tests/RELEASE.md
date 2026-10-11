@@ -9,8 +9,6 @@ layouts, and the `liblwbgt.so.0` SONAME.
 - R now reports status -1 and `NA` numerical outputs when a requested
   psychrometric solve fails. `psychrometric=FALSE` can still return valid WBGT.
 - Non-finite R `esat()` results become `NA` with a warning.
-- Python raises `OverflowError` for integer fields outside signed 32-bit storage.
-  Representable values retain the existing native input and failure policy.
 - Source archives exclude generated R/Swift files. Native installation paths
   support nested library directories and relocation through `pkg-config`.
 - The release workflow requires native and SwiftPM validation before publication.
@@ -27,7 +25,7 @@ Local Linux checks passed on 2026-10-11:
   directory explicitly for CMake discovery.
 - Source distribution built from a checkout containing R/Swift build products;
   archive checks confirm they are excluded. A wheel rebuilt from that archive
-  passes its content check; all 23 installed-package tests pass on Python 3.14.7.
+  passes its content check; all 21 installed-package tests pass on Python 3.14.7.
 - All four SwiftPM consumer tests with `swift:6.2.4-noble`, release mode and
   `-march=native`, including bitwise comparison over all 35,976 corpus rows.
 - R 4.6.1 source-package build and full check, including requested psychrometric

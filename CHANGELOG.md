@@ -7,7 +7,6 @@
 - Treat a failed requested psychrometric solve as an R row failure, with status
   -1 and `NA` numerical outputs. Skipping that solve can still yield valid WBGT.
 - Replace non-finite R `esat()` results with `NA` and one warning per call.
-- Reject Python integer fields that cannot fit the signed 32-bit native ABI.
 - Exclude local R/Swift build products from Python source distributions and
   reject generated files during archive checks.
 - Fix relocatable `pkg-config` paths for nested installation library directories
