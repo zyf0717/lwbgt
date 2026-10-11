@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## v1.2.1 — 2026-10-11
+
+- Treat a failed requested psychrometric solve as an R row failure, with status
+  -1 and `NA` numerical outputs. Skipping that solve can still yield valid WBGT.
+- Replace non-finite R `esat()` results with `NA` and one warning per call.
+- Reject Python integer fields that cannot fit the signed 32-bit native ABI.
+- Exclude local R/Swift build products from Python source distributions and
+  reject generated files during archive checks.
+- Fix relocatable `pkg-config` paths for nested installation library directories
+  and test an installed consumer through `pkg-config` where available.
+- Require native C/C++ and SwiftPM validation before release publication.
+- Link the R documentation to other interfaces sharing the same C kernel and
+  document output units, input ranges, timestamp centering, and failure handling.
+- Refresh API and release evidence. Native v1 results, layouts, and SONAME remain
+  unchanged.
+
 ## v1.2.0 — 2026-10-09
 
 - Allow explicitly skipping psychrometric wet-bulb: a null scalar output,
