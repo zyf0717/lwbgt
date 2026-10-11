@@ -35,8 +35,9 @@ git tag -a "v${release_version}" -m "lwbgt v${release_version}"
 git push origin "v${release_version}"
 ```
 
-The release workflow builds/tests Python and R packages and publishes Python
-to TestPyPI. After hash and installation checks, it publishes the same Python
+The release workflow validates native C/C++ and SwiftPM consumers, builds/tests
+Python and R packages, and publishes Python to TestPyPI only after all checks
+pass. After hash and installation checks, it publishes the same Python
 files to PyPI and attaches Python and R distributions to the GitHub release.
 
 Wait for the entire run to succeed. Check Python/R installation using the
