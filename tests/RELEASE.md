@@ -22,7 +22,9 @@ Local Linux checks passed on 2026-10-11:
 - Version coherence and byte-identical R source copies.
 - All 15 native CTest checks with GCC 13.3.0, including the retained-original
   comparison and installed CMake/`pkg-config` consumers. The installation uses
-  Debian-style `lib/x86_64-linux-gnu` and relocates to a temporary prefix.
+  Debian-style `lib/x86_64-linux-gnu` and custom `lib/lwbgt-test` layouts,
+  relocated to temporary prefixes. Custom layouts specify the package config
+  directory explicitly for CMake discovery.
 - Source distribution built from a checkout containing R/Swift build products;
   archive checks confirm they are excluded. A wheel rebuilt from that archive
   passes its content check; all 23 installed-package tests pass on Python 3.14.7.

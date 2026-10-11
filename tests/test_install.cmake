@@ -32,6 +32,7 @@ endif()
 run_checked("${CMAKE_COMMAND}" -G "${GENERATOR}"
             -S "${SOURCE_DIR}" -B "${BUILD_DIR}/consumer-build"
             "-DCMAKE_PREFIX_PATH=${INSTALL_DIR}"
+            "-Dlwbgt_DIR=${INSTALL_DIR}/${INSTALL_LIBDIR}/cmake/lwbgt"
             "-DLWBGT_USE_PKG_CONFIG=${USE_PKG_CONFIG}")
 run_checked("${CMAKE_COMMAND}" --build "${BUILD_DIR}/consumer-build" --config "${CONFIG}")
 if(SYSTEM_NAME STREQUAL "Windows")
