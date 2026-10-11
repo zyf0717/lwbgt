@@ -18,7 +18,9 @@ Description: Computes outdoor wet bulb globe temperature using the
 License: Apache License (== 2.0)
 Copyright: See file inst/COPYRIGHTS.
 URL: https://github.com/zyf0717/lwbgt,
-    https://zyf0717.r-universe.dev/lwbgt
+    https://zyf0717.r-universe.dev/lwbgt,
+    https://pypi.org/project/lwbgt/,
+    https://github.com/zyf0717/LWBGT.jl
 BugReports: https://github.com/zyf0717/lwbgt/issues
 Depends: R (>= 4.3.0)
 Encoding: UTF-8
