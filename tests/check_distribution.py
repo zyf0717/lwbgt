@@ -88,6 +88,14 @@ def inspect_sdist(path: Path) -> None:
     names = {name.removeprefix(f"{root}/") for name in members}
     if any("__pycache__" in Path(name).parts for name in names):
         raise RuntimeError(f"{path}: sdist contains Python bytecode caches")
+    generated = sorted(
+        name for name in names
+        if ".build" in Path(name).parts
+        or Path(name).suffix.lower() in {".o", ".obj", ".a", ".lib", ".pyc", ".pyo", ".pyd"}
+        or is_native_library(name)
+    )
+    if generated:
+        raise RuntimeError(f"{path}: sdist contains build products: {generated}")
     required = LICENSE_FILES | SDIST_BUILD_FILES
     missing = sorted(required - names)
     if missing:
