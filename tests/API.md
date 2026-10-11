@@ -5,7 +5,7 @@ status codes, and ownership rules. Tests verify that contract:
 
 | Check | Coverage |
 |---|---|
-| `shared_exports`, `python_runtime_exports` | Only `calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1` are exported by shared runtimes |
+| `shared_exports`, `python_runtime_exports` | Only `calc_wbgt`, `esat`, `lwbgt_calc_batch_v1`, and `lwbgt_calc_batch_ex_v1` are exported by shared runtimes |
 | `installed_consumer` | Installed C/C++ headers, structure sizes/offsets, CMake and available `pkg-config` linkage, relocation, SONAME, and accompanying documents |
 | Whole-corpus compatibility probes | Status and output bits against the retained original through static and Python-runtime libraries |
 | Water/ice probes | Both `esat` phases, rounding boundaries, and non-finite temperatures |
@@ -22,6 +22,6 @@ At 2 m height, compatibility checks require the supplied wind rounded to
 unwritten. Rejected solar inputs and non-finite weather have separate current-API
 checks. [BASELINE.md](BASELINE.md) records corpora, hashes, and limitations.
 
-The static archive retains internal helpers for solar geometry, wind scaling,
-and thermophysical properties. Their visibility does not make them supported
-entrypoints. Library builds omit the demonstration `main` and its I/O dependencies.
+Numerical helpers for solar geometry, wind scaling, and thermophysical
+properties have internal linkage. Library builds omit the demonstration
+`main` and its I/O dependencies.

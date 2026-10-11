@@ -43,10 +43,14 @@
 #' common length of the non-scalar arguments.
 #'
 #' @param year Integer-valued Gregorian year from 1950 through 2049.
-#' @param month,day,hour,minute Integer-valued local date and time fields.
+#' @param month,day,hour,minute Integer-valued local standard date and time fields.
 #'   A `month` of zero makes `day` a day-of-year value.
-#' @param gmt_offset_hours Local standard time minus GMT, in whole hours.
-#' @param averaging_minutes Input averaging interval, in minutes.
+#' @param gmt_offset_hours Local standard time minus GMT, in whole hours from
+#'   -12 through 14. Convert daylight-saving or fractional-offset timestamps to
+#'   standard time or UTC first.
+#' @param averaging_minutes Integer interval from 0 through 1440 minutes.
+#'   The kernel subtracts half the interval to center the supplied timestamp.
+#'   Use zero for instantaneous or already centered observations.
 #' @param urban Zero for rural wind scaling or one for urban wind scaling.
 #' @param latitude_deg_north,longitude_deg_east Geographic coordinates in
 #'   degrees north and degrees east.

@@ -11,20 +11,27 @@ lwbgt_input(
 }
 \arguments{
 \item{year}{Integer-valued Gregorian year from 1950 through 2049.}
-\item{month, day, hour, minute}{Integer-valued local date and time fields.
-A \code{month} of zero makes \code{day} a day-of-year value.}
-\item{gmt_offset_hours}{Local standard time minus GMT, in whole hours.}
-\item{averaging_minutes}{Input averaging interval, in minutes.}
+\item{month, day, hour, minute}{Integer-valued local standard date and time.
+Months are 1--12 and days must be valid for the selected year and month.
+A \code{month} of zero makes \code{day} a day-of-year value (1--365 or 366).
+Hours are 0--23 and minutes are 0--59.}
+\item{gmt_offset_hours}{Local standard time minus GMT, in whole hours from
+-12 through 14. Convert daylight-saving or fractional-offset timestamps to
+standard time or UTC before constructing inputs.}
+\item{averaging_minutes}{Integer averaging interval from 0 through 1440 minutes.
+The kernel subtracts half this interval from the supplied timestamp to center
+the calculation. Use zero for instantaneous or already centered observations.}
 \item{urban}{Zero for rural wind scaling or one for urban wind scaling.}
-\item{latitude_deg_north, longitude_deg_east}{Coordinates in degrees north and
-degrees east.}
-\item{solar_w_m2}{Solar irradiance in watts per square metre.}
-\item{pressure_hpa}{Barometric pressure in hectopascals.}
-\item{air_temperature_c}{Dry-bulb air temperature in degrees Celsius.}
-\item{relative_humidity_percent}{Relative humidity in percent.}
-\item{wind_speed_m_s}{Wind speed in metres per second.}
-\item{wind_height_m}{Wind measurement height in metres.}
-\item{vertical_temperature_difference_c}{Upper-minus-lower temperature
+\item{latitude_deg_north, longitude_deg_east}{Finite coordinates in degrees
+north (-90 through 90) and degrees east (-180 through 180).}
+\item{solar_w_m2}{Finite, nonnegative solar irradiance in watts per square metre.}
+\item{pressure_hpa}{Finite, positive barometric pressure in hectopascals.}
+\item{air_temperature_c}{Finite dry-bulb temperature in degrees Celsius,
+strictly above -273.15.}
+\item{relative_humidity_percent}{Finite relative humidity from 0 through 100 percent.}
+\item{wind_speed_m_s}{Finite, nonnegative wind speed in metres per second.}
+\item{wind_height_m}{Finite, positive wind measurement height in metres.}
+\item{vertical_temperature_difference_c}{Finite upper-minus-lower temperature
 difference in degrees Celsius. Only whether it is \code{< 0} or \code{>= 0} is
 used. It can affect results only for rural nighttime records when
 \code{wind_height_m} differs from 2 m and \code{wind_speed_m_s} is below 2.5.}
@@ -32,7 +39,9 @@ used. It can affect results only for rural nighttime records when
 \value{A plain data frame with the 17 native input columns.}
 \description{
 Constructs one or more input rows. All arguments are required; scalar values
-are recycled to the common non-scalar length.
+are recycled to the common non-scalar length. Row values are validated by
+\code{\link{calculate}}, rather than by this constructor. Valid input ranges
+do not guarantee solver convergence.
 }
 \examples{
 input <- lwbgt_input(
