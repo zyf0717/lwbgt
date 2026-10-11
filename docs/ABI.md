@@ -78,6 +78,8 @@ int lwbgt_calc_batch_v1(
   The function return reports call validity; each row has its own `status`.
 - Row status is 0 on success or -1 for solar-position rejection or failure of
   the globe or natural wet-bulb solver to converge.
+- The independent psychrometric solve can return -9999 while row status is 0;
+  its convergence does not determine native WBGT status.
 - Solar rejection sets all five numerical outputs to -9999. On solver
   non-convergence, the failed temperature and WBGT are -9999; other outputs
   may remain valid.
@@ -156,6 +158,6 @@ and original oracle are not compiled by MSVC.
 | Binding | Behavior |
 |---|---|
 | Python | `Input` and `Result` map to the v1 structures. Both calculation functions use the extended batch ABI with keyword-only `psychrometric=True` by default; `False` returns `-9999` for that field. `esat` calls the scalar symbol. The bundled runtime loads through `ctypes` and `importlib.resources`. No extra input or failure policy. |
-| R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. `calculate(input, psychrometric=TRUE)` includes the independent solve by default; `FALSE` returns `NA` for that column. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
+| R | Compiles synchronized kernel sources and calls the scalar API through `.Call`. `calculate(input, psychrometric=TRUE)` requires the independent solve to converge; `FALSE` skips it and returns `NA` for that column. All requested solver failures give status -1 and `NA` numerical outputs. Adds recycling, validation, R-specific statuses, warnings, and `NA` substitution; see the [R quick start](https://github.com/zyf0717/lwbgt/blob/main/r/README.md). |
 | Julia | [LWBGT.jl](https://github.com/zyf0717/LWBGT.jl) maps immutable `Input` and `Result` records to the v1 structures and loads the native library through `lwbgt_jll`. Both calculation functions use the serial batch ABI; `esat` calls the scalar symbol. No extra input or failure policy. |
 | SwiftPM | `CLWBGT` builds the canonical C sources and exposes the header directly. It is a C-library product, not a Swift wrapper. |

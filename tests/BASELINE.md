@@ -38,8 +38,10 @@ Other compiler, architecture, and math-library combinations may differ.
 | Seeded nominal | 5,000 | 5 | Air -10–45 °C, pressure 700–1,100 hPa, RH 10–100%, wind 0–15 m/s, height 1–30 m, solar 0–1,200 W/m² |
 | Seeded stress | 5,000 | 2,035 | Air -80–65 °C, pressure 200–1,100 hPa, RH 0.001–100%, wind 0–40 m/s, height 0.1–100 m, solar 0–2,000 W/m² |
 
-There are **32,900 successful solves and 3,076 failures**. Failure status means
-at least one temperature solve failed; other outputs can still be finite.
+There are **32,900 successful WBGT solves and 3,076 failures**. Failure status
+means the globe or natural wet-bulb solve failed; other outputs can still be
+finite. In the matched Linux baseline, another 445 rows have a failed independent
+psychrometric solve while native WBGT status remains zero.
 Success cohorts in `compare.py` must converge. Extreme and seeded cohorts
 retain failure behavior; five nominal-range cases fail, so nominal ranges alone
 do not guarantee convergence.

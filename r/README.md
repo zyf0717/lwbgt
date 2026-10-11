@@ -1,7 +1,12 @@
 # lwbgt
 
-`lwbgt` provides dependency-free, vectorized R access to the Liljegren WBGT
-kernel. Input names and units match the native and Python APIs.
+`lwbgt` provides dependency-free, vectorized R access to the Liljegren outdoor
+WBGT C kernel. The same numerical kernel powers the
+[Python](https://pypi.org/project/lwbgt/),
+[Julia](https://github.com/zyf0717/LWBGT.jl),
+[Swift](https://github.com/zyf0717/lwbgt#swiftpm), and
+[native C](https://github.com/zyf0717/lwbgt#native-c) interfaces.
+Input names and units match the native and Python APIs.
 
 Install from CRAN:
 
@@ -33,7 +38,15 @@ esat(273.15)
 
 `calculate(input, psychrometric = FALSE)` skips the independent psychrometric
 wet-bulb solve and returns `NA` for that column. It is calculated by default;
-the other outputs retain their existing behavior.
+the other calculations are unchanged. Skipping a failed psychrometric solve
+can allow a row to return successful WBGT results.
 
 Rows with missing, invalid, or non-convergent inputs return a nonzero status
 and `NA` numerical outputs without preventing other rows from being calculated.
+
+See the [input guide](https://github.com/zyf0717/lwbgt/blob/main/docs/INPUTS.md)
+for sourcing and fallback assumptions, the
+[compatibility policy](https://github.com/zyf0717/lwbgt/blob/main/docs/COMPATIBILITY.md)
+for numerical guarantees and reference comparisons, and the
+[documentation index](https://github.com/zyf0717/lwbgt/blob/main/docs/README.md)
+for the shared kernel and its interfaces.

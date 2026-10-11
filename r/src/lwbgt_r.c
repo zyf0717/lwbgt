@@ -339,7 +339,8 @@ static SEXP lwbgt_r_calculate(SEXP input, SEXP psychrometric)
             &wbgt
         );
 
-        if (native_status == STATUS_SOLVER_FAILURE) {
+        if (native_status == STATUS_SOLVER_FAILURE ||
+            (include_psychrometric && psychrometric_wet_bulb == -9999.0f)) {
             INTEGER(status_column)[index] = STATUS_SOLVER_FAILURE;
             SET_STRING_ELT(message_column, index, mkChar("solver did not converge"));
             continue;

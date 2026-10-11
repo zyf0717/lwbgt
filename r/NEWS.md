@@ -1,3 +1,11 @@
+# lwbgt 1.2.1
+
+- Treat failure of a requested psychrometric solve as status -1 with `NA`
+  numerical outputs. Skipping that solve can still yield successful WBGT results.
+- Replace non-finite `esat()` results with `NA` and include them in the warning.
+- Link other interfaces to the shared C kernel and expand input/output documentation.
+- Synchronize with the shared patch release; native numerical results are unchanged.
+
 # lwbgt 1.2.0
 
 - Add `calculate(input, psychrometric = FALSE)` to skip the independent

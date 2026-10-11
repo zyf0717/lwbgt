@@ -19,6 +19,10 @@ jobs:
       - name: Require an annotated tag object
         run: test "$(git cat-file -t "$GITHUB_REF_NAME")" = tag
 
+  native:
+    needs: release-tag
+    uses: ./.github/workflows/native.yml
+
   artifacts:
     needs: release-tag
     uses: ./.github/workflows/python.yml
@@ -29,7 +33,7 @@ jobs:
 
   testpypi-publish:
     name: Publish verified artifacts to TestPyPI
-    needs: [artifacts, r-artifact]
+    needs: [native, artifacts, r-artifact]
     runs-on: ubuntu-24.04
     environment:
       name: testpypi

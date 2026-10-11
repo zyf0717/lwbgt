@@ -43,10 +43,14 @@
 #' common length of the non-scalar arguments.
 #'
 #' @param year Integer-valued Gregorian year from 1950 through 2049.
-#' @param month,day,hour,minute Integer-valued local date and time fields.
+#' @param month,day,hour,minute Integer-valued local standard date and time fields.
 #'   A `month` of zero makes `day` a day-of-year value.
-#' @param gmt_offset_hours Local standard time minus GMT, in whole hours.
-#' @param averaging_minutes Input averaging interval, in minutes.
+#' @param gmt_offset_hours Local standard time minus GMT, in whole hours from
+#'   -12 through 14. Convert daylight-saving or fractional-offset timestamps to
+#'   standard time or UTC first.
+#' @param averaging_minutes Integer interval from 0 through 1440 minutes.
+#'   The kernel subtracts half the interval to center the supplied timestamp.
+#'   Use zero for instantaneous or already centered observations.
 #' @param urban Zero for rural wind scaling or one for urban wind scaling.
 #' @param latitude_deg_north,longitude_deg_east Geographic coordinates in
 #'   degrees north and degrees east.
@@ -120,7 +124,8 @@ lwbgt_input <- function(
 #' @param input A data frame containing the columns produced by
 #'   [lwbgt_input()]. Additional columns are ignored.
 #' @param psychrometric Calculate psychrometric wet-bulb temperature, default
-#'   `TRUE`. With `FALSE`, that column is `NA` and other results are unchanged.
+#'   `TRUE`. With `FALSE`, that column is `NA`; the other calculations are
+#'   unchanged. Skipping a failed psychrometric solve can allow a row to succeed.
 #'
 #' @return A plain data frame containing `status`, `status_message`,
 #'   `estimated_wind_speed_m_s`, `globe_temperature_c`,
@@ -164,7 +169,8 @@ calculate <- function(input, psychrometric = TRUE) {
 #'   the Python wrapper.
 #'
 #' @return A numeric vector in hectopascals. Missing inputs propagate to `NA`.
-#'   Invalid non-missing inputs also return `NA` and produce one warning.
+#'   Invalid non-missing inputs or non-finite native results also return `NA`
+#'   and produce one warning per call.
 #' @export
 esat <- function(temperature_k, phase = 0L) {
     if (!is.numeric(temperature_k)) {
@@ -178,18 +184,21 @@ esat <- function(temperature_k, phase = 0L) {
     phase <- as.double(fields[[2L]])
     missing <- (is.na(temperature_k) & !is.nan(temperature_k)) |
         (is.na(phase) & !is.nan(phase))
+    result <- .Call(C_lwbgt_esat, temperature_k, phase)
     invalid <- !missing & (
         !is.finite(temperature_k) |
         temperature_k <= 0 |
         !is.finite(phase) |
         phase != trunc(phase) |
-        !phase %in% c(0, 1)
+        !phase %in% c(0, 1) |
+        !is.finite(result)
     )
     if (any(invalid)) {
         indices <- which(invalid)
         shown <- paste(indices[seq_len(min(length(indices), 10L))], collapse = ", ")
         suffix <- if (length(indices) > 10L) ", ..." else ""
-        warning(sprintf("invalid temperature_k or phase at rows: %s%s", shown, suffix), call. = FALSE)
+        warning(sprintf("invalid temperature_k, phase, or native result at rows: %s%s", shown, suffix), call. = FALSE)
     }
-    .Call(C_lwbgt_esat, temperature_k, phase)
+    result[invalid] <- NA_real_
+    result
 }
