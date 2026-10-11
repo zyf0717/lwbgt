@@ -45,9 +45,11 @@ jobs:
           "CC=${{ steps.mingw.outputs.gcc }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "CXX=${{ steps.mingw.outputs.gxx }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Configure
+        # Exercise relocation with a nested installation library directory.
         run: >-
           cmake -S . -B build -G Ninja
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_LIBDIR=lib/lwbgt-test
       - name: Build
         run: cmake --build build --parallel
       - name: Test

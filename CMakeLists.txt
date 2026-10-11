@@ -302,6 +302,9 @@ write_basic_package_version_file(
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
+file(RELATIVE_PATH LWBGT_PC_PREFIX_RELATIVE
+    "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
+    "${CMAKE_INSTALL_PREFIX}")
 configure_file(cmake/lwbgt.pc.in "${CMAKE_CURRENT_BINARY_DIR}/lwbgt.pc" @ONLY)
 
 install(TARGETS lwbgt lwbgt_shared

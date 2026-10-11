@@ -6,7 +6,7 @@ status codes, and ownership rules. Tests verify that contract:
 | Check | Coverage |
 |---|---|
 | `shared_exports`, `python_runtime_exports` | Only `calc_wbgt`, `esat`, and `lwbgt_calc_batch_v1` are exported by shared runtimes |
-| `installed_consumer` | Installed C/C++ headers, structure sizes/offsets, linkage, SONAME, and accompanying documents |
+| `installed_consumer` | Installed C/C++ headers, structure sizes/offsets, CMake and available `pkg-config` linkage, relocation, SONAME, and accompanying documents |
 | Whole-corpus compatibility probes | Status and output bits against the retained original through static and Python-runtime libraries |
 | Water/ice probes | Both `esat` phases, rounding boundaries, and non-finite temperatures |
 | Internal branch diagnostics | Stability classes and adjacent horizon/clipping inputs; helpers remain unsupported API |
