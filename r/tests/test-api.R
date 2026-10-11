@@ -263,6 +263,10 @@ stopifnot(
 )
 invalid_esat <- assert_warning(esat(c(0, 273.15), c(0, 2)))
 stopifnot(all(is.na(invalid_esat)))
+nonfinite_esat <- assert_warning(esat(c(273.15, 32.17, 0.59, 1e300), c(0, 0, 1, 0)))
+assert_float_equal(nonfinite_esat[[1L]], esat(273.15))
+stopifnot(all(is.na(nonfinite_esat[-1L])))
+stopifnot(identical(esat(c(NA_real_, 273.15)), c(NA_real_, esat(273.15))))
 
 assert_error(calculate(list()))
 assert_error(calculate(singapore[-1L]))

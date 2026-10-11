@@ -165,7 +165,8 @@ calculate <- function(input, psychrometric = TRUE) {
 #'   the Python wrapper.
 #'
 #' @return A numeric vector in hectopascals. Missing inputs propagate to `NA`.
-#'   Invalid non-missing inputs also return `NA` and produce one warning.
+#'   Invalid non-missing inputs or non-finite native results also return `NA`
+#'   and produce one warning per call.
 #' @export
 esat <- function(temperature_k, phase = 0L) {
     if (!is.numeric(temperature_k)) {
@@ -179,18 +180,21 @@ esat <- function(temperature_k, phase = 0L) {
     phase <- as.double(fields[[2L]])
     missing <- (is.na(temperature_k) & !is.nan(temperature_k)) |
         (is.na(phase) & !is.nan(phase))
+    result <- .Call(C_lwbgt_esat, temperature_k, phase)
     invalid <- !missing & (
         !is.finite(temperature_k) |
         temperature_k <= 0 |
         !is.finite(phase) |
         phase != trunc(phase) |
-        !phase %in% c(0, 1)
+        !phase %in% c(0, 1) |
+        !is.finite(result)
     )
     if (any(invalid)) {
         indices <- which(invalid)
         shown <- paste(indices[seq_len(min(length(indices), 10L))], collapse = ", ")
         suffix <- if (length(indices) > 10L) ", ..." else ""
-        warning(sprintf("invalid temperature_k or phase at rows: %s%s", shown, suffix), call. = FALSE)
+        warning(sprintf("invalid temperature_k, phase, or native result at rows: %s%s", shown, suffix), call. = FALSE)
     }
-    .Call(C_lwbgt_esat, temperature_k, phase)
+    result[invalid] <- NA_real_
+    result
 }
