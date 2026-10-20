@@ -3,6 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/lwbgt.svg)](https://pypi.org/project/lwbgt/)
 [![CRAN](https://img.shields.io/cran/v/lwbgt.svg)](https://cran.r-project.org/web/packages/lwbgt/index.html)
 [![R-universe](https://zyf0717.r-universe.dev/lwbgt/badges/version)](https://zyf0717.r-universe.dev/lwbgt)
+[![Julia General](https://img.shields.io/badge/Julia-General-9558B2.svg)](https://github.com/JuliaRegistries/General/tree/master/L/LWBGT)
 
 `lwbgt` computes outdoor wet bulb globe temperature (WBGT) using the original
 Argonne Liljegren C calculation. One optimized C kernel serves the C/FFI,
